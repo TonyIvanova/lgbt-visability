@@ -1,7 +1,8 @@
 import "./App.css";
-import Test from "./components/Test";
+import Map from "./components/Map";
 import { createContext, useEffect, useState } from "react";
 import { getAirtableData } from "./services/airtableService";
+import mapData from "./assets/geodata/mapData.json";
 
 export const DataContext = createContext(null);
 
@@ -17,7 +18,7 @@ function App() {
   return (
     <div className="App">
       <DataContext.Provider value={data}>
-        <Test />
+        <Map mapData={mapData} />
       </DataContext.Provider>
     </div>
   );
