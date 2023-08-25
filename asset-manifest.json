@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/lgbt-visability/static/css/main.073c9b0a.css",
+    "main.js": "/lgbt-visability/static/js/main.0f6952ff.js",
+    "static/js/787.d48df502.chunk.js": "/lgbt-visability/static/js/787.d48df502.chunk.js",
+    "static/media/logo.svg": "/lgbt-visability/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
+    "index.html": "/lgbt-visability/index.html",
+    "main.073c9b0a.css.map": "/lgbt-visability/static/css/main.073c9b0a.css.map",
+    "main.0f6952ff.js.map": "/lgbt-visability/static/js/main.0f6952ff.js.map",
+    "787.d48df502.chunk.js.map": "/lgbt-visability/static/js/787.d48df502.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.073c9b0a.css",
+    "static/js/main.0f6952ff.js"
+  ]
+}
