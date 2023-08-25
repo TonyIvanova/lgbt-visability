@@ -1,3 +1,9 @@
+# Project Dev Setup
+
+- Run npm install
+- Create .env file in root folder with relevant API keys
+- Enjoy!
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
