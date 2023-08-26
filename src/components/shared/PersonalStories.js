@@ -12,22 +12,42 @@ export default function PersonalStories({ stories }) {
     }
   };
 
+  const onPreviousClick = () => {
+    if (storyIndex > 0) {
+      setStoryIndex(storyIndex - 1);
+    } else if (storyIndex === 0) {
+      setStoryIndex(stories.length - 1);
+    }
+  };
+
   const getStory = () => {
     return (
       <div className="personal-stories">
+        <img
+          src={arrow}
+          className="arrow left"
+          alt=""
+          onClick={onPreviousClick}
+          style={{ width: 24 }}
+        />
         <div className="personal-story-card">
           <p>{stories[storyIndex].message}</p>
           <p>{stories[storyIndex].signature}</p>
         </div>
-
-        <img src={arrow} alt="" onClick={onNextClick} style={{ width: 32 }} />
+        <img
+          src={arrow}
+          className="arrow"
+          alt=""
+          onClick={onNextClick}
+          style={{ width: 24 }}
+        />
       </div>
     );
   };
 
   return (
     <div className="personal-stories-container">
-      <h2>Истории</h2>
+      <h2 className="container">Истории</h2>
       {getStory()}
     </div>
   );

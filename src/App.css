@@ -171,26 +171,61 @@ header {
 
 .personal-stories {
   display: grid;
-  grid-template-columns: 1fr 34px;
+  grid-template-columns: 24px 800px 24px;
+  justify-content: center;
   gap: 16px;
   align-items: center;
-  margin: 32px;
-  width: 100%;
+  margin: 32px 0;
   padding: 16px;
   margin: 0 auto;
-  max-width: 832px;
   text-align: left;
-  background-color: #f4f3ee;
-  border-radius: 30px;
 }
 
 .personal-story-card > p:nth-child(2) {
   text-align: right;
+  font-style: italic;
+  color: #6e6e6e;
 }
-
+.personal-story-card {
+  background-color: #f4f3ee;
+  border-radius: 30px;
+  padding: 32px; 
+}
 .personal-stories-container {
-
   text-align: left;
   margin: 32px auto;
-  max-width: 800px;
+}
+
+.container {
+  width: 800px; 
+  margin: 0 auto; 
+}
+
+
+.arrow {
+  cursor: pointer; 
+  opacity: 0.6; 
+  animation: taadaa 2s infinite;
+}
+
+.arrow:hover {
+  opacity: 1; 
+}
+
+.arrow.left {
+  transform: rotate(180deg);
+}
+
+@keyframes taadaa { 
+  0% {
+    scale: 0.9;
+  }
+
+  50% {
+    scale: 1;
+  }
+
+   100% {
+    scale: 0.9;
+  }
 }
