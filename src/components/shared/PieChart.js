@@ -1,76 +1,98 @@
-import React, { useEffect } from "react";
-import { DataContext } from "../../App";
+import React, { useRef, useMemo } from "react";
+
 import * as d3 from "d3";
+import styles from "./pie-chart.module.css";
+export default function PieChart({ data }) {
+  const width = 200;
+  const height = width;
 
-export default function PieChart(props) {
-  const { data } = props;
-  const outerRadius = 100;
-  const innerRadius = outerRadius * 0.6;
+  const colors = [
+    "#00876c",
+    "#51a676",
+    "#88c580",
+    "#c2e38c",
+    "#ffff9d",
+    "#fdd172",
+    "#f7a258",
+    "#ea714e",
+    "#d43d51",
+  ];
 
-  const margin = {
-    top: 50,
-    right: 50,
-    bottom: 50,
-    left: 50,
-  };
+  const ref = useRef(null);
 
-  const width = 2 * outerRadius + margin.left + margin.right;
-  const height = 2 * outerRadius + margin.top + margin.bottom;
+  const radius = width / 2;
 
-  const colorScale = d3
-    .scaleSequential()
-    .interpolator(d3.interpolateCool)
-    .domain([0, data.length]);
-
-  useEffect(() => {
-    drawChart();
+  const pie = useMemo(() => {
+    const pieGenerator = d3.pie().value((d) => d.value);
+    return pieGenerator(data);
   }, [data]);
 
-  function drawChart() {
-    // Remove the old svg
-    d3.select("#pie-container").select("svg").remove();
+  const arcGenerator = d3.arc();
 
-    // Create new svg
-    const svg = d3
-      .select("#pie-container")
-      .append("svg")
-      .attr("width", width)
-      .attr("height", height)
-      .append("g")
-      .attr("transform", `translate(${width / 2}, ${height / 2})`);
+  const shapes = pie.map((arc, i) => {
+    const sliceInfo = {
+      innerRadius: radius * 0.7,
+      outerRadius: radius,
+      startAngle: arc.startAngle,
+      endAngle: arc.endAngle,
+    };
 
-    const arcGenerator = d3
-      .arc()
-      .innerRadius(innerRadius)
-      .outerRadius(outerRadius);
+    const slicePath = arcGenerator(sliceInfo);
 
-    const pieGenerator = d3
-      .pie()
-      .padAngle(0)
-      .value((d) => d.value);
+    return (
+      <g
+        key={i}
+        className={styles.slice}
+        onMouseEnter={() => {
+          if (ref.current) {
+            ref.current.classList.add(styles.hasHighlight);
+          }
+        }}
+        onMouseLeave={() => {
+          if (ref.current) {
+            ref.current.classList.remove(styles.hasHighlight);
+          }
+        }}
+        onClick={() => {
+          console.info(arc.data.name);
+          console.info(arc.data.value);
+        }}
+      >
+        <path d={slicePath} fill={colors[i]} />
+      </g>
+    );
+  });
 
-    const arc = svg.selectAll().data(pieGenerator(data)).enter();
+  const legend = pie.map((arc, i) => {
+    return (
+      <>
+        <div className={styles.legendText}>
+          <div
+            style={{
+              background: colors[i],
+              width: 10,
+              height: 10,
+              "border-radius": 10,
+            }}
+          ></div>
+          {arc.data.name}
+        </div>
+      </>
+    );
+  });
 
-    // Append arcs
-    arc
-      .append("path")
-      .attr("d", arcGenerator)
-      .style("fill", (_, i) => colorScale(i))
-      .style("stroke", "#ffffff")
-      .style("stroke-width", 0);
-
-    // Append text labels
-    arc
-      .append("text")
-      .attr("text-anchor", "middle")
-      .attr("alignment-baseline", "middle")
-      .text((d) => d.data.label)
-      .style("fill", (_, i) => colorScale(data.length - i))
-      .attr("transform", (d) => {
-        const [x, y] = arcGenerator.centroid(d);
-        return `translate(${x}, ${y})`;
-      });
-  }
-
-  return <div id="pie-container" />;
+  return (
+    <div className={styles.pieChart}>
+      <svg width={width} height={height} style={{ display: "inline-block" }}>
+        <g
+          transform={`translate(${width / 2}, ${height / 2})`}
+          className={styles.container}
+          ref={ref}
+        >
+          {shapes}
+        </g>
+      </svg>
+      <div className={styles.legendContainer}>{legend}</div>
+    </div>
+  );
 }

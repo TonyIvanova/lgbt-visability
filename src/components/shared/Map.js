@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { select } from "d3";
 import * as d3 from "d3-geo";
-
+import Tooltip from "./Tooltip";
 function Map({ mapData }) {
   const projection = d3
     .geoConicConformal()
@@ -15,7 +15,6 @@ function Map({ mapData }) {
     return mapData.features.map((d) => {
       return (
         <>
-          {console.info(d.properties)}
           <path
             key={d.properties.Name}
             name={d.properties.Name}

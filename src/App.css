@@ -29,7 +29,6 @@
 .map {
   width: 500px;
   height: 300px;
-  
 }
 
 header img {
@@ -140,7 +139,7 @@ header {
   margin: 0;
   border-radius: 0;
   border-right-width: 0;
-  border-width: 1px; 
+  border-width: 1px;
   border-color: #413a2e40;
 }
 .button-group > button:last-child {
@@ -150,7 +149,48 @@ header {
 }
 
 .section {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tooltip {
+  position: absolute;
+  right: 110%;
+  margin-top: 1.5rem;
+  top: -7rem;
+  width: 14rem;
+  height: 14rem;
+}
+
+.conclusions {
+  margin: 0 auto;
+  max-width: 800px;
+  text-align: left;
+}
+
+.personal-stories {
+  display: grid;
+  grid-template-columns: 1fr 34px;
+  gap: 16px;
+  align-items: center;
+  margin: 32px;
+  width: 100%;
+  padding: 16px;
+  margin: 0 auto;
+  max-width: 832px;
+  text-align: left;
+  background-color: #f4f3ee;
+  border-radius: 30px;
+}
+
+.personal-story-card > p:nth-child(2) {
+  text-align: right;
+}
+
+.personal-stories-container {
+
+  text-align: left;
+  margin: 32px auto;
+  max-width: 800px;
 }
