@@ -13,7 +13,7 @@ function App() {
   const [data, setData] = useState(null);
   const [sections, setSections] = useState(null);
   const [topic, setTopic] = useState(null);
-  const [conclusions, setConclusions] = useState([]);
+ 
 
   useEffect(() => {
     getAirtableData("configuration_2022").then((data) => {
@@ -22,13 +22,6 @@ function App() {
     });
   }, []);
 
-  useEffect(() => {
-    getAirtableData("conclusions_2022").then((data) => {
-      setConclusions(data.filter((row) => row.name === topic));
-      console.info(conclusions);
-    });
-  }, [topic]);
-
   const selectTopic = (event) => {
     setTopic(event.target.name);
   };
@@ -36,7 +29,7 @@ function App() {
   const topicComponent = () => {
     return (
       <>
-        <Section name={topic} conclusions={conclusions} />
+        <Section topic={topic} />
       </>
     );
   };

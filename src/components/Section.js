@@ -1,16 +1,23 @@
-import React, { useContext } from "react";
-import { DataContext } from "../App";
+import React, { useState, useEffect } from "react";
 import PieChart from "./shared/PieChart";
 import Map from "./shared/Map";
 import mapData from "./../assets/geodata/mapData.json";
 import PersonalStories from "./shared/PersonalStories";
+import { getAirtableData } from ".././services/airtableService";
 
-export default function Section({ name, conclusions }) {
-  const data = useContext(DataContext);
+export default function Section({ topic }) {
+  const [conclusions, setConclusions] = useState([]);
+
+  useEffect(() => {
+    getAirtableData("conclusions_2022").then((data) => {
+      setConclusions(data.filter((row) => row.name === topic));
+      console.info(conclusions);
+    });
+  }, [topic]);
 
   return (
     <div>
-      <h2>{name}</h2>
+      <h2>{topic}</h2>
       <div className="section">
         <Map mapData={mapData} />
         <PieChart data={pieChartData} />
@@ -22,7 +29,7 @@ export default function Section({ name, conclusions }) {
         })}
       </div>
       <div>
-        <PersonalStories stories={personalStories} />
+        <PersonalStories topic={topic} />
       </div>
     </div>
   );
@@ -33,7 +40,6 @@ export const pieChartData = [
   { name: "мало", value: 12 },
   { name: "средне", value: 34 },
 ];
-
 
 const personalStories = [
   {

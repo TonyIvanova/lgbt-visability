@@ -1,8 +1,42 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import arrow from "./../../assets/arrow.svg";
+import { getAirtableData } from "../../services/airtableService";
+export default function PersonalStories({ topic }) {
+  const [storyIndex, setStoryIndex] = useState(null);
+  const [stories, setStories] = useState([]);
 
-export default function PersonalStories({ stories }) {
-  const [storyIndex, setStoryIndex] = useState(0);
+  useEffect(() => {
+    getAirtableData("stories_2022").then((data) => {
+      const datas = data.filter((row) => row.name === topic);
+      setStories(datas);
+      setStoryIndex(0);
+      console.info(stories);
+    });
+  }, [topic]);
+  const getStory = () => {
+    return (
+      <div className="personal-stories">
+        <img
+          src={arrow}
+          className="arrow left"
+          alt=""
+          onClick={onPreviousClick}
+          style={{ width: 24 }}
+        />
+        <div className="personal-story-card">
+          <p>{stories[storyIndex].text}</p>
+          <p>{stories[storyIndex].author}</p>
+        </div>
+        <img
+          src={arrow}
+          className="arrow"
+          alt=""
+          onClick={onNextClick}
+          style={{ width: 24 }}
+        />
+      </div>
+    );
+  };
 
   const onNextClick = () => {
     if (storyIndex < stories.length - 1) {
@@ -20,35 +54,14 @@ export default function PersonalStories({ stories }) {
     }
   };
 
-  const getStory = () => {
+  if (storyIndex != null) {
     return (
-      <div className="personal-stories">
-        <img
-          src={arrow}
-          className="arrow left"
-          alt=""
-          onClick={onPreviousClick}
-          style={{ width: 24 }}
-        />
-        <div className="personal-story-card">
-          <p>{stories[storyIndex].message}</p>
-          <p>{stories[storyIndex].signature}</p>
-        </div>
-        <img
-          src={arrow}
-          className="arrow"
-          alt=""
-          onClick={onNextClick}
-          style={{ width: 24 }}
-        />
+      <div className="personal-stories-container">
+        <h2 className="container">Истории</h2>
+        {getStory()}
       </div>
     );
-  };
-
-  return (
-    <div className="personal-stories-container">
-      <h2 className="container">Истории</h2>
-      {getStory()}
-    </div>
-  );
+  } else {
+    return <>loading</>;
+  }
 }
