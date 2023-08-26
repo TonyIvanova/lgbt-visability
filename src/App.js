@@ -4,6 +4,7 @@ import { getAirtableData } from "./services/airtableService";
 import Header from "./components/Header";
 import bg1 from "./assets/bg1.svg";
 import bg2 from "./assets/bg2.svg";
+import loader from "./assets/loader.gif";
 import ButtonGroup from "./components/shared/ButtonGroup";
 import Section from "./components/Section";
 
@@ -13,7 +14,6 @@ function App() {
   const [data, setData] = useState(null);
   const [sections, setSections] = useState(null);
   const [topic, setTopic] = useState(null);
- 
 
   useEffect(() => {
     getAirtableData("configuration_2022").then((data) => {
@@ -49,7 +49,15 @@ function App() {
       </div>
     );
   } else {
-    return <>Loading</>;
+    return (
+      <div className="App">
+        <Header />
+        <h1>Положение лгбт+ людей в россии на 2022 год</h1>
+        <img src={loader} alt=""></img>
+        <img src={bg1} alt="" className="background-image-1"></img>
+        <img src={bg2} alt="" className="background-image-2"></img>
+      </div>
+    );
   }
 }
 
