@@ -3,7 +3,7 @@ import React, { useRef, useMemo } from "react";
 import * as d3 from "d3";
 import styles from "./pie-chart.module.css";
 export default function PieChart({ data }) {
-  const width = 200;
+  const width = 150;
   const height = width;
 
   const colors = [
@@ -31,7 +31,7 @@ export default function PieChart({ data }) {
 
   const shapes = pie.map((arc, i) => {
     const sliceInfo = {
-      innerRadius: radius * 0.7,
+      innerRadius: radius * 0.6,
       outerRadius: radius,
       startAngle: arc.startAngle,
       endAngle: arc.endAngle,
@@ -54,8 +54,8 @@ export default function PieChart({ data }) {
           }
         }}
         onClick={() => {
-          console.info(arc.data.name);
-          console.info(arc.data.value);
+          // console.info(arc.data.name);
+          // console.info(arc.data.value);
         }}
       >
         <path d={slicePath} fill={colors[i]} />

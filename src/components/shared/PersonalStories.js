@@ -10,7 +10,6 @@ export default function PersonalStories({ topic }) {
       const datas = data.filter((row) => row.name === topic);
       setStories(datas);
       setStoryIndex(0);
-      console.info(stories);
     });
   }, [topic]);
   const getStory = () => {

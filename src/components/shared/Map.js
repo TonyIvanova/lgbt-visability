@@ -2,7 +2,9 @@ import React, { useMemo } from "react";
 import { select } from "d3";
 import * as d3 from "d3-geo";
 import Tooltip from "./Tooltip";
-function Map({ mapData }) {
+import mapData from "./../../assets/geodata/mapData.json";
+
+function Map({ statistics }) {
   const projection = d3
     .geoConicConformal()
     .scale(300)
