@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 const ButtonGroup = ({ buttons, doSomethingAfterClick }) => {
-  const [clickedId, setClickedId] = useState(-1);
+  const [clickedId, setClickedId] = useState(0);
 
   const handleClick = (event, id) => {
     setClickedId(id);

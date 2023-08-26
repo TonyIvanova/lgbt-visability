@@ -1,12 +1,9 @@
 import "./App.css";
-import Map from "./components/shared/Map";
 import { createContext, useEffect, useState } from "react";
 import { getAirtableData } from "./services/airtableService";
-import mapData from "./assets/geodata/mapData.json";
 import Header from "./components/Header";
 import bg1 from "./assets/bg1.svg";
 import bg2 from "./assets/bg2.svg";
-import PieChart from "./components/shared/PieChart";
 import ButtonGroup from "./components/shared/ButtonGroup";
 import Section from "./components/Section";
 
@@ -14,47 +11,53 @@ export const DataContext = createContext(null);
 
 function App() {
   const [data, setData] = useState(null);
-  const [topic, setTopic] = useState(sections[0]);
+  const [sections, setSections] = useState(null);
+  const [topic, setTopic] = useState(null);
+  const [conclusions, setConclusions] = useState([]);
 
   useEffect(() => {
-    getAirtableData("LGBT Data").then((data) => {
-      setData(data);
+    getAirtableData("configuration_2022").then((data) => {
+      setSections(data.map((row) => row.section_title));
+      setTopic(data[0].section_title);
     });
   }, []);
 
+  useEffect(() => {
+    getAirtableData("conclusions_2022").then((data) => {
+      setConclusions(data.filter((row) => row.name === topic));
+      console.info(conclusions);
+    });
+  }, [topic]);
+
   const selectTopic = (event) => {
     setTopic(event.target.name);
-    console.info(topic);
   };
 
   const topicComponent = () => {
     return (
       <>
-        <Section name={topic} />
+        <Section name={topic} conclusions={conclusions} />
       </>
     );
   };
 
-  return (
-    <div className="App">
-      <Header />
+  if (sections) {
+    return (
+      <div className="App">
+        <Header />
 
-      <h1>Положение лгбт+ людей в россии на 2022 год</h1>
-      <ButtonGroup buttons={sections} doSomethingAfterClick={selectTopic} />
-      <div className="topic-component">{topicComponent()}</div>
-      <DataContext.Provider value={data}>
+        <h1>Положение лгбт+ людей в россии на 2022 год</h1>
+        <ButtonGroup buttons={sections} doSomethingAfterClick={selectTopic} />
+        <div className="topic-component">{topicComponent()}</div>
+        {/* <DataContext.Provider value={{ data, conclusions }}> */}
         <img src={bg1} alt="" className="background-image-1"></img>
         <img src={bg2} alt="" className="background-image-2"></img>
-      </DataContext.Provider>
-    </div>
-  );
+        {/* </DataContext.Provider> */}
+      </div>
+    );
+  } else {
+    return <>Loading</>;
+  }
 }
 
 export default App;
-
-const sections = [
-  "Экономическое положение",
-  "Насилие",
-  "Взаимодействие с правоохранительными органами",
-  "Влияние войны в Украине",
-]; 

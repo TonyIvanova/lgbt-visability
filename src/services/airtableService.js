@@ -14,7 +14,7 @@ export function getAirtableData(tableName) {
       })
       .eachPage(
         function page(records, fetchNextPage) {
-          data.push(records.map((record) => record.fields));
+          data.push(...records.map((record) => record.fields));
           fetchNextPage();
         },
         function done(err) {
