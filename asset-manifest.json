@@ -1,18 +1,21 @@
 {
   "files": {
-    "main.css": "/lgbt-visability/static/css/main.953a6e2f.css",
-    "main.js": "/lgbt-visability/static/js/main.441f6f26.js",
+    "main.css": "/lgbt-visability/static/css/main.18517402.css",
+    "main.js": "/lgbt-visability/static/js/main.689bc9aa.js",
     "static/js/787.d48df502.chunk.js": "/lgbt-visability/static/js/787.d48df502.chunk.js",
     "static/media/Stolzl-Regular.woff2": "/lgbt-visability/static/media/Stolzl-Regular.5cbda06fcf6155861c21.woff2",
     "static/media/Stolzl-Medium.woff2": "/lgbt-visability/static/media/Stolzl-Medium.e48c0686c6dfd1db2c68.woff2",
     "static/media/helveticaneuecyr-heavy.woff2": "/lgbt-visability/static/media/helveticaneuecyr-heavy.31abf4828115acce8d4e.woff2",
+    "static/media/bg1.svg": "/lgbt-visability/static/media/bg1.839ea45ce25d21e594634f997a3bb141.svg",
+    "static/media/logo.svg": "/lgbt-visability/static/media/logo.20ceefc72b3462ffe16aa0c46e3dfff2.svg",
+    "static/media/bg2.svg": "/lgbt-visability/static/media/bg2.a177e241f3279be135fb8cd3f292c2f6.svg",
     "index.html": "/lgbt-visability/index.html",
-    "main.953a6e2f.css.map": "/lgbt-visability/static/css/main.953a6e2f.css.map",
-    "main.441f6f26.js.map": "/lgbt-visability/static/js/main.441f6f26.js.map",
+    "main.18517402.css.map": "/lgbt-visability/static/css/main.18517402.css.map",
+    "main.689bc9aa.js.map": "/lgbt-visability/static/js/main.689bc9aa.js.map",
     "787.d48df502.chunk.js.map": "/lgbt-visability/static/js/787.d48df502.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.953a6e2f.css",
-    "static/js/main.441f6f26.js"
+    "static/css/main.18517402.css",
+    "static/js/main.689bc9aa.js"
   ]
 }
