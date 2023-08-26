@@ -4,7 +4,6 @@ import PieChart from "./shared/PieChart";
 import { getAirtableData } from ".././services/airtableService";
 
 export default function Statistics({ topic }) {
-  const [data, setData] = useState([]);
   const [chartData, setChartData] = useState([]);
   const [mapData, setMapData] = useState([]);
 
@@ -31,19 +30,19 @@ export default function Statistics({ topic }) {
   };
 
   const parseMapData = (res) => {
-    console.info(res);
-    res.map((row) => {
+    const result = res.map((row) => {
       return {
         name: row.District,
         value: row.All,
       };
     });
+    return result;
   };
 
   if (chartData) {
     return (
       <div className="section">
-        <Map data={data} />
+        <Map statistics={mapData} />
         <PieChart data={chartData} />
       </div>
     );
