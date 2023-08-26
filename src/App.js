@@ -3,6 +3,7 @@ import Map from "./components/Map";
 import { createContext, useEffect, useState } from "react";
 import { getAirtableData } from "./services/airtableService";
 import mapData from "./assets/geodata/mapData.json";
+import Header from "./components/Header";
 
 export const DataContext = createContext(null);
 
@@ -17,21 +18,7 @@ function App() {
 
   return (
     <div className="App">
-     <header className="header">
-        <div className="App-header-logo">
-          <img 
-          src=".src/assets/сокращенная-насветлом-англ.png" 
-          alt="Logo" 
-          />
-        </div>
-        <a href="https://comingoutspb.org/support/" 
-        className="App-header-donate" 
-        target="_blank" 
-        rel="noopener noreferrer">
-          Donate
-        </a>
-      </header>
-
+      <Header />
       <DataContext.Provider value={data}>
         <Map mapData={mapData} />
       </DataContext.Provider>

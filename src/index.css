@@ -28,6 +28,8 @@ body {
   font-family: "Stolzl", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  margin: 0; 
+  padding-top: 60px; 
 }
 
 code {
