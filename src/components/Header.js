@@ -22,7 +22,7 @@ export default function Header() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Хочу помощь
+          Хочу помочь
         </a>
       </div>
     </header>
