@@ -34,6 +34,9 @@ function Map({ mapData }) {
 
   //   renderMap();
   // }, [mapData]);
+
+  // const data = useContext(DataContext);
+  
   const projection = d3
     .geoConicConformal()
     .scale(450)
@@ -57,10 +60,10 @@ function Map({ mapData }) {
                 strokeWidth="0.5"
                 strokeOpacity="0.5"
                 onMouseEnter={(e) => {
-                  select(e.target).attr("fill", "#000");
+                  select(e.target).attr("fill", "#969AFF");
                 }}
                 onMouseOut={(e) => {
-                  select(e.target).attr("fill", "#eee");
+                  select(e.target).attr("fill", "#f4f3ee");
                 }}
               />
             </>

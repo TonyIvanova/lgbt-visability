@@ -15,13 +15,15 @@
 
 .App-header {
   background-color: #282c34;
-  min-height: 100vh;
+  /* min-height: 100vh; */
   display: flex;
-  flex-direction: column;
+  /* flex-direction: row; */
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  padding: 1rem;
   font-size: calc(10px + 2vmin);
   color: white;
+  border-bottom: 1px solid #000;
 }
 
 .App-link {
@@ -40,4 +42,25 @@
 .map {
   width: 1000px;
   height: 450px;
+}
+
+
+
+.App-header-logo img {
+  max-height: 150px;
+  max-width: 150px; 
+}
+
+.App-header-donate {
+  margin-left: auto;
+  padding: 0.5rem 1rem;
+  background-color: #969AFF; 
+  color: #fff;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.App-header-donate:hover {
+  background-color: #797dfb;
 }

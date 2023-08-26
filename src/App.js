@@ -17,6 +17,21 @@ function App() {
 
   return (
     <div className="App">
+     <header className="header">
+        <div className="App-header-logo">
+          <img 
+          src=".src/assets/сокращенная-насветлом-англ.png" 
+          alt="Logo" 
+          />
+        </div>
+        <a href="https://comingoutspb.org/support/" 
+        className="App-header-donate" 
+        target="_blank" 
+        rel="noopener noreferrer">
+          Donate
+        </a>
+      </header>
+
       <DataContext.Provider value={data}>
         <Map mapData={mapData} />
       </DataContext.Provider>
