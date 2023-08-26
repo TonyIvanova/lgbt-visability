@@ -7,7 +7,7 @@ export default function Header() {
       <div className="App-header-logo">
         <img src={logo} alt="Logo" />
       </div>
-      <div class="button-group">
+      <div class="header-buttons-container">
         <a
           href="https://comingoutspb.com/we-are-helping/"
           className="button-secondary"
