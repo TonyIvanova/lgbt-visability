@@ -29,6 +29,7 @@ function App() {
   return (
     <div className="App">
       <Header />
+      <h1>Положение лгбт+ людей в россии на 2022 год</h1>
       <ButtonGroup
         buttons={[
           "Экономическое положение",

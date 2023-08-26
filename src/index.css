@@ -46,6 +46,11 @@ h6 {
   font-family: "Helvetica Neue", sans-serif;
 }
 
+h1 {
+  color: #413a2e;
+  text-transform: uppercase; 
+}
+
 body,
 button,
 input,
