@@ -1,10 +1,14 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import * as d3 from "d3";
 import * as d3geo from "d3-geo";
 import Tooltip from "./Tooltip";
 import mapData from "./../../assets/geodata/mapData.json";
 
 function Map({ statistics }) {
+  // Map
+  const [regionDescription, setRegionDescription] = useState("");
+  const [regionValue, setRegionValue] = useState("");
+
   const projection = d3geo
     .geoConicConformal()
     .scale(300)
@@ -13,10 +17,11 @@ function Map({ statistics }) {
 
   const path = d3geo.geoPath().projection(projection);
 
+  const values = statistics.map((item) => item.value);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+
   const getScale = () => {
-    const values = statistics.map((item) => item.value);
-    const min = Math.min(...values);
-    const max = Math.max(...values);
     return [min, (min + max) / 2, max];
   };
 
@@ -47,9 +52,13 @@ function Map({ statistics }) {
             opacity="0.9"
             onMouseEnter={(e) => {
               d3.select(e.target).attr("opacity", 1);
+              setRegionDescription(relevantStatistics.name);
+              setRegionValue(Math.round(relevantStatistics.value));
             }}
             onMouseOut={(e) => {
               d3.select(e.target).attr("opacity", 0.9);
+              setRegionDescription("");
+              setRegionValue("");
             }}
           />
         </>
@@ -57,14 +66,32 @@ function Map({ statistics }) {
     });
   }, [mapData, statistics]);
 
-  if (statistics) {
+  // Legend
+
+  if (statistics && regionDescription !== "") {
     return (
-      <svg className="map">
-        <g className="map">{mapElements}</g>
-      </svg>
+      <div style={{ position: "relative" }}>
+        <svg className="map">
+          <g className="map">{mapElements}</g>
+        </svg>
+        <div className="map-tooltip">
+          <h3>{regionDescription}</h3>
+          <h2>{regionValue}%</h2>
+        </div>
+        {/* <div style={{ background: colorScale(min) }}>{min}</div>
+        <div style={{ background: colorScale(max) }}>{max}</div> */}
+      </div>
     );
-  } else {
-    return <></>;
+  } else if (statistics) {
+    return (
+      <>
+        <svg className="map">
+          <g className="map">{mapElements}</g>
+        </svg>
+        {/* <div style={{ background: colorScale(min) }}>{min}</div>
+        <div style={{ background: colorScale(max) }}>{max}</div> */}
+      </>
+    );
   }
 }
 
