@@ -13,7 +13,18 @@ function Map({ statistics }) {
 
   const path = d3geo.geoPath().projection(projection);
 
-  var colorScale = d3.scaleLinear([0, 13, 25], ["green", "orange", "red"]);
+  const getScale = () => {
+    const values = statistics.map((item) => item.value);
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    return [min, (min + max) / 2, max];
+  };
+
+  var colorScale = d3.scaleLinear(getScale(), [
+    "#F4F3EE",
+    "#969AFF",
+    "#413A2E",
+  ]);
 
   const mapElements = useMemo(() => {
     return mapData.features.map((d) => {
