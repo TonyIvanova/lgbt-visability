@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import arrow from "./../../assets/arrow.svg";
 import { getAirtableData } from "../../services/airtableService";
-import loader from "./../../assets/loader.gif";
+
 
 export default function PersonalStories({ topic }) {
   const [storyIndex, setStoryIndex] = useState(null);
@@ -63,10 +63,6 @@ export default function PersonalStories({ topic }) {
       </div>
     );
   } else {
-    return (
-      <>
-        <img src={loader} alt=""></img>
-      </>
-    );
+    return <></>;
   }
 }

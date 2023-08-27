@@ -11,6 +11,7 @@ export default function Statistics({ topic }) {
   const [selectedQuestion, setSelectedQuestion] = useState("All");
 
   useEffect(() => {
+    setSelectedQuestion("All");
     getAirtableData("descriptions").then((res) => {
       setDescriptions(res);
     });
@@ -65,9 +66,12 @@ export default function Statistics({ topic }) {
           <Map statistics={mapData} />
           <p className="statistics-description">
             {selectedQuestion !== "All"
-              ? "Процент респондентов ответивших Да относительно количества ответов по региону на вопрос: " +
-                selectedQuestion
+              ? "Процент респондентов которые сталкивались с: " + ""
               : mapDescription}
+            <h3 style={{ margin: 0 }}>
+              {selectedQuestion !== "All" ? selectedQuestion : ""}
+            </h3>
+
             <br />
           </p>
         </div>

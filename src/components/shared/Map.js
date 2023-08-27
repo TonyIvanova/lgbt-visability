@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from "react";
 import * as d3 from "d3";
 import * as d3geo from "d3-geo";
-import Tooltip from "./Tooltip";
 import mapData from "./../../assets/geodata/mapData.json";
 
 function Map({ statistics }) {
@@ -78,8 +77,6 @@ function Map({ statistics }) {
           <h3>{regionDescription}</h3>
           <h2>{regionValue}%</h2>
         </div>
-        {/* <div style={{ background: colorScale(min) }}>{min}</div>
-        <div style={{ background: colorScale(max) }}>{max}</div> */}
       </div>
     );
   } else if (statistics) {
@@ -88,8 +85,6 @@ function Map({ statistics }) {
         <svg className="map">
           <g className="map">{mapElements}</g>
         </svg>
-        {/* <div style={{ background: colorScale(min) }}>{min}</div>
-        <div style={{ background: colorScale(max) }}>{max}</div> */}
       </>
     );
   }
