@@ -1,96 +1,77 @@
 import React, { useRef, useMemo } from "react";
-
 import * as d3 from "d3";
 import styles from "./pie-chart.module.css";
+
 export default function PieChart({ data }) {
   const width = 150;
   const height = width;
 
-  const colors = [
-    "#00876c",
-    "#51a676",
-    "#88c580",
-    "#c2e38c",
-    "#ffff9d",
-    "#fdd172",
-    "#f7a258",
-    "#ea714e",
-    "#d43d51",
-  ];
+  var colorScale = d3.scaleOrdinal(d3.schemeAccent);
 
-    const getScale = () => {
-      const values = data.map((item) => item.value);
-      const min = Math.min(...values);
-      const max = Math.max(...values);
-      return [min, (min + max) / 2, max];
+  const ref = useRef(null);
+
+  const radius = width / 2;
+
+  const pie = useMemo(() => {
+    const pieGenerator = d3.pie().value((d) => d.value);
+    return pieGenerator(data);
+  }, [data]);
+
+  const arcGenerator = d3.arc();
+
+  const shapes = pie.map((arc, i) => {
+    const sliceInfo = {
+      innerRadius: radius * 0.6,
+      outerRadius: radius,
+      startAngle: arc.startAngle,
+      endAngle: arc.endAngle,
     };
 
-    var colorScale = d3.scaleOrdinal(d3.schemeAccent);
+    const slicePath = arcGenerator(sliceInfo);
 
-    const ref = useRef(null);
+    const color = arc?.data?.value ? colorScale(arc.data.value) : "lightgrey";
 
-    const radius = width / 2;
+    return (
+      <g
+        key={i}
+        className={styles.slice}
+        onMouseEnter={() => {
+          if (ref.current) {
+            ref.current.classList.add(styles.hasHighlight);
+          }
+        }}
+        onMouseLeave={() => {
+          if (ref.current) {
+            ref.current.classList.remove(styles.hasHighlight);
+          }
+        }}
+        onClick={() => {
+          // console.info(arc.data.name);
+          // console.info(arc.data.value);
+        }}
+      >
+        <path d={slicePath} fill={color} />
+      </g>
+    );
+  });
 
-    const pie = useMemo(() => {
-      const pieGenerator = d3.pie().value((d) => d.value);
-      return pieGenerator(data);
-    }, [data]);
-
-    const arcGenerator = d3.arc();
-
-    const shapes = pie.map((arc, i) => {
-      const sliceInfo = {
-        innerRadius: radius * 0.6,
-        outerRadius: radius,
-        startAngle: arc.startAngle,
-        endAngle: arc.endAngle,
-      };
-
-      const slicePath = arcGenerator(sliceInfo);
-
-      const color = arc?.data?.value ? colorScale(arc.data.value) : "lightgrey";
-
-      return (
-        <g
-          key={i}
-          className={styles.slice}
-          onMouseEnter={() => {
-            if (ref.current) {
-              ref.current.classList.add(styles.hasHighlight);
-            }
-          }}
-          onMouseLeave={() => {
-            if (ref.current) {
-              ref.current.classList.remove(styles.hasHighlight);
-            }
-          }}
-          onClick={() => {
-            // console.info(arc.data.name);
-            // console.info(arc.data.value);
-          }}
-        >
-          <path d={slicePath} fill={color} />
-        </g>
-      );
-    });
-
-    const legend = pie.map((arc, i) => {
-      return (
-        <>
-          <div className={styles.legendText}>
-            <div
-              style={{
-                background: colorScale(arc.data.value),
-                width: 10,
-                height: 10,
-                "border-radius": 10,
-              }}
-            ></div>
-            {arc.data.name}
-          </div>
-        </>
-      );
-    });
+  const legend = pie.map((arc, i) => {
+    return (
+      <>
+        <div className={styles.legendText}>
+          <div
+            style={{
+              background: colorScale(arc.data.value),
+              width: 10,
+              height: 10,
+              "border-radius": 10,
+            }}
+          ></div>
+          {arc.data.name}
+        </div>
+      </>
+    );
+  });
 
   return (
     <div className={styles.pieChart}>
