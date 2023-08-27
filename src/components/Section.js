@@ -14,7 +14,6 @@ export default function Section({ topic }) {
 
   return (
     <div>
-      <h2>{topic}</h2>
       <Statistics topic={topic} />
       <div className="conclusions">
         <h2>Выводы</h2>

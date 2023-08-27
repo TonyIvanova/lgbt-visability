@@ -54,10 +54,14 @@ export default function Statistics({ topic }) {
   if (chartData) {
     return (
       <div className="section">
-        <Map statistics={mapData} />
-        {mapDescription}
-        <PieChart data={chartData} />
-        {chartDescription}
+        <div>
+          <Map statistics={mapData} />
+          <p className="statistics-description"> {mapDescription}</p>
+        </div>
+        <div>
+          <PieChart data={chartData} />
+          <p className="statistics-description">{chartDescription}</p>
+        </div>
       </div>
     );
   }

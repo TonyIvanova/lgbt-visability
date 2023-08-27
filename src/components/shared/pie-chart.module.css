@@ -1,6 +1,7 @@
 .pieChart {
   display: flex;
   align-items: center;
+  margin: 16px 0;
 }
 .legendContainer {
   display: flex;
