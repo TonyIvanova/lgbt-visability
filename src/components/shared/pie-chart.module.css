@@ -11,7 +11,7 @@
 }
 
 .legendText {
-    gap: 8px; 
+  gap: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -31,6 +31,11 @@
 }
 
 .container.hasHighlight .slice:hover {
+  filter: saturate(80%);
+  opacity: 0.7;
+}
+
+.container.hasHighlight .slice .active {
   filter: saturate(100%);
   opacity: 1;
 }

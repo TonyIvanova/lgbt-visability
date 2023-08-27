@@ -1,8 +1,16 @@
-import React, { useRef, useMemo } from "react";
+import React, { useRef, useMemo, useState } from "react";
 import * as d3 from "d3";
 import styles from "./pie-chart.module.css";
 
-export default function PieChart({ data }) {
+export default function PieChart({ data, onArcClick = () => {} }) {
+  // const [selectedArc, setSelectedArc] = useState(null);
+
+  const handleArcClick = (name) => {
+    // setSelectedArc(name);
+    onArcClick(name);
+  };
+
+  // Chart setup
   const width = 150;
   const height = width;
 
@@ -31,6 +39,30 @@ export default function PieChart({ data }) {
 
     const color = arc?.data?.value ? colorScale(arc.data.value) : "lightgrey";
 
+    // Add highlight for selected arc
+    // if (selectedArc === arc?.data?.name) {
+    //   return (
+    //     <g
+    //       key={i}
+    //       className={styles.slice}
+    //       onMouseEnter={() => {
+    //         if (ref.current) {
+    //           ref.current.classList.add(styles.hasHighlight);
+    //         }
+    //       }}
+    //       onMouseLeave={() => {
+    //         if (ref.current) {
+    //           ref.current.classList.remove(styles.hasHighlight);
+    //         }
+    //       }}
+    //       onClick={() => {
+    //         handleArcClick(arc.data.name);
+    //       }}
+    //     >
+    //       <path d={slicePath} fill={color} />
+    //     </g>
+    //   );
+    // } else {}
     return (
       <g
         key={i}
@@ -46,11 +78,10 @@ export default function PieChart({ data }) {
           }
         }}
         onClick={() => {
-          // console.info(arc.data.name);
-          // console.info(arc.data.value);
+          handleArcClick(arc.data.name);
         }}
       >
-        <path d={slicePath} fill={color} />
+        <path d={slicePath} fill={color} className={styles.active} />
       </g>
     );
   });

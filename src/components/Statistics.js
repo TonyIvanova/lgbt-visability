@@ -8,17 +8,20 @@ export default function Statistics({ topic }) {
   const [mapData, setMapData] = useState([]);
   const [chartDescription, setChartDescription] = useState("");
   const [mapDescription, setMapDescription] = useState("");
+  const [selectedQuestion, setSelectedQuestion] = useState("All");
+
+  useEffect(() => {
+    getAirtableData("descriptions").then((res) => {
+      setDescriptions(res);
+    });
+  }, [topic]);
 
   useEffect(() => {
     getAirtableData(topic).then((res) => {
       setChartData(parseChartData(res));
       setMapData(parseMapData(res));
     });
-
-    getAirtableData("descriptions").then((res) => {
-      setDescriptions(res);
-    });
-  }, [topic]);
+  }, [topic, selectedQuestion]);
 
   const setDescriptions = (res) => {
     const relevantTopic = res.find((value) => value.Name === topic);
@@ -45,10 +48,14 @@ export default function Statistics({ topic }) {
     const result = res.map((row) => {
       return {
         name: row.District,
-        value: row.All,
+        value: row[selectedQuestion],
       };
     });
     return result;
+  };
+
+  const handleArcClick = (arcName) => {
+    setSelectedQuestion(arcName);
   };
 
   if (chartData) {
@@ -56,10 +63,13 @@ export default function Statistics({ topic }) {
       <div className="section">
         <div>
           <Map statistics={mapData} />
-          <p className="statistics-description"> {mapDescription}</p>
+          <p className="statistics-description">
+            Процент респондентов ответивших да на вопрос "{selectedQuestion}"
+            <br />
+          </p>
         </div>
         <div>
-          <PieChart data={chartData} />
+          <PieChart data={chartData} onArcClick={handleArcClick} />
           <p className="statistics-description">{chartDescription}</p>
         </div>
       </div>
