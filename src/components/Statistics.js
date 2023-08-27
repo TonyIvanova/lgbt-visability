@@ -6,13 +6,25 @@ import { getAirtableData } from ".././services/airtableService";
 export default function Statistics({ topic }) {
   const [chartData, setChartData] = useState([]);
   const [mapData, setMapData] = useState([]);
+  const [chartDescription, setChartDescription] = useState("");
+  const [mapDescription, setMapDescription] = useState("");
 
   useEffect(() => {
     getAirtableData(topic).then((res) => {
       setChartData(parseChartData(res));
       setMapData(parseMapData(res));
     });
+
+    getAirtableData("descriptions").then((res) => {
+      setDescriptions(res);
+    });
   }, [topic]);
+
+  const setDescriptions = (res) => {
+    const relevantTopic = res.find((value) => value.Name === topic);
+    setChartDescription(relevantTopic?.Pie);
+    setMapDescription(relevantTopic?.Map);
+  };
 
   const parseChartData = (res) => {
     if (res?.length === 0) return [];
@@ -43,7 +55,9 @@ export default function Statistics({ topic }) {
     return (
       <div className="section">
         <Map statistics={mapData} />
+        {mapDescription}
         <PieChart data={chartData} />
+        {chartDescription}
       </div>
     );
   }
