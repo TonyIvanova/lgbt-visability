@@ -11,7 +11,6 @@ import Section from "./components/Section";
 export const DataContext = createContext(null);
 
 function App() {
-  const [data, setData] = useState(null);
   const [sections, setSections] = useState(null);
   const [topic, setTopic] = useState(null);
 

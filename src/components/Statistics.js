@@ -58,13 +58,16 @@ export default function Statistics({ topic }) {
     setSelectedQuestion(arcName);
   };
 
-  if (chartData) {
+  if (chartData && mapData) {
     return (
       <div className="section">
         <div>
           <Map statistics={mapData} />
           <p className="statistics-description">
-            Процент респондентов ответивших да на вопрос "{selectedQuestion}"
+            {selectedQuestion !== "All"
+              ? "Процент респондентов ответивших Да относительно количества ответов по региону на вопрос: " +
+                selectedQuestion
+              : mapDescription}
             <br />
           </p>
         </div>

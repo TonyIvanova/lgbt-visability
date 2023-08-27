@@ -23,7 +23,7 @@ function Map({ statistics }) {
   var colorScale = d3.scaleLinear(getScale(), [
     "#F4F3EE",
     "#969AFF",
-    "#413A2E",
+    "#242424",
   ]);
 
   const mapElements = useMemo(() => {
@@ -31,7 +31,6 @@ function Map({ statistics }) {
       const relevantStatistics = statistics.filter(
         (item) => item.name === d.properties.name
       )[0];
-      console.info(relevantStatistics);
       const color = relevantStatistics
         ? colorScale(relevantStatistics?.value)
         : "lightgrey";
@@ -58,11 +57,15 @@ function Map({ statistics }) {
     });
   }, [mapData, statistics]);
 
-  return (
-    <svg className="map">
-      <g className="map">{mapElements}</g>
-    </svg>
-  );
+  if (statistics) {
+    return (
+      <svg className="map">
+        <g className="map">{mapElements}</g>
+      </svg>
+    );
+  } else {
+    return <></>;
+  }
 }
 
 export default Map;
