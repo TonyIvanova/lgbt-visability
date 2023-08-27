@@ -31,38 +31,40 @@ function Map({ statistics }) {
   ]);
 
   const mapElements = useMemo(() => {
-    return mapData.features.map((d) => {
-      const relevantStatistics = statistics.filter(
-        (item) => item.name === d.properties.name
-      )[0];
-      const color = relevantStatistics
-        ? colorScale(relevantStatistics?.value)
-        : "lightgrey";
-      return (
-        <>
-          <path
-            key={d.properties.name}
-            name={d.properties.name}
-            d={path(d)}
-            fill={color}
-            stroke="#0e1724"
-            strokeWidth="0.5"
-            strokeOpacity="0.5"
-            opacity="0.9"
-            onMouseEnter={(e) => {
-              d3.select(e.target).attr("opacity", 1);
-              setRegionDescription(relevantStatistics.name);
-              setRegionValue(Math.round(relevantStatistics.value));
-            }}
-            onMouseOut={(e) => {
-              d3.select(e.target).attr("opacity", 0.9);
-              setRegionDescription("");
-              setRegionValue("");
-            }}
-          />
-        </>
-      );
-    });
+    if (statistics.length > 0) {
+      return mapData.features.map((d) => {
+        const relevantStatistics = statistics.filter(
+          (item) => item.name === d.properties.name
+        )[0];
+        const color = relevantStatistics
+          ? colorScale(relevantStatistics?.value)
+          : "lightgrey";
+        return (
+          <>
+            <path
+              key={d.properties.name}
+              name={d.properties.name}
+              d={path(d)}
+              fill={color}
+              stroke="#0e1724"
+              strokeWidth="0.5"
+              strokeOpacity="0.5"
+              opacity="0.9"
+              onMouseEnter={(e) => {
+                d3.select(e.target).attr("opacity", 1);
+                setRegionDescription(relevantStatistics.name);
+                setRegionValue(Math.round(relevantStatistics.value));
+              }}
+              onMouseOut={(e) => {
+                d3.select(e.target).attr("opacity", 0.9);
+                setRegionDescription("");
+                setRegionValue("");
+              }}
+            />
+          </>
+        );
+      });
+    }
   }, [mapData, statistics]);
 
   // Legend
