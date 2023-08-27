@@ -66,7 +66,7 @@ export default function PieChart({ data }) {
   const legend = pie.map((arc, i) => {
     return (
       <>
-        <div className={styles.legendText}>
+        <div className={styles.legendText}  style={{ width: 600}}>
           <div
             style={{
               background: colors[i],

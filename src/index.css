@@ -51,6 +51,10 @@ h1 {
   text-transform: uppercase; 
 }
 
+h2 {
+  font-weight: bold; 
+}
+
 body,
 button,
 input,

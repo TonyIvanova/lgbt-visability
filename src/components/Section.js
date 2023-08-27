@@ -14,10 +14,10 @@ export default function Section({ topic }) {
 
   return (
     <div>
-      <h2>{topic}</h2>
+      <h2 style={{color:'#969aff'}}>{topic}</h2>
       <Statistics topic={topic} />
       <div className="conclusions">
-        <h2>Выводы</h2>
+        <h2 style={{color:'#969aff'}}>Выводы</h2>
         {conclusions.map((item, index) => {
           return <p key={index}>{item.text}</p>;
         })}

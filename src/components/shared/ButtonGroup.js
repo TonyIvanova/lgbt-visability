@@ -16,7 +16,7 @@ const ButtonGroup = ({ buttons, doSomethingAfterClick }) => {
           name={buttonLabel}
           onClick={(event) => handleClick(event, i)}
           className={
-            i === clickedId ? "button-secondary active" : "button-secondary"
+            i === clickedId ? "button-tetriary active" : "button-tetriary"
           }
         >
           {buttonLabel}
