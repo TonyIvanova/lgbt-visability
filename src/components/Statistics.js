@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import Map from "./shared/Map";
 import PieChart from "./shared/PieChart";
-import { getAirtableData } from ".././services/airtableService";
+// import { getAirtableData } from ".././services/airtableService";
+import { getData, getSheetData } from ".././services/googleService";
+import { useYear } from "../contexts/yearContext";
+import { useData } from "../contexts/dataContext";
 
 export default function Statistics({ topic }) {
   const [chartData, setChartData] = useState([]);
@@ -9,27 +12,31 @@ export default function Statistics({ topic }) {
   const [chartDescription, setChartDescription] = useState("");
   const [mapDescription, setMapDescription] = useState("");
   const [selectedQuestion, setSelectedQuestion] = useState("All");
+  const { yearData } = useData(); 
 
+  // Fetches and sets description whenever 'topic' changes
   useEffect(() => {
     setSelectedQuestion("All");
-    getAirtableData("descriptions").then((res) => {
-      setDescriptions(res);
-    });
+    const descriptionsData = getSheetData('descriptions')
+    setDescriptions(descriptionsData);
   }, [topic]);
 
+  // Fetches and processes data for chart and map visualization when 'topic' or 'selectedQuestion' changes
   useEffect(() => {
-    getAirtableData(topic).then((res) => {
+    getSheetData(topic).then((res) => {
       setChartData(parseChartData(res));
       setMapData(parseMapData(res));
     });
   }, [topic, selectedQuestion]);
 
+  //Parses and sets descriptive text for the chart and map visualizations
   const setDescriptions = (res) => {
     const relevantTopic = res.find((value) => value.Name === topic);
     setChartDescription(relevantTopic?.Pie);
     setMapDescription(relevantTopic?.Map);
   };
 
+  // Extracts and structures data to be used in PieChart
   const parseChartData = (res) => {
     if (res?.length === 0) return [];
     const fields = Object.keys(res[0])
@@ -45,7 +52,9 @@ export default function Statistics({ topic }) {
     return result;
   };
 
+  //Extracts and structures data to be used in Map
   const parseMapData = (res) => {
+    //TODO:
     const result = res.map((row) => {
       return {
         name: row.District,
@@ -55,10 +64,14 @@ export default function Statistics({ topic }) {
     return result;
   };
 
+  //Handles user interactions on PieChart segments
   const handleArcClick = (arcName) => {
     setSelectedQuestion(arcName);
   };
 
+
+  //Displays Map and PieChart when data is available,
+  // otherwise loading or fallback UI can be implemented here
   if (chartData && mapData) {
     return (
       <div className="section">
