@@ -12,18 +12,18 @@ export default function Statistics({ topic }) {
   const [chartDescription, setChartDescription] = useState("");
   const [mapDescription, setMapDescription] = useState("");
   const [selectedQuestion, setSelectedQuestion] = useState("All");
-  const { yearData } = useData(); 
+  const { data } = useData(); 
 
   // Fetches and sets description whenever 'topic' changes
   useEffect(() => {
     setSelectedQuestion("All");
-    const descriptionsData = getSheetData(yearData,'descriptions')
+    const descriptionsData = getSheetData(data,'descriptions')
     setDescriptions(descriptionsData);
   }, [topic]);
 
   // Fetches and processes data for chart and map visualization when 'topic' or 'selectedQuestion' changes
   useEffect(() => {
-      const res = getSheetData(yearData,topic);
+      const res = getSheetData(data,topic);
       setChartData(parseChartData(res));
       setMapData(parseMapData(res));
     

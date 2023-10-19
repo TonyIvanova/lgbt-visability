@@ -9,13 +9,13 @@ import { useData} from "../contexts/dataContext";
 export default function Section({ topic }) {
   const [conclusions, setConclusions] = useState([]);
   const { year, setYear } = useYear();
-  const { yearData } = useData(); 
+  const { data } = useData(); 
 
   useEffect(() => {
     
-    if(yearData) {
+    if(data) {
 
-      const conclusionsData  = getSheetData(yearData,'conclusions')
+      const conclusionsData  = getSheetData(data,'conclusions')
         
         // Make sure conclusionsData is defined before trying to filter it
         if(conclusionsData) {
@@ -26,7 +26,7 @@ export default function Section({ topic }) {
     } else {
         console.error("Data is not available");
     }
-}, [yearData, topic]);
+}, [data, topic]);
 
 
   return (

@@ -10,12 +10,12 @@ export default function PersonalStories({ topic }) {
   const [storyIndex, setStoryIndex] = useState(null);
   const [stories, setStories] = useState([]);
 
-  const { yearData } = useData(); 
+  const { data } = useData(); 
 
   useEffect(() => {
     //  TODO: feed data from the column by year
     // getSheetData("stories").then((storiesData) => {
-      const storiesData = getSheetData(yearData,"stories")
+      const storiesData = getSheetData(data,"stories")
       const datas = storiesData.filter((row) => row.name === topic);
 
       setStories(datas);

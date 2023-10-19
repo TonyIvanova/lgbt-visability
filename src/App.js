@@ -13,39 +13,39 @@ import { DataProvider, useData } from "./contexts/dataContext";
 
 export const DataContext = createContext(null);
 
-function DataTable({ data, title }) {
-  if (!data || data.length === 0) return <p>No data available</p>;
+// function DataTable({ data, title }) {
+//   if (!data || data.length === 0) return <p>No data available</p>;
 
-  const headers = Object.keys(data[0]);
+//   const headers = Object.keys(data[0]);
 
-  return (
-    <div>
-      <h2>{title}</h2>
-      <table>
-        <thead>
-          <tr>
-            {headers.map(header => (
-              <th key={header}>{header}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((row, idx) => (
-            <tr key={idx}>
-              {headers.map(header => (
-                <td key={header}>{row[header]}</td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
+//   return (
+//     <div>
+//       <h2>{title}</h2>
+//       <table>
+//         <thead>
+//           <tr>
+//             {headers.map(header => (
+//               <th key={header}>{header}</th>
+//             ))}
+//           </tr>
+//         </thead>
+//         <tbody>
+//           {data.map((row, idx) => (
+//             <tr key={idx}>
+//               {headers.map(header => (
+//                 <td key={header}>{row[header]}</td>
+//               ))}
+//             </tr>
+//           ))}
+//         </tbody>
+//       </table>
+//     </div>
+//   );
+// }
 
 
 function AppContent() {
-  const { setData } = useData();
+  const { data, setData } = useData();
   const [sections, setSections] = useState(null);
   const [topic, setTopic] = useState(null);
   const { year, setYear } = useYear();
@@ -65,13 +65,11 @@ function AppContent() {
     });
 }, [year, setData]);
 
-const { yearData } = useData();
-
-
+// const { data } = useData();
 useEffect(() => {
-    if (yearData) {
+    if (data) {
       // Get data from 'configuration' sheet
-      const configData = getSheetData(yearData, 'configuration');
+      const configData = getSheetData(data, 'configuration');
       setConfigurationData(configData);
 
       if (configData) {
@@ -83,7 +81,7 @@ useEffect(() => {
         console.error("No configuration data found for year:", year);
       }
     }
-}, [yearData, year]);
+}, [data, year]);
 
 
   //// Function to update the topic state based on the name of the clicked button
@@ -112,8 +110,8 @@ useEffect(() => {
       
           <div className="App">
             <Header />
-            <DataTable data={configurationData} title="Configuration Data" />
-
+            {/* <DataTable data={configurationData} title="Configuration Data" /> */}
+<h2>{sections}</h2>
             <ButtonGroup
               buttons={["2022", "2023"]}
               doSomethingAfterClick={selectYear}
@@ -137,6 +135,7 @@ useEffect(() => {
       
           <div className="App">
             <Header />
+            {/* <h2>{sections}</h2> */}
             <h1>Положение лгбт+ людей в россии на {year} год</h1>
             <img src={loader} alt=""></img>
             <img src={bg1} alt="" className="background-image-1"></img>
