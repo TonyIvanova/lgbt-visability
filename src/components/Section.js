@@ -13,9 +13,9 @@ export default function Section({ topic }) {
 
   useEffect(() => {
     
-    if(data) {
+    if(yearData) {
 
-      const conclusionsData  = getSheetData('conclusions')
+      const conclusionsData  = getSheetData(yearData,'conclusions')
         
         // Make sure conclusionsData is defined before trying to filter it
         if(conclusionsData) {
@@ -26,7 +26,7 @@ export default function Section({ topic }) {
     } else {
         console.error("Data is not available");
     }
-}, [data, topic]);
+}, [yearData, topic]);
 
 
   return (
@@ -44,32 +44,34 @@ export default function Section({ topic }) {
     </div>
   );
 }
-import React, { useState, useEffect } from "react";
-import PersonalStories from "./shared/PersonalStories";
-import { getAirtableData } from ".././services/airtableService";
-import Statistics from "./Statistics";
 
-export default function Section({ topic }) {
-  const [conclusions, setConclusions] = useState([]);
 
-  useEffect(() => {
-    getAirtableData("conclusions_2022").then((data) => {
-      setConclusions(data.filter((row) => row.name === topic));
-    });
-  }, [topic]);
+// // import React, { useState, useEffect } from "react";
+// import PersonalStories from "./shared/PersonalStories";
+// import { getAirtableData } from ".././services/airtableService";
+// import Statistics from "./Statistics";
 
-  return (
-    <div>
-      <Statistics topic={topic} />
-      <div className="conclusions">
-        <h2>Выводы</h2>
-        {conclusions.map((item, index) => {
-          return <p key={index}>{item.text}</p>;
-        })}
-      </div>
-      <div>
-        <PersonalStories topic={topic} />
-      </div>
-    </div>
-  );
-}
+// export default function Section({ topic }) {
+//   const [conclusions, setConclusions] = useState([]);
+
+//   useEffect(() => {
+//     getAirtableData("conclusions_2022").then((data) => {
+//       setConclusions(data.filter((row) => row.name === topic));
+//     });
+//   }, [topic]);
+
+//   return (
+//     <div>
+//       <Statistics topic={topic} />
+//       <div className="conclusions">
+//         <h2>Выводы</h2>
+//         {conclusions.map((item, index) => {
+//           return <p key={index}>{item.text}</p>;
+//         })}
+//       </div>
+//       <div>
+//         <PersonalStories topic={topic} />
+//       </div>
+//     </div>
+//   );
+// }

@@ -1,6 +1,6 @@
 import "./App.css";
 import { createContext, useEffect, useState } from "react";
-import { getData, getSheetData } from "./services/googleService";
+import  getData,{ getSheetData } from "./services/googleService";
 import Header from "./components/Header";
 import bg1 from "./assets/bg1.svg";
 import bg2 from "./assets/bg2.svg";
@@ -8,22 +8,28 @@ import loader from "./assets/loader.gif";
 import ButtonGroup from "./components/shared/ButtonGroup";
 import Section from "./components/Section";
 import { YearProvider, useYear } from "./contexts/yearContext";
-import { DataProvider } from "./contexts/dataContext";
+import { DataProvider, useData } from "./contexts/dataContext";
 
 
 export const DataContext = createContext(null);
 
-function App() {
+function AppContent() {
   const [sections, setSections] = useState(null);
   const [topic, setTopic] = useState(null);
   const { year, setYear } = useYear();
-
-  //This hook retrieves data when the component is mounted or year changed
+  // const { yearData } = useData(); 
+ console.log(year)
+  //Retrieves data when the component is mounted or year changed
   useEffect(() => {
     getData(year).then(yearData => {
+      if (!yearData) {
+        console.error("yearData is undefined");
+        return;
+      }
       // Get data from 'configuration' sheet
-      configurationData = getSheetData('configuration')
-      
+      const configurationData = getSheetData(yearData,'configuration')
+      // console.log(year)
+      // console.log(yearData)
       if (configurationData) {
         //Set menu buttons sections
         setSections(configurationData.map((row) => row.section_title));
@@ -63,8 +69,7 @@ function App() {
   if (sections) {
     return (
 
-      <YearProvider>
-        <DataProvider>
+      
           <div className="App">
             <Header />
 
@@ -83,14 +88,12 @@ function App() {
             <img src={bg2} alt="" className="background-image-2"></img>
             {/* </DataContext.Provider> */}
           </div>
-        </DataProvider>
-      </YearProvider>
+       
    
     );
   } else {
     return (
-      <YearProvider>
-        <DataProvider>
+      
           <div className="App">
             <Header />
             <h1>Положение лгбт+ людей в россии на 2022 год</h1>
@@ -98,8 +101,7 @@ function App() {
             <img src={bg1} alt="" className="background-image-1"></img>
             <img src={bg2} alt="" className="background-image-2"></img>
           </div>
-        </DataProvider>
-      </YearProvider>
+       
 
     );
 
@@ -108,6 +110,14 @@ function App() {
   }
 }
 
-
+function App() {
+  return (
+    <YearProvider>
+      <DataProvider>
+        <AppContent />
+      </DataProvider>
+    </YearProvider>
+  );
+}
 
 export default App;

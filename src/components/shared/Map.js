@@ -2,10 +2,8 @@ import React, { useMemo, useState } from "react";
 import * as d3 from "d3";
 import * as d3geo from "d3-geo";
 import mapData from "./../../assets/geodata/mapData.json";
-<<<<<<< HEAD
-=======
-import {useYear } from "./contexts/yearContext";
->>>>>>> e96e25f (init)
+import { useYear } from "../../contexts/yearContext";
+
 
 function Map({ statistics }) {
   // Map

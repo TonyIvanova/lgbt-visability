@@ -17,16 +17,16 @@ export default function Statistics({ topic }) {
   // Fetches and sets description whenever 'topic' changes
   useEffect(() => {
     setSelectedQuestion("All");
-    const descriptionsData = getSheetData('descriptions')
+    const descriptionsData = getSheetData(yearData,'descriptions')
     setDescriptions(descriptionsData);
   }, [topic]);
 
   // Fetches and processes data for chart and map visualization when 'topic' or 'selectedQuestion' changes
   useEffect(() => {
-    getSheetData(topic).then((res) => {
+      const res = getSheetData(yearData,topic);
       setChartData(parseChartData(res));
       setMapData(parseMapData(res));
-    });
+    
   }, [topic, selectedQuestion]);
 
   //Parses and sets descriptive text for the chart and map visualizations

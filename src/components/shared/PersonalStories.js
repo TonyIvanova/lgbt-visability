@@ -1,33 +1,26 @@
 import React, { useState, useEffect } from "react";
 import arrow from "./../../assets/arrow.svg";
-<<<<<<< HEAD
-import { getAirtableData } from "../../services/airtableService";
 
-=======
 import { getData, getSheetData } from "../../services/googleService";
-import {useYear } from "./contexts/yearContext";
-import { useData } from "./contexts/dataContext";
->>>>>>> e96e25f (init)
+import {useYear } from "../../contexts/yearContext";
+import { useData } from "../../contexts/dataContext";
+
 
 export default function PersonalStories({ topic }) {
   const [storyIndex, setStoryIndex] = useState(null);
   const [stories, setStories] = useState([]);
-<<<<<<< HEAD
 
-  useEffect(() => {
-    getAirtableData("stories_2022").then((data) => {
-      const datas = data.filter((row) => row.name === topic);
-=======
   const { yearData } = useData(); 
 
   useEffect(() => {
     //  TODO: feed data from the column by year
-    getSheetData("stories").then((storiesData) => {
+    // getSheetData("stories").then((storiesData) => {
+      const storiesData = getSheetData(yearData,"stories")
       const datas = storiesData.filter((row) => row.name === topic);
->>>>>>> e96e25f (init)
+
       setStories(datas);
       setStoryIndex(0);
-    });
+    // });
   }, [topic]);
   const getStory = () => {
     return (

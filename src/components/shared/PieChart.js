@@ -1,10 +1,8 @@
 import React, { useRef, useMemo, useState } from "react";
 import * as d3 from "d3";
 import styles from "./pie-chart.module.css";
-<<<<<<< HEAD
-=======
-import {useYear } from "./contexts/yearContext";
->>>>>>> e96e25f (init)
+import {useYear } from "../../contexts/yearContext";
+
 
 export default function PieChart({ data, onArcClick = () => {} }) {
   // const [selectedArc, setSelectedArc] = useState(null);

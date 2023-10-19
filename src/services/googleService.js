@@ -1,13 +1,15 @@
 import { useYear } from "../contexts/yearContext";
 
 export default async function getData(year) {
-    const { year, setYear } = useYear();
+    // const { year, setYear } = useYear();
 
     // spreadsheetId based on selected year
-    if (year == '2023')
-    {const spreadsheetId = '1sPD_8M_X4Bm3YwQKdI6yobC7nlvV8gygkfViE5lekaM'}
+    let spreadsheetId;
+    if (year === '2023')
+    { spreadsheetId = '1sPD_8M_X4Bm3YwQKdI6yobC7nlvV8gygkfViE5lekaM'}
+    //TODO: other years
     else //2022 default
-    {const spreadsheetId = '1izL48ioAQQizdUGssrOSMZibA5JMwO6WBlCHuk64Gbw';}
+    { spreadsheetId = '1izL48ioAQQizdUGssrOSMZibA5JMwO6WBlCHuk64Gbw';}
     
     const sheetNames = [
         'map_economy', 
@@ -47,13 +49,14 @@ export default async function getData(year) {
         }
     }
 
+    // console.log(allData)
     return allData; 
 }
 
 
-export function getSheetData(sheetName) {
+export function getSheetData(yearData,sheetName) {
     // Check if yearData contains the sheetName as a property
-    if (yearData.hasOwnProperty(sheetName)) {
+    if (yearData && yearData.hasOwnProperty(sheetName)) {
         // Return the data associated with sheetName
         return yearData[sheetName];
     }
