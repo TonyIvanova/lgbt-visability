@@ -1,68 +1,58 @@
-import { useYear } from "../contexts/yearContext";
+// import { useYear } from "../contexts/yearContext";
+import axios from 'axios';
+import { useState } from 'react';
 
-export default async function getData(year) {
-    // const { year, setYear } = useYear();
 
-    // spreadsheetId based on selected year
-    let spreadsheetId;
-    if (year === '2023')
-    { spreadsheetId = '1sPD_8M_X4Bm3YwQKdI6yobC7nlvV8gygkfViE5lekaM'}
-    //TODO: other years
-    else //2022 default
-    { spreadsheetId = '1izL48ioAQQizdUGssrOSMZibA5JMwO6WBlCHuk64Gbw';}
-    
-    const sheetNames = [
-        'map_economy', 
-        'map_violence', 
-        'map_discrimination',
-        'map_wareffect'
-    ]; 
-    
-    // Create an array to hold data from all sheets
-    let allData = [];
+const BASE_URL = "https://sheets.googleapis.com/v4/spreadsheets";
+const API_KEY = "AIzaSyD71dPGb38J0b2Y4XC7tShKP0JQ_H9rGPM"; 
 
-    for (const sheetName of sheetNames) {
-        try {
-            const response = await fetch(`https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?sheet=${sheetName}&tqx=out:json`);
-            if (!response.ok) {
-                console.error('Network response was not ok' + response.statusText);
-                return;  // or throw, or continue, depending on desired error handling
-            }
-            const result = await response.text();
-            const json = JSON.parse(result.replace(/.*google.visualization.Query.setResponse\({(.*?)}\);?/s, '{$1}'));
-
-            const headings = json.table.cols.map(item => item.label);
-            let data = json.table.rows.map(item => {
-                let row = {};
-                item.c.forEach((cell, idx) => {
-                    row[headings[idx]] = cell?.v ?? null;
-                });
-                return row;
-            });
-
-            // Do something with `data` here
-            allData.push({[sheetName]: data});
-
-        } catch (error) {
-            console.error('Fetching or parsing failed', error);
-            // handle error 
-        }
-    }
-
-    // console.log(allData)
-    return allData; 
+function getSpreadsheetIdByYear(year) {
+    const mapping = {
+        '2022': '1izL48ioAQQizdUGssrOSMZibA5JMwO6WBlCHuk64Gbw',
+        '2023': '1sPD_8M_X4Bm3YwQKdI6yobC7nlvV8gygkfViE5lekaM',
+        '2024': '',
+        '2025': '',
+        '2026': '',
+        '2027': '',
+    };
+    return mapping[year];
 }
 
 
-export function getSheetData(yearData,sheetName) {
-    // Check if yearData contains the sheetName as a property
-    if (yearData && yearData.hasOwnProperty(sheetName)) {
-        // Return the data associated with sheetName
-        return yearData[sheetName];
-    }
-
-    console.warn(`Sheet "${sheetName}" not found in yearData`);
+function getData(year) {
+    const SHEET_ID = getSpreadsheetIdByYear(year);
+    const metadataUrl = `${BASE_URL}/${SHEET_ID}?fields=sheets.properties.title&key=${API_KEY}`;
     
-    // Return an empty array if the sheet is not found
-    return [];
+    return axios.get(metadataUrl)
+        .then(response => {
+            const sheetNames = response.data.sheets.map(sheet => sheet.properties.title);
+            return Promise.all(sheetNames.map(sheetName => fetchDataFromSheet(SHEET_ID, sheetName)));
+        })
+        .then(allData => allData.flat())
+        .catch(error => {
+            console.error("Error fetching data:", error);
+            throw error; // You can handle the error or re-throw it.
+        });
+}
+
+export default getData;
+
+function fetchDataFromSheet(sheetId, sheetName) {
+    const url = `${BASE_URL}/${sheetId}/values/${sheetName}?valueRenderOption=FORMATTED_VALUE&key=${API_KEY}`;
+    return axios.get(url)
+        .then(response => formatResponse(response.data))
+        .catch(error => {
+            console.error("Error fetching data from sheet:", error);
+            throw error;
+        });
+}
+
+function formatResponse(response) {
+    const keys = response.values[0];
+    const data = response.values.slice(1);
+    return data.map(arr => Object.assign({}, ...keys.map((k, i) => ({ [k]: arr[i] }))));
+}
+
+export function getSheetData(yearData, sheetName) {
+    return yearData[sheetName] || [];
 }

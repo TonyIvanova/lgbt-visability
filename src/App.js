@@ -1,6 +1,6 @@
 import "./App.css";
 import { createContext, useEffect, useState } from "react";
-import  getData,{ getSheetData } from "./services/googleService";
+import  getData, { getSheetData } from "./services/googleService";
 import Header from "./components/Header";
 import bg1 from "./assets/bg1.svg";
 import bg2 from "./assets/bg2.svg";
@@ -13,38 +13,78 @@ import { DataProvider, useData } from "./contexts/dataContext";
 
 export const DataContext = createContext(null);
 
+function DataTable({ data, title }) {
+  if (!data || data.length === 0) return <p>No data available</p>;
+
+  const headers = Object.keys(data[0]);
+
+  return (
+    <div>
+      <h2>{title}</h2>
+      <table>
+        <thead>
+          <tr>
+            {headers.map(header => (
+              <th key={header}>{header}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((row, idx) => (
+            <tr key={idx}>
+              {headers.map(header => (
+                <td key={header}>{row[header]}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+
 function AppContent() {
+  const { setData } = useData();
   const [sections, setSections] = useState(null);
   const [topic, setTopic] = useState(null);
   const { year, setYear } = useYear();
-  // const { yearData } = useData(); 
- console.log(year)
+  const [configurationData, setConfigurationData] = useState(null); 
+
+
   //Retrieves data when the component is mounted or year changed
   useEffect(() => {
-    getData(year).then(yearData => {
-      if (!yearData) {
+    getData(year).then(fetchedData => {
+      if (!fetchedData) {
         console.error("yearData is undefined");
         return;
       }
-      // Get data from 'configuration' sheet
-      const configurationData = getSheetData(yearData,'configuration')
-      // console.log(year)
-      // console.log(yearData)
-      if (configurationData) {
-        //Set menu buttons sections
-        setSections(configurationData.map((row) => row.section_title));
-        setTopic(configurationData[0].section_title);
-        console.log(configurationData)
+      setData(fetchedData); //store in context
+    }).catch(error => {
+      console.error("Error fetching data for year:", year, error);
+    });
+}, [year, setData]);
 
+const { yearData } = useData();
+
+
+useEffect(() => {
+    if (yearData) {
+      // Get data from 'configuration' sheet
+      const configData = getSheetData(yearData, 'configuration');
+      setConfigurationData(configData);
+
+      if (configData) {
+        //Set menu buttons sections
+        setSections(configData.map((row) => row.section_title));
+        setTopic(configData[0].section_title);
+        console.log(configData);
       } else {
         console.error("No configuration data found for year:", year);
       }
+    }
+}, [yearData, year]);
 
-    }).catch(error => {
-
-      console.error("Error fetching data for year:", year, error);
-    });
-  }, [year]);
 
   //// Function to update the topic state based on the name of the clicked button
   const selectTopic = (event) => {
@@ -72,6 +112,7 @@ function AppContent() {
       
           <div className="App">
             <Header />
+            <DataTable data={configurationData} title="Configuration Data" />
 
             <ButtonGroup
               buttons={["2022", "2023"]}
@@ -80,7 +121,7 @@ function AppContent() {
 
             {/* TODO: change data based on year picked */}
 
-            <h1>Положение лгбт+ людей в россии на ${year} год</h1>
+            <h1>Положение лгбт+ людей в россии на {year} год</h1>
             <ButtonGroup buttons={sections} doSomethingAfterClick={selectTopic} />
             <div className="topic-component">{topicComponent()}</div>
             {/* <DataContext.Provider value={{ data, conclusions }}> */}
@@ -96,7 +137,7 @@ function AppContent() {
       
           <div className="App">
             <Header />
-            <h1>Положение лгбт+ людей в россии на 2022 год</h1>
+            <h1>Положение лгбт+ людей в россии на {year} год</h1>
             <img src={loader} alt=""></img>
             <img src={bg1} alt="" className="background-image-1"></img>
             <img src={bg2} alt="" className="background-image-2"></img>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import arrow from "./../../assets/arrow.svg";
 
 import { getData, getSheetData } from "../../services/googleService";
-import {useYear } from "../../contexts/yearContext";
+import { useYear } from "../../contexts/yearContext";
 import { useData } from "../../contexts/dataContext";
 
 
@@ -28,7 +28,7 @@ export default function PersonalStories({ topic }) {
     if (storyIndex === null || !stories[storyIndex]) {
       return null;
   }
-  
+
     return (
       <div className="personal-stories">
         <img
