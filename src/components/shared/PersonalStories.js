@@ -22,7 +22,13 @@ export default function PersonalStories({ topic }) {
       setStoryIndex(0);
     // });
   }, [topic]);
+
   const getStory = () => {
+
+    if (storyIndex === null || !stories[storyIndex]) {
+      return null;
+  }
+  
     return (
       <div className="personal-stories">
         <img
