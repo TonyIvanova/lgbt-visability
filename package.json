@@ -11,6 +11,8 @@
     "axios": "^1.4.0",
     "d3": "^7.8.5",
     "dotenv": "^16.3.1",
+    "google-spreadsheet": "^4.1.0",
+    "googleapis": "^127.0.0",
     "leaflet": "^1.9.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
