@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Map from "./shared/Map";
 import PieChart from "./shared/PieChart";
-import { getAirtableData } from ".././services/airtableService";
+import { getSheetData, dataMap } from ".././services/googleSheetsService";
 
 export default function Statistics({ topic }) {
   const [chartData, setChartData] = useState([]);
@@ -9,16 +9,21 @@ export default function Statistics({ topic }) {
   const [chartDescription, setChartDescription] = useState("");
   const [mapDescription, setMapDescription] = useState("");
   const [selectedQuestion, setSelectedQuestion] = useState("All");
-
+  const topicsMap = {
+    'Экономическое положение': 'economical_status',
+    'Насилие':'violence',
+    'Дискриминация':'discrimination',
+    'Влияние войны в Украине':'map_wareffect'
+  }
   useEffect(() => {
     setSelectedQuestion("All");
-    getAirtableData("descriptions").then((res) => {
+    getSheetData(dataMap['2022']['report']['sheet'], 'descriptions').then((res) => {
       setDescriptions(res);
     });
   }, [topic]);
 
   useEffect(() => {
-    getAirtableData(topic).then((res) => {
+    getSheetData(dataMap['2022']['report']['sheet'], topicsMap[topic]).then((res) => {
       setChartData(parseChartData(res));
       setMapData(parseMapData(res));
     });
@@ -40,7 +45,7 @@ export default function Statistics({ topic }) {
 
     const values = res.find((row) => row.District === "Все");
     const result = fields.map((field) => {
-      return { name: field, value: values[field] };
+      return { name: field, value: parseFloat(values[field]) };
     });
     return result;
   };
@@ -49,7 +54,7 @@ export default function Statistics({ topic }) {
     const result = res.map((row) => {
       return {
         name: row.District,
-        value: row[selectedQuestion],
+        value: parseFloat(row[selectedQuestion]),
       };
     });
     return result;
