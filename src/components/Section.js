@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import PersonalStories from "./shared/PersonalStories";
-import { getAirtableData } from ".././services/airtableService";
+import { getSheetData, dataMap } from ".././services/googleSheetsService";
 import Statistics from "./Statistics";
 
 export default function Section({ topic }) {
   const [conclusions, setConclusions] = useState([]);
 
   useEffect(() => {
-    getAirtableData("conclusions_2022").then((data) => {
+    getSheetData(dataMap['2022']['report']['sheet'], 'conclusions').then((data) => {
       setConclusions(data.filter((row) => row.name === topic));
     });
   }, [topic]);

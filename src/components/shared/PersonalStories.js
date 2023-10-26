@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import arrow from "./../../assets/arrow.svg";
-import { getAirtableData } from "../../services/airtableService";
+import { getSheetData, dataMap } from "../.././services/googleSheetsService";
 
 
 export default function PersonalStories({ topic }) {
@@ -8,7 +8,7 @@ export default function PersonalStories({ topic }) {
   const [stories, setStories] = useState([]);
 
   useEffect(() => {
-    getAirtableData("stories_2022").then((data) => {
+    getSheetData(dataMap['2022']['report']['sheet'], 'df_stories').then((data) => {
       const datas = data.filter((row) => row.name === topic);
       setStories(datas);
       setStoryIndex(0);

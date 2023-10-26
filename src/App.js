@@ -1,6 +1,6 @@
 import "./App.css";
 import { createContext, useEffect, useState } from "react";
-import { getAirtableData } from "./services/airtableService";
+import { getSheetData, dataMap } from "./services/googleSheetsService";
 import Header from "./components/Header";
 import bg1 from "./assets/bg1.svg";
 import bg2 from "./assets/bg2.svg";
@@ -15,7 +15,7 @@ function App() {
   const [topic, setTopic] = useState(null);
 
   useEffect(() => {
-    getAirtableData("configuration_2022").then((data) => {
+    getSheetData(dataMap['2022']['report']['sheet'], 'configuration').then((data) => {
       setSections(data.map((row) => row.section_title));
       setTopic(data[0].section_title);
     });
