@@ -74,6 +74,29 @@ header {
   background-color: #ffffff;
 }
 
+.lang {
+  margin: 0px;
+  text-decoration: none;
+  font-family: "Stolzl", Sans-serif;
+  font-size: 16px;
+  font-weight: 100;
+  text-transform: none;
+  text-decoration: none; 
+  fill: #ffffff;
+  color: #040303;
+  background-color: #ffffff;
+  letter-spacing: -0.48px;
+  /* padding: 0px 0px 0px 0px; */
+  border-style: none;
+  padding: 0px 0px 0px 10px;
+}
+.lang:hover,
+.lang:active {
+  color: #969aff;
+  background-color: #ffffff;
+}
+
+
 .button-primary:hover {
   color: #969aff;
   background-color: #ffffff;
@@ -97,7 +120,6 @@ header {
   border-radius: 200px 200px 200px 200px;
   padding: 11px 24px 10px 24px;
 }
-
 .button-primary:hover {
   color: #969aff;
   background-color: #ffffff;
@@ -142,7 +164,6 @@ header {
   border-radius: 200px 200px 200px 200px;
   padding: 11px 24px 10px 24px;
 }
-
 .button-secondary:hover,
 .button-secondary.active {
   color: #ffffff;
@@ -185,6 +206,11 @@ header {
 .button-group > button {
   margin: 0;
 }
+.button-group2 > lang {
+  margin: 0;
+  border-radius: 0;
+}
+
 
 .button-group > button:first-child {
   margin: 0;
