@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Map from "./shared/Map";
 import PieChart from "./shared/PieChart";
 import { getSheetData, dataMap } from ".././services/googleSheetsService";
+import {ButtonGroupLang} from "./shared/ButtonGroup";
 
 export default function Statistics({ topic }) {
   const [chartData, setChartData] = useState([]);
@@ -68,6 +69,7 @@ export default function Statistics({ topic }) {
     return (
       <div className="section">
         <div>
+        <ButtonGroupLang buttons={['Cis','Trans','All']}/>
           <Map statistics={mapData} />
           <p className="statistics-description">
             {selectedQuestion !== "All"
