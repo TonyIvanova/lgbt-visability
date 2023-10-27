@@ -51,6 +51,13 @@ h1 {
   text-transform: uppercase; 
 }
 
+h4  {
+  color: #42413f;
+  text-transform: none; 
+  text-decoration: underline; 
+  font-size: small;
+}
+
 body,
 button,
 input,

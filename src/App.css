@@ -52,6 +52,33 @@ header {
   align-items: center;
 }
 
+
+
+.link {
+  margin: 0px;
+  text-decoration: none;
+  font-family: "Stolzl", Sans-serif;
+  font-size: 10px;
+  font-weight: 100;
+  text-transform: none;
+  text-decoration: underline; 
+  fill: #ffffff;
+  color: #ffffff;
+  background-color: #ffffff;
+  padding: 0px 0px 0px 0px;
+}
+
+.link:hover,
+.link:active {
+  color: #969aff;
+  background-color: #ffffff;
+}
+
+.button-primary:hover {
+  color: #969aff;
+  background-color: #ffffff;
+}
+
 .button-primary {
   margin: 8px;
   text-decoration: none;
@@ -95,11 +122,40 @@ header {
   padding: 11px 24px 10px 24px;
 }
 
+
+
+.button-tetriary {
+  margin: 8px;
+  text-decoration: none;
+  font-family: "Stolzl", Sans-serif;
+  font-size: 12px;
+  font-weight: 300;
+  text-transform: uppercase;
+  line-height: 17.6px;
+  letter-spacing: -0.48px;
+  fill: #fff;
+  color: #413a2e;
+  background-color: #fff;
+  border-style: solid;
+  border-width: 2px 2px 2px 2px;
+  /* border-color: #f4f3ee; */
+  border-radius: 200px 200px 200px 200px;
+  padding: 11px 24px 10px 24px;
+}
+
 .button-secondary:hover,
 .button-secondary.active {
   color: #ffffff;
   background-color: #969aff;
 }
+
+
+.button-tetriary:hover,
+.button-tetriary.active {
+  color: #fff;
+  background-color: #111;
+}
+
 
 .header-buttons-container {
   padding: 0 20px;
@@ -113,7 +169,7 @@ header {
   top: 385px;
   right: 0px;
   overflow: hidden;
-  opacity: 0.8;
+  opacity: 0.3;
 }
 
 .background-image-2 {

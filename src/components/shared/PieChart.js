@@ -89,7 +89,7 @@ export default function PieChart({ data, onArcClick = () => {} }) {
   const legend = pie.map((arc, i) => {
     return (
       <>
-        <div className={styles.legendText}>
+        <div className={styles.legendText} style={{ width: 500}}>
           <div
             style={{
               background: colorScale(arc.data.value),
