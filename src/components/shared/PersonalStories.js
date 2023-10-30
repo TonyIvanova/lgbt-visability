@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
 import arrow from "./../../assets/arrow.svg";
-import { getSheetData, dataMap } from "../.././services/googleSheetsService";
-
+import { getSheetData } from "../../services/googleSheetsService";
+import { useDataMap } from "../../contexts/dataContext"
+import { useYear } from "../../contexts/yearContext";
 
 export default function PersonalStories({ topic }) {
   const [storyIndex, setStoryIndex] = useState(null);
   const [stories, setStories] = useState([]);
+  const {dataMap} = useDataMap()
+  const {year, setYear} = useYear();
 
   useEffect(() => {
-    getSheetData(dataMap['2022']['report']['sheet'], 'df_stories').then((data) => {
+    getSheetData(dataMap[year]['report']['sheet'], 'df_stories_filtered').then((data) => {
       const datas = data.filter((row) => row.name === topic);
       setStories(datas);
       setStoryIndex(0);

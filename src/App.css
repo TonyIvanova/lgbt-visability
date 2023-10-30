@@ -52,7 +52,7 @@ header {
   align-items: center;
 }
 
-
+/* 
 
 .link {
   margin: 0px;
@@ -66,19 +66,50 @@ header {
   color: #ffffff;
   background-color: #ffffff;
   padding: 0px 0px 0px 0px;
+} */
+
+
+.custom-link {
+  text-decoration: none;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 2px;
 }
+.custom-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: var(--link-color);
+  transition: all 0.3s;
+}
+.custom-link:hover {
+  color: var(--link-color);
+}
+.custom-link:hover::after {
+  height: 100%;
+  background-color: var(--link-color);
+}
+.custom-link:active {
+  color: var(--link-color);
+  background-color: rgba(0,0,0,0.1); /* This gives a slight shade for the active state */
+}
+
+/* 
 
 .link:hover,
 .link:active {
   color: #969aff;
   background-color: #ffffff;
-}
+} */
 
 .lang {
   margin: 0px;
   text-decoration: none;
   font-family: "Stolzl", Sans-serif;
-  font-size: 16px;
+  font-size: 10px;
   font-weight: 100;
   text-transform: none;
   text-decoration: none; 
@@ -150,7 +181,7 @@ header {
   margin: 8px;
   text-decoration: none;
   font-family: "Stolzl", Sans-serif;
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 300;
   text-transform: uppercase;
   line-height: 17.6px;

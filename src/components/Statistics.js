@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import Map from "./shared/Map";
-import PieChart from "./shared/PieChart";
-import { getSheetData, dataMap } from ".././services/googleSheetsService";
+import {PieChart,PieChart2} from "./shared/PieChart";
+import { getSheetData } from ".././services/googleSheetsService";
 import {ButtonGroupLang} from "./shared/ButtonGroup";
+import {useDataMap} from "../contexts/dataContext"
+
 
 export default function Statistics({ topic }) {
   const [chartData, setChartData] = useState([]);
   const [mapData, setMapData] = useState([]);
+  const {dataMap} = useDataMap()
   const [chartDescription, setChartDescription] = useState("");
   const [mapDescription, setMapDescription] = useState("");
   const [selectedQuestion, setSelectedQuestion] = useState("All");
@@ -14,7 +17,8 @@ export default function Statistics({ topic }) {
     'Экономическое положение': 'economical_status',
     'Насилие':'violence',
     'Дискриминация':'discrimination',
-    'Влияние войны в Украине':'map_wareffect'
+    'Влияние войны в Украине':'map_wareffect',
+    'Открытость': 'opennes'
   }
   useEffect(() => {
     setSelectedQuestion("All");
@@ -69,7 +73,9 @@ export default function Statistics({ topic }) {
     return (
       <div className="section">
         <div>
-        <ButtonGroupLang buttons={['Cis','Trans','All']}/>
+
+          
+        <ButtonGroupLang buttons={['| Cis','|  Trans  |','All |']}/>
           <Map statistics={mapData} />
           <p className="statistics-description">
             {selectedQuestion !== "All"
@@ -82,8 +88,17 @@ export default function Statistics({ topic }) {
             <br />
           </p>
         </div>
+
         <div>
+        {topic === "Открытость" ? (
+          <div>
+          <ButtonGroupLang buttons={['Семья','Друзья','Коллеги/однокурсники']}/>
           <PieChart data={chartData} onArcClick={handleArcClick} />
+          </div>
+        ):(
+          <PieChart data={chartData} onArcClick={handleArcClick} />
+        )
+         }
           <p className="statistics-description">{chartDescription}</p>
         </div>
       </div>

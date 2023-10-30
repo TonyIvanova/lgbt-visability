@@ -2,7 +2,7 @@ import React, { useRef, useMemo, useState } from "react";
 import * as d3 from "d3";
 import styles from "./pie-chart.module.css";
 
-export default function PieChart({ data, onArcClick = () => {} }) {
+export  function PieChart({ data, onArcClick = () => {} }) {
   // const [selectedArc, setSelectedArc] = useState(null);
 
   const handleArcClick = (name) => {

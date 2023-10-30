@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from "react";
 import PersonalStories from "./shared/PersonalStories";
-import { getSheetData, dataMap } from ".././services/googleSheetsService";
+import { getSheetData, fetchDataMap } from "../services/googleSheetsService";
 import Statistics from "./Statistics";
+import {useDataMap} from "../contexts/dataContext"
+import { useYear, YearProvider } from "../contexts/yearContext";
+
 
 export default function Section({ topic }) {
   const [conclusions, setConclusions] = useState([]);
+  const {year, setYear} = useYear();
+  const {dataMap} = useDataMap()
+
 
   useEffect(() => {
-    getSheetData(dataMap['2022']['report']['sheet'], 'conclusions').then((data) => {
+    getSheetData(dataMap[year]['report']['sheet'], 'conclusions').then((data) => {
       setConclusions(data.filter((row) => row.name === topic));
     });
-  }, [topic]);
+  }, [topic, year]);
 
   return (
     <div>
