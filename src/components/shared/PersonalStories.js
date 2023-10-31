@@ -1,22 +1,26 @@
 import React, { useState, useEffect } from "react";
 import arrow from "./../../assets/arrow.svg";
 import { getSheetData } from "../../services/googleSheetsService";
-import { useDataMap } from "../../contexts/dataContext"
+import { useData } from "../../contexts/dataContext"
 import { useYear } from "../../contexts/yearContext";
+import { useLanguage } from "../../contexts/langContext";
 
 export default function PersonalStories({ topic }) {
   const [storyIndex, setStoryIndex] = useState(null);
   const [stories, setStories] = useState([]);
-  const {dataMap} = useDataMap()
+  const {data} = useData()
   const {year, setYear} = useYear();
+  const { language } = useLanguage();
 
-  useEffect(() => {
-    getSheetData(dataMap[year]['report']['sheet'], 'df_stories_filtered').then((data) => {
-      const datas = data.filter((row) => row.name === topic);
-      setStories(datas);
-      setStoryIndex(0);
-    });
-  }, [topic]);
+useEffect(() => {
+  getSheetData(data, 'df_stories_filtered').then((dat) => {
+    const datas = dat.filter((row) => row.name === topic && row.language === language); // filtering based on language
+    setStories(datas);
+    setStoryIndex(0);
+  });
+  console.log('Stories: ',stories)
+}, [topic, language]); 
+
   const getStory = () => {
     return (
       <div className="personal-stories">

@@ -9,44 +9,77 @@ import bg2 from "./assets/bg2.svg";
 import loader from "./assets/loader.gif";
 import {ButtonGroup1,ButtonGroup2} from "./components/shared/ButtonGroup";
 import {LinkComponent} from './components/shared/LinkComponent';
-import { DataProvider, useData, useDataMap } from "./contexts/dataContext";
+import { 
+  DataProvider, 
+  useData, 
+  useDataMap,
+  useConfiguration,
+  useDescriptions,
+  useWhichSubset
+ } from "./contexts/dataContext";
+import { LanguageProvider, useLanguage } from './contexts/langContext';
 import Section from "./components/Section";
 import { useYear, YearProvider } from "./contexts/yearContext";
 
-export const DataContext = createContext(null);
+export const DataContext = createContext([]);
 
 function AppContent() {
+  console.log('AppContent start')
+  const CONFIG_SHEET_ID = '1QKmA5UX-FM31jEE7UOVTmlCKxQ_Wa1K2oXxulhtkJHE'
   const [sections, setSections] = useState(null);
-  const [topic, setTopic] = useState(null);
-  const {year, setYear} = useYear();
-  const { dataMap, setDataMap } = useDataMap(); 
+  const [topic, setTopic] = useState(null); 
+ 
+  const {language, setLanguage} = useLanguage(); 
+  const {year, setYear} = useYear(); // report year
+  const { dataMap, setDataMap } = useDataMap(); // reports ids
   const { data, setData } = useData(); 
+  const configuration = useConfiguration()
+  const descriptions = useDescriptions()
+  const whichSubset = useWhichSubset()
+  console.log('App/configuration',configuration)
+  console.log('App/descriptions',descriptions)
+  console.log('App/whichSubset',whichSubset)
+  
+  const years = Object.keys(dataMap);// to get list of years reports exist for
+ 
 
-
-  const [years, setYears] = useState([]);
-  // Fetch years when component mounts
   useEffect(() => {
-    async function fetchYears() {
-      const map = await fetchDataMap(); 
-      const fetchedYears = Object.keys(map); // an array of years
-      setYears(fetchedYears);
-    }
-    fetchYears();
-  }, []);
+    console.log("Updated sections data:", sections);
+    console.log("Updated years data", years);
+    console.log("Updated topic data:", topic);
+    console.log("Updated year data:", year);
+    console.log("Updated configuration data:", configuration);
+    console.log("Updated descriptions data:", descriptions);
+    // console.log("Updated spreadsheet data:", spreadsheet);
+    console.log("Updated data data:", data);
 
+}, [sections, topic]);
+
+
+
+  // Get selected year
   const selectYear = (event) => {
     setYear(event.target.name);
   };
 
+  
+  // Get sections names: from config.xlsx
   useEffect(() => {
-    // TODO: change to config/configuration/key+lang
-    getSheetData(dataMap[year]['report']['sheet'], 'configuration').then((data) => {
-      setSections(data.map((row) => row.section_title));
-      setTopic(data[0].section_title);
-    });
-  }, [year]);
+    const fetchTranslations = async () => {
+      const colName = language === 'en' ? 'en' : 'ru';
+      setSections(configuration.map((row) => row[colName]));
+      setTopic(configuration[0][colName]);
 
+    };  
+    fetchTranslations();
+  }, [language]);  // Re-fetch translations when the language changes
+  
+  const changeLanguage = (lang) => {
+    setLanguage(lang);
+  };
+  
   const selectTopic = (event) => {
+    console.log(event.target.name);
     setTopic(event.target.name);
   };
 
@@ -65,7 +98,6 @@ function AppContent() {
         <Header />
         <ButtonGroup2
               buttons={years}//{["2022", "2023"]}
-              // TODO: fetch years from config/years_data/year
               doSomethingAfterClick={selectYear}              
             />
 
@@ -77,7 +109,10 @@ function AppContent() {
         
         <h1>Положение лгбт+ людей в россии на {year} год</h1>
 
-        <ButtonGroup1 buttons={sections} doSomethingAfterClick={selectTopic} />
+        <ButtonGroup1 
+          buttons={sections} 
+          doSomethingAfterClick={selectTopic} 
+          />
        
         <div className="topic-component">{topicComponent()}</div>
         {/* <DataContext.Provider value={{ data, conclusions }}> */}
@@ -104,12 +139,16 @@ function AppContent() {
 
 
 function App() {
+  console.log('App start');
+
   return (
+    <LanguageProvider>
     <YearProvider>
       <DataProvider>
         <AppContent />
       </DataProvider>
     </YearProvider>
+    </LanguageProvider>
   );
 }
 

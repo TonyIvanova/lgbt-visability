@@ -2,7 +2,11 @@ import React, { useState, useEffect } from "react";
 import PersonalStories from "./shared/PersonalStories";
 import { getSheetData, fetchDataMap } from "../services/googleSheetsService";
 import Statistics from "./Statistics";
-import {useDataMap} from "../contexts/dataContext"
+import {
+  useDataMap,
+  useDatata,
+  useWhichSubset
+} from "../contexts/dataContext"
 import { useYear, YearProvider } from "../contexts/yearContext";
 
 
@@ -13,7 +17,8 @@ export default function Section({ topic }) {
 
 
   useEffect(() => {
-    getSheetData(dataMap[year]['report']['sheet'], 'conclusions').then((data) => {
+
+    getSheetData('16rkG1h_82MCuImvFkvV8P7N5TsJw5S49avmCuUG3HQ', 'conclusions').then((data) => {
       setConclusions(data.filter((row) => row.name === topic));
     });
   }, [topic, year]);
