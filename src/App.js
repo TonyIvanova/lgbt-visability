@@ -28,7 +28,6 @@ function AppContent() {
   const CONFIG_SHEET_ID = '1QKmA5UX-FM31jEE7UOVTmlCKxQ_Wa1K2oXxulhtkJHE'
   const [sections, setSections] = useState(null);
   const [topic, setTopic] = useState(null); 
- 
   const {language, setLanguage} = useLanguage(); 
   const {year, setYear} = useYear(); // report year
   const { dataMap, setDataMap } = useDataMap(); // reports ids
@@ -36,9 +35,6 @@ function AppContent() {
   const configuration = useConfiguration()
   const descriptions = useDescriptions()
   const whichSubset = useWhichSubset()
-  console.log('App/configuration',configuration)
-  console.log('App/descriptions',descriptions)
-  console.log('App/whichSubset',whichSubset)
   
   const years = Object.keys(dataMap);// to get list of years reports exist for
  
@@ -65,14 +61,15 @@ function AppContent() {
   
   // Get sections names: from config.xlsx
   useEffect(() => {
-    const fetchTranslations = async () => {
-      const colName = language === 'en' ? 'en' : 'ru';
-      setSections(configuration.map((row) => row[colName]));
-      setTopic(configuration[0][colName]);
-
-    };  
-    fetchTranslations();
-  }, [language]);  // Re-fetch translations when the language changes
+    // const fetchTranslations = async () => {
+      // const colName = language === 'en' ? 'en' : 'ru';
+      if (Array.isArray(configuration)){
+      setSections(configuration.map((row) => row.name));
+      setTopic(configuration[0].name);
+    }
+    // };  
+    // fetchTranslations();
+  }, [language,configuration]);  // Re-fetch translations when the language changes
   
   const changeLanguage = (lang) => {
     setLanguage(lang);

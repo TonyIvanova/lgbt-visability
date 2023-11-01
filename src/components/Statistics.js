@@ -30,19 +30,15 @@ export default function Statistics({ topic }) {
   const [mapDescription, setMapDescription] = useState("");
   const [selectedQuestion, setSelectedQuestion] = useState("All");
 
-  // const topicsMap = {
-  //   'Экономическое положение': 'economical_status',
-  //   'Насилие':'violence',
-  //   'Дискриминация':'discrimination',
-  //   'Влияние войны в Украине':'war_effects',
-  //   'Открытость': 'opennes'
-  // }
+  const topicsMap = {
+    'Экономическое положение': 'economical_status',
+    'Насилие':'violence',
+    'Дискриминация':'discrimination',
+    'Влияние войны в Украине':'war_effects',
+    'Открытость': 'opennes'
+  }
   const configuration = getConfiguration()
-  const topicsMap = Object.entries(configuration).reduce((acc, [key, value]) => {
-    acc[value] = key;
-    return acc;
-  }, {});   
-console.log(topicsMap);
+  
 
 
 // TODO: change to fetConfiguration(language)
@@ -58,13 +54,15 @@ console.log(topicsMap);
   useEffect(() => {
     // Get row (topic) from preloaded config.xlsx/descriptions, by language (column)
     setSelectedQuestion("All");
-    const descriptions = useDescriptions()
-    console.log('Statistics/descr',descriptions)
     // setDescriptions(descr[topic])
   }, [language]);
 
 
   useEffect(() => {
+    if (!configuration) {
+      return; // Exit the effect if configuration is not yet available
+  }
+
     // getSheetData(dataMap[year]['report']['sheet'], topicsMap[topic]).then((res) => {
       getSheetData('16rkG1h_82MCuImvFkvV8P7N5TsJw5S49avmCuUG3HQ',
       topicsMap[topic]).then((res) => {
@@ -72,7 +70,7 @@ console.log(topicsMap);
       setChartData(parseChartData(res));
       setMapData(parseMapData(res));
     });
-  }, [topic, selectedQuestion, year]);
+  }, [topic, selectedQuestion, year, configuration]);
 
 
   const setDescriptions = (res) => {

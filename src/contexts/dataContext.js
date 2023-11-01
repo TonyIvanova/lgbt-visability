@@ -139,7 +139,7 @@ export const useConfiguration = () => {
   if (configuration === undefined) {
     throw new Error('useConfiguration must be used within a DataProvider');
   }
-  return { configuration };
+  return configuration ;
 };
 
 export const useDescriptions = () => {
@@ -147,7 +147,7 @@ export const useDescriptions = () => {
   if (descriptions === undefined) {
     throw new Error('useDescriptions must be used within a DataProvider');
   }
-  return { descriptions };
+  return descriptions ;
 };
 
 export const useWhichSubset = () => {
@@ -155,5 +155,5 @@ export const useWhichSubset = () => {
   if (whichSubset === undefined) {
     throw new Error('usewhichSubset must be used within a DataProvider');
   }
-  return { whichSubset };
+  return  whichSubset ;
 };
