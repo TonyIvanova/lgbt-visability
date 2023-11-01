@@ -13,21 +13,25 @@ export  function PieChart({ data, onArcClick = () => {} }) {
   // Chart setup
   const width = 150;
   const height = width;
-
+  const radius = width / 2;
   var colorScale = d3.scaleOrdinal(d3.schemeAccent);
 
+  // Reference to the SVG group containing the arcs for adding/removing highlight class
   const ref = useRef(null);
 
-  const radius = width / 2;
-
+  
+// Compute the pie layout for the given data
   const pie = useMemo(() => {
     const pieGenerator = d3.pie().value((d) => d.value);
     return pieGenerator(data);
   }, [data]);
 
+// Arc generator to create arc shapes for pie chart
   const arcGenerator = d3.arc();
 
+    // Create SVG shapes for each pie slice
   const shapes = pie.map((arc, i) => {
+    // Define the properties for each slice
     const sliceInfo = {
       innerRadius: radius * 0.6,
       outerRadius: radius,
@@ -35,8 +39,10 @@ export  function PieChart({ data, onArcClick = () => {} }) {
       endAngle: arc.endAngle,
     };
 
+    // Generate the SVG path data for the slice
     const slicePath = arcGenerator(sliceInfo);
 
+    // Determine the fill color for the slice
     const color = arc?.data?.value ? colorScale(arc.data.value) : "lightgrey";
 
     // Add highlight for selected arc
@@ -63,6 +69,8 @@ export  function PieChart({ data, onArcClick = () => {} }) {
     //     </g>
     //   );
     // } else {}
+
+   // Return SVG group for each pie slice with interaction handlers
     return (
       <g
         key={i}

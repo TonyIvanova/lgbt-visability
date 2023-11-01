@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Map from "./shared/Map";
-import {PieChart,PieChart2} from "./shared/PieChart";
+import {PieChart} from "./shared/PieChart";
+import {BarPlot} from "./shared/BarPlot";
 import { 
   getConfiguration, 
   getSheetData, 
@@ -69,9 +70,6 @@ export default function Statistics({ topic }) {
   }
 
     getSheetData(dataMap[year]['report']['sheet'],
-     
-      // getSheetData(
-        // '16rkG1h__82MCuImvFkvV8P7N5TsJw5S49avmCuUG3HQ',
       topicsMap[topic]).then((res) => {
       console.log('res:',res)
       setMapData(res)
@@ -140,9 +138,10 @@ export default function Statistics({ topic }) {
           <div>
           <ButtonGroupLang buttons={['Семья','Друзья','Коллеги/однокурсники']}/>
           <PieChart data={chartData} onArcClick={handleArcClick} />
+          <BarPlot data={chartData} onArcClick={handleArcClick} />
           </div>
         ):(
-          <PieChart data={chartData} onArcClick={handleArcClick} />
+          <BarPlot data={chartData} onArcClick={handleArcClick} />
         )
          }
           <p className="statistics-description">{chartDescription}</p>
