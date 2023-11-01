@@ -14,7 +14,7 @@ export async function getDataMap() {
         let sheetId = data.values[i][1];
         tempDataMap[year] = { report: { sheet: sheetId } };
     }
-    console.log('getDataMap: ', tempDataMap)
+    console.log('gheetService/getDataMap: ', tempDataMap)
     return tempDataMap;
   }
 
@@ -24,11 +24,9 @@ export async function getDataMap() {
 var dataCache = {}
 // Function to get data from a specific sheet from  a corresponding'report.xlsx'
 export function getSheetData(tableId, sheetName) {
-  // const [dataMap, setDataMap] = useState({});
- 
      // Check if data for the requested table and sheet is already in cache
-    console.log('dataCache:',dataCache)
-    
+     console.log('tableId:',tableId)
+     console.log('sheetName:',sheetName)
      if(dataCache[tableId+"_"+sheetName]) {
         // If yes - return the cached data   
         return new Promise((resolve, reject) => {
@@ -40,8 +38,9 @@ export function getSheetData(tableId, sheetName) {
         var jsonData = []
         var colsMap = {}
         // Map column indices to their respective headers
-        console.log('data',data)
-        console.log('data[0]',data[0])
+        console.log('gsheetService/data',data)
+        // console.log('data[0]',data[0])
+        
         data[0].forEach( (item, idx) => {
             colsMap[idx] = item
         })
@@ -60,10 +59,13 @@ export function getSheetData(tableId, sheetName) {
 
      // Fetch data from Google Sheets API
     const tableData = new Promise((resolve, reject) => {
+    
       return fetch(`https://sheets.googleapis.com/v4/spreadsheets/${tableId}/values/${sheetName}?key=${API_KEY}`)
         .then(response => response.json())
+        
         // Cache the transformed data
         .then(data => {
+          console.log('sghs/data',data)
             dataCache[tableId+"_"+sheetName] = transformData(data.values)
             resolve(dataCache[tableId+"_"+sheetName])
             return
@@ -77,6 +79,69 @@ export function getSheetData(tableId, sheetName) {
 
   // Function to get info  from 'config.xlsx'
 export async function getDescriptions(language = 'ru') {
+  const CONFIG_SHEET_ID = '1QKmA5UX-FM31jEE7UOVTmlCKxQ_Wa1K2oXxulhtkJHE'; 
+  const CONFIG_SHEET_descriptions = 'descriptions';
+  const data = await getSheetData(CONFIG_SHEET_ID, CONFIG_SHEET_descriptions);
+  console.log('getDescriptions: ', data)
+  return data.map(item => ({
+      key: item.key,
+      name: item[`name_${language}`],
+      map: item[`map_${language}`],
+      pie: item[`pie_${language}`]
+  }));
+}
+
+
+// export async function getDMapData(spreadsheet_id, topic_key) {
+//   const res = await getSheetData(spreadsheet_id, topic_key);
+//   console.log('getDMapData: ', res)
+//   return res.map((row) => ({
+//     name: row.District,
+//     value: parseFloat(row[selectedQuestion]),
+//   }));
+
+// }
+
+// export async function getBarData(spreadsheet_id, topic_key) {
+//   const res = await getSheetData(spreadsheet_id, topic_key);
+//   console.log('getBarData: ', res)
+//   if (res?.length === 0) return [];
+//   //get qiuestions
+//     const fields = Object.keys(res[0])
+//       .filter((key) => key !== "District" && key !== "All")
+//       .map((key) => {
+//         return key;
+//       });
+//      //get row Vse districts
+//     const values = res.find((row) => row.District === "Все");
+//     const result = fields.map((field) => {
+//       //name=district value=for Question
+//       return { name: field, value: parseFloat(values[field]) };
+//     });
+//     return result;
+//   };
+
+
+
+// export async function getPieData(spreadsheet_id, topic_key) {
+//   const res = await getSheetData(spreadsheet_id, topic_key);
+//   console.log('getBarData: ', res)
+//   if (res?.length === 0) return [];
+//     const fields = Object.keys(res[0])
+//       .filter((key) => key !== "District" && key !== "All")
+//       .map((key) => {
+//         return key;
+//       });
+//     const values = res.find((row) => row.District === "Все");
+//     const result = fields.map((field) => {
+//       return { name: field, value: parseFloat(values[field]) };
+//     });
+//     return result;
+//   };
+
+
+
+export async function getPieData( topic, language = 'ru',) {
   const CONFIG_SHEET_ID = '1QKmA5UX-FM31jEE7UOVTmlCKxQ_Wa1K2oXxulhtkJHE'; 
   const CONFIG_SHEET_descriptions = 'descriptions';
   const data = await getSheetData(CONFIG_SHEET_ID, CONFIG_SHEET_descriptions);

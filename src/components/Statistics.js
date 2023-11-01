@@ -37,8 +37,13 @@ export default function Statistics({ topic }) {
     'Влияние войны в Украине':'war_effects',
     'Открытость': 'opennes'
   }
+
   const configuration = getConfiguration()
-  
+  //   const topicsMap = {};
+// configuration.forEach(topic => {
+//   topicsMap[topic.name] = topic.key;
+// });
+
 
 
 // TODO: change to fetConfiguration(language)
@@ -63,10 +68,13 @@ export default function Statistics({ topic }) {
       return; // Exit the effect if configuration is not yet available
   }
 
-    // getSheetData(dataMap[year]['report']['sheet'], topicsMap[topic]).then((res) => {
-      getSheetData('16rkG1h_82MCuImvFkvV8P7N5TsJw5S49avmCuUG3HQ',
+    getSheetData(dataMap[year]['report']['sheet'],
+     
+      // getSheetData(
+        // '16rkG1h__82MCuImvFkvV8P7N5TsJw5S49avmCuUG3HQ',
       topicsMap[topic]).then((res) => {
       console.log('res:',res)
+      setMapData(res)
       setChartData(parseChartData(res));
       setMapData(parseMapData(res));
     });
@@ -74,9 +82,9 @@ export default function Statistics({ topic }) {
 
 
   const setDescriptions = (res) => {
-    const relevantTopic = res.find((value) => value.Name === topic);
-    setChartDescription(relevantTopic?.Pie);
-    setMapDescription(relevantTopic?.Map);
+    const relevantTopic = res.find((value) => value.name === topic);
+    setChartDescription(relevantTopic?.pie);
+    setMapDescription(relevantTopic?.map);
   };
 
   const parseChartData = (res) => {
