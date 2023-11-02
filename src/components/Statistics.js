@@ -1,23 +1,23 @@
 import React, { useState, useEffect, useMemo } from "react";
 import Map from "./shared/Map";
-import {PieChart} from "./shared/PieChart";
-import {BarPlot} from "./shared/BarPlot";
-import { 
-  getConfiguration, 
-  getSheetData, 
+import { PieChart } from "./shared/PieChart";
+import { BarPlot } from "./shared/BarPlot";
+import {
+  getConfiguration,
+  getSheetData,
   // getFullSpreadsheetData,
   // getStories
 } from ".././services/googleSheetsService";
-import {ButtonGroupLang} from "./shared/ButtonGroup";
+import { ButtonGroupLang } from "./shared/ButtonGroup";
 // import {useDataMap} from "../contexts/dataContext"
-import {useYear} from "../contexts/yearContext"
-import { 
-  useConfiguration,   
+import { useYear } from "../contexts/yearContext"
+import {
+  useConfiguration,
   useDescriptions,
   // useData,
   // useSubset,
   useDataMap
- } from "../contexts/dataContext";
+} from "../contexts/dataContext";
 import { useLanguage } from "../contexts/langContext";
 
 
@@ -25,9 +25,9 @@ export default function Statistics({ topic }) {
   const [pieData, setPieData] = useState([]);
   const [barData, setBarData] = useState([]);
   const [mapData, setMapData] = useState([]);
-  const {dataMap} = useDataMap()
-  const {year} = useYear()
-  const {language} = useLanguage()
+  const { dataMap } = useDataMap()
+  const { year } = useYear()
+  const { language } = useLanguage()
   // console.log(dataMap)
   const [pieDescription, setPieDescription] = useState("");
   const [mapDescription, setMapDescription] = useState("");
@@ -37,27 +37,27 @@ export default function Statistics({ topic }) {
   const [whichSubset, setWhichSubset] = useState('All'); //Trans/Cis
 
   const [selectedQuestion, setSelectedQuestion] = useState("All");
-// console.log('Statistics/topic', topic)
+  // console.log('Statistics/topic', topic)
   const topicsMap = {
     'Экономическое положение': 'economical_status',
-    'Насилие':'violence',
-    'Дискриминация':'discrimination',
-    'Влияние войны в Украине':'war_effects',
+    'Насилие': 'violence',
+    'Дискриминация': 'discrimination',
+    'Влияние войны в Украине': 'war_effects',
     'Открытость': 'opennes'
   }
 
   const configuration = getConfiguration()
   //   const topicsMap = {};
-// configuration.forEach(topic => {
-//   topicsMap[topic.name] = topic.key;
-// });
+  // configuration.forEach(topic => {
+  //   topicsMap[topic.name] = topic.key;
+  // });
 
-// useEffect(() => {
-// const [spreadsheet_id] = dataMap[year]['report']['sheet']
-// },[year])
+  // useEffect(() => {
+  // const [spreadsheet_id] = dataMap[year]['report']['sheet']
+  // },[year])
 
 
-// TODO: change to fetConfiguration(language)
+  // TODO: change to fetConfiguration(language)
 
   useEffect(() => {
     // // console.log("Statistics/pieData:", pieData);
@@ -65,16 +65,16 @@ export default function Statistics({ topic }) {
     // console.log("Statistics/ mapDescription:", pieDescription);
     // console.log("Statistics/ mapDescription:", barDescription);
     // console.log("Statistics/ mapDescription:", mapDescription);
-    console.log('Statistics/selectedQuestion[year]: ',selectedQuestion)
+    console.log('Statistics/selectedQuestion[year]: ', selectedQuestion)
     // console.log('Statistics/stories: ',stories)
-}, [
-  // chartData,
-  //  mapDescription,
-  stories,
-   selectedQuestion]);
+  }, [
+    // chartData,
+    //  mapDescription,
+    stories,
+    selectedQuestion]);
 
-  
-// TODO: change to  useDescriptions[lang]
+
+  // TODO: change to  useDescriptions[lang]
   useEffect(() => {
     // Get row (topic) from preloaded config.xlsx/descriptions, by language (column)
     setSelectedQuestion("All");
@@ -85,17 +85,17 @@ export default function Statistics({ topic }) {
   useEffect(() => {
     if (!configuration) {
       return; // Exit the effect if configuration is not yet available
-  }
- 
+    }
+
     getSheetData(dataMap[year]['report']['sheet'],
       topicsMap[topic]).then((res) => {
-      // console.log('res:',res)
-      setMapData(res)
-      setPieData(parsePieData(res));
-      setMapData(parseMapData(res));
-      setBarData(parseBarData(res));
-    });
-   
+        // console.log('res:',res)
+        setMapData(res)
+        setPieData(parsePieData(res));
+        setMapData(parseMapData(res));
+        setBarData(parseBarData(res));
+      });
+
 
   }, [topic, selectedQuestion, year, configuration]);
 
@@ -168,20 +168,20 @@ export default function Statistics({ topic }) {
       return ['Family', 'Friends', 'Associates'];
     }
     if (language === 'ru') {
-      return ['Семья','Друзья','Учеба/работа'];
+      return ['Семья', 'Друзья', 'Учеба/работа'];
     }
     // default to English if the language doesn't match any known value
-    return ['Семья','Друзья','Учеба/работа'];
+    return ['Семья', 'Друзья', 'Учеба/работа'];
   }, [language]);
 
   if (pieData && mapData && barData) {
     return (
       <div className="section">
         <div>
- 
-        <ButtonGroupLang 
-          buttons={subsetButtons}
-          doSomethingAfterClick = {setWhichSubset}
+
+          <ButtonGroupLang
+            buttons={subsetButtons}
+            doSomethingAfterClick={setWhichSubset}
           />
           <Map statistics={mapData} />
           <p className="statistics-description">
@@ -197,19 +197,19 @@ export default function Statistics({ topic }) {
         </div>
 
         <div>
-        {topic === "Открытость" ? (
-          <div>
-          <ButtonGroupLang 
-          buttons={opennessButtons}
-          doSomethingAfterClick = {setOpennesGroup}/>
-          {/* {opennes_group === "Открытость" ? ( */}
-          <PieChart data={pieData} onArcClick={handleArcClick} />
-          {/* <BarPlot data={barData} onArcClick={handleArcClick} /> */}
-          </div>
-        ):(
-          <BarPlot data={barData} onArcClick={handleArcClick} />
-        )
-         }
+          {topic === "Открытость" ? (
+            <div>
+              <ButtonGroupLang
+                buttons={opennessButtons}
+                doSomethingAfterClick={setOpennesGroup} />
+              {/* {opennes_group === "Открытость" ? ( */}
+              <PieChart data={pieData} onArcClick={handleArcClick} />
+              {/* <BarPlot data={barData} onArcClick={handleArcClick} /> */}
+            </div>
+          ) : (
+            <BarPlot data={barData} onArcClick={handleArcClick} />
+          )
+          }
           <p className="statistics-description">{pieDescription}</p>
         </div>
       </div>
