@@ -1,25 +1,62 @@
 import React, { useState, useEffect } from "react";
 import arrow from "./../../assets/arrow.svg";
 import { getSheetData } from "../../services/googleSheetsService";
-import { useData } from "../../contexts/dataContext"
+import { useData, useDataMap } from "../../contexts/dataContext"
 import { useYear } from "../../contexts/yearContext";
 import { useLanguage } from "../../contexts/langContext";
 
 export default function PersonalStories({ topic }) {
   const [storyIndex, setStoryIndex] = useState(null);
   const [stories, setStories] = useState([]);
-  const {data} = useData()
+  const {dataMap} = useDataMap()
   const {year, setYear} = useYear();
   const { language } = useLanguage();
 
-useEffect(() => {
-  getSheetData(data, 'df_stories_filtered').then((dat) => {
-    const datas = dat.filter((row) => row.name === topic && row.language === language); // filtering based on language
-    setStories(datas);
-    setStoryIndex(0);
-  });
-  console.log('Stories: ',stories)
-}, [topic, language]); 
+
+  useEffect(() => {
+   
+    console.log('PersonaStories/stories: ',stories)
+}, [
+  // chartData,
+  //  mapDescription,
+  stories
+  ]);
+
+  useEffect(() => {
+    async function fetchStories() {
+      const stories = await getStories(dataMap, topic, language);
+      setStories(stories);
+      setStoryIndex(0);
+    }
+  
+    async function getStories(dataMap, topic, language = 'ru') {
+      const rawData = await getSheetData(dataMap[year]['report']['sheet'], 'df_stories_filtered');
+      console.log('rawData',rawData)
+      const mappedData = rawData.map(item => ({
+        key: item.key,
+        name: item[`name_${language}`],
+        text: item[`text_${language}`],
+        author: item[`author_${language}`]
+      }));
+      console.log('mappedData',mappedData)
+      return mappedData.filter(story => story.name === topic);
+  
+    }
+  
+    fetchStories();
+    console.log('stories:::',stories)
+  }, [topic, language, year, dataMap]);
+  
+
+  
+// useEffect(() => {
+//   getSheetData(data, 'df_stories_filtered').then((dat) => {
+//     const datas = dat.filter((row) => row.name === topic && row.language === language); // filtering based on language
+//     setStories(datas);
+//     setStoryIndex(0);
+//   });
+//   console.log('Stories: ',stories)
+// }, [topic, language]); 
 
   const getStory = () => {
     return (

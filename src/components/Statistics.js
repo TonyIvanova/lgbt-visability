@@ -5,7 +5,8 @@ import {BarPlot} from "./shared/BarPlot";
 import { 
   getConfiguration, 
   getSheetData, 
-  getFullSpreadsheetData 
+  // getFullSpreadsheetData,
+  // getStories
 } from ".././services/googleSheetsService";
 import {ButtonGroupLang} from "./shared/ButtonGroup";
 // import {useDataMap} from "../contexts/dataContext"
@@ -13,8 +14,8 @@ import {useYear} from "../contexts/yearContext"
 import { 
   useConfiguration,   
   useDescriptions,
-  useData,
-  useSubset,
+  // useData,
+  // useSubset,
   useDataMap
  } from "../contexts/dataContext";
 import { useLanguage } from "../contexts/langContext";
@@ -31,11 +32,12 @@ export default function Statistics({ topic }) {
   const [pieDescription, setPieDescription] = useState("");
   const [mapDescription, setMapDescription] = useState("");
   const [barDescription, setBarDescription] = useState("");
-  const [opennesGroup, setOpennesGroup] = useState("");
+  const [stories, setStories] = useState("");
+  const [opennesGroup, setOpennesGroup] = useState("All");
   const [whichSubset, setWhichSubset] = useState('All'); //Trans/Cis
 
   const [selectedQuestion, setSelectedQuestion] = useState("All");
-
+// console.log('Statistics/topic', topic)
   const topicsMap = {
     'Экономическое положение': 'economical_status',
     'Насилие':'violence',
@@ -50,6 +52,9 @@ export default function Statistics({ topic }) {
 //   topicsMap[topic.name] = topic.key;
 // });
 
+// useEffect(() => {
+// const [spreadsheet_id] = dataMap[year]['report']['sheet']
+// },[year])
 
 
 // TODO: change to fetConfiguration(language)
@@ -61,9 +66,11 @@ export default function Statistics({ topic }) {
     // console.log("Statistics/ mapDescription:", barDescription);
     // console.log("Statistics/ mapDescription:", mapDescription);
     console.log('Statistics/selectedQuestion[year]: ',selectedQuestion)
+    // console.log('Statistics/stories: ',stories)
 }, [
   // chartData,
   //  mapDescription,
+  stories,
    selectedQuestion]);
 
   
@@ -79,15 +86,17 @@ export default function Statistics({ topic }) {
     if (!configuration) {
       return; // Exit the effect if configuration is not yet available
   }
-
+ 
     getSheetData(dataMap[year]['report']['sheet'],
       topicsMap[topic]).then((res) => {
-      console.log('res:',res)
+      // console.log('res:',res)
       setMapData(res)
       setPieData(parsePieData(res));
       setMapData(parseMapData(res));
       setBarData(parseBarData(res));
     });
+   
+
   }, [topic, selectedQuestion, year, configuration]);
 
 

@@ -15,7 +15,7 @@ export const DataContext = createContext();
 
 // Provider component
 export const DataProvider = ({ children }) => {
-  console.log('DataProvider start')
+  // console.log('DataProvider start')
   const [data, setData] = useState(null);
   const [dataMap, setDataMap] = useState({}); 
   const [loading, setLoading] = useState(true); 
@@ -30,7 +30,7 @@ export const DataProvider = ({ children }) => {
   // Fetches the data map when when the app or a part of the app using the provider first mounts
   useEffect(() => {
     async function loadDataMap() {
-      console.log('loadConfig start')
+      // console.log('loadConfig start')
       try {
           const map = await getDataMap();
           setDataMap(map);
@@ -46,16 +46,16 @@ export const DataProvider = ({ children }) => {
 
   useEffect(() => {
     async function loadConfig() {
-      console.log('loadConfig start')
+      // console.log('loadConfig start')
       try {
          
           const descr = await getDescriptions(language);
-          console.log(descriptions);
+          // console.log(descriptions);
           setDescriptions(descr)
 
           const config = await getConfiguration(language);
           setConfiguration(config)
-          console.log(configuration);
+          // console.log(configuration);
 
       } catch (err) {
           setError(err);
@@ -65,20 +65,20 @@ export const DataProvider = ({ children }) => {
   loadConfig();
   }, [language]);
 
-  useEffect(() => {
-    async function loadSpreadsheet() {
-      console.log('loadSpreadsheet start')
-      try {        
-          const data = await getFullSpreadsheetData(year)
-          console.log(data);
-          setData(data);
-      } catch (err) {
-          setError(err);
-          setLoading(false);
-      }
-  }
-  loadSpreadsheet();
-  }, [year]);
+  // useEffect(() => {
+  //   async function loadSpreadsheet() {
+  //     console.log('loadSpreadsheet start')
+  //     try {        
+  //         const data = await getFullSpreadsheetData(year)
+  //         console.log(data);
+  //         setData(data);
+  //     } catch (err) {
+  //         setError(err);
+  //         setLoading(false);
+  //     }
+  // }
+  // loadSpreadsheet();
+  // }, [year]);
 
 
   return (
@@ -88,7 +88,7 @@ export const DataProvider = ({ children }) => {
       loading, error,
       descriptions, 
       configuration,  
-      whichSubset, setWhichSubset 
+      // whichSubset, setWhichSubset 
       }}>
       {children}
     </DataContext.Provider>
@@ -126,7 +126,7 @@ return context;
 
 
 export const useDataMap = () => {
-  console.log('useDataMap start')
+  // console.log('useDataMap start')
   const { dataMap, setDataMap } = useContext(DataContext);
   if (dataMap === undefined) {
     throw new Error('useDataMap must be used within a DataProvider');
@@ -150,10 +150,10 @@ export const useDescriptions = () => {
   return descriptions ;
 };
 
-export const useSubset = () => {
-  const { whichSubset, setWhichSubset } = useContext(DataContext);
-  if (whichSubset === undefined) {
-    throw new Error('usewhichSubset must be used within a DataProvider');
-  }
-  return  { whichSubset, setWhichSubset } ;
-};
+// export const useSubset = () => {
+//   const { whichSubset, setWhichSubset } = useContext(DataContext);
+//   if (whichSubset === undefined) {
+//     throw new Error('usewhichSubset must be used within a DataProvider');
+//   }
+//   return  { whichSubset, setWhichSubset } ;
+// };

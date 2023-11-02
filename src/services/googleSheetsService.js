@@ -14,7 +14,7 @@ export async function getDataMap() {
         let sheetId = data.values[i][1];
         tempDataMap[year] = { report: { sheet: sheetId } };
     }
-    console.log('gheetService/getDataMap: ', tempDataMap)
+    // console.log('gheetService/getDataMap: ', tempDataMap)
     return tempDataMap;
   }
 
@@ -25,8 +25,8 @@ var dataCache = {}
 // Function to get data from a specific sheet from  a corresponding'report.xlsx'
 export function getSheetData(tableId, sheetName) {
      // Check if data for the requested table and sheet is already in cache
-     console.log('tableId:',tableId)
-     console.log('sheetName:',sheetName)
+    //  console.log('tableId:',tableId)
+    //  console.log('sheetName:',sheetName)
      if(dataCache[tableId+"_"+sheetName]) {
         // If yes - return the cached data   
         return new Promise((resolve, reject) => {
@@ -38,7 +38,7 @@ export function getSheetData(tableId, sheetName) {
         var jsonData = []
         var colsMap = {}
         // Map column indices to their respective headers
-        console.log('gsheetService/data',data)
+        // console.log('gsheetService/data',data)
         // console.log('data[0]',data[0])
         
         data[0].forEach( (item, idx) => {
@@ -65,7 +65,7 @@ export function getSheetData(tableId, sheetName) {
         
         // Cache the transformed data
         .then(data => {
-          console.log('sghs/data',data)
+          // console.log('sghs/data',data)
             dataCache[tableId+"_"+sheetName] = transformData(data.values)
             resolve(dataCache[tableId+"_"+sheetName])
             return
@@ -82,7 +82,7 @@ export async function getDescriptions(language = 'ru') {
   const CONFIG_SHEET_ID = '1QKmA5UX-FM31jEE7UOVTmlCKxQ_Wa1K2oXxulhtkJHE'; 
   const CONFIG_SHEET_descriptions = 'descriptions';
   const data = await getSheetData(CONFIG_SHEET_ID, CONFIG_SHEET_descriptions);
-  console.log('getDescriptions: ', data)
+  // console.log('getDescriptions: ', data)
   return data.map(item => ({
       key: item.key,
       name: item[`name_${language}`],
@@ -92,7 +92,26 @@ export async function getDescriptions(language = 'ru') {
   }));
 }
 
+// export async function getStories(dataMap, topic, language = 'ru') {
+//   // Assuming SPREADSHEET_ID is a global constant or needs to be passed as a parameter.
+//   const rawData = await getSheetData( dataMap[year]['report']['sheet'], 'df_stories_filtered');
+  
+//   // Map the raw data to the desired structure
+//   const mappedData = rawData.map(item => ({
+//     key: item.key,
+//     name: item[`name_${language}`],
+//     text: item[`text_${language}`],
+//     author: item[`author_${language}`]
+//   }));
+  
+  // Filter the stories based on the topic
+//   const topicStories = mappedData.filter(story => story.name === topic);
+  
+//   return topicStories;
+// }
 
+  
+ 
 // export async function getDMapData(spreadsheet_id, topic_key) {
 //   const res = await getSheetData(spreadsheet_id, topic_key);
 //   console.log('getDMapData: ', res)
@@ -146,7 +165,7 @@ export async function getPieData( topic, language = 'ru',) {
   const CONFIG_SHEET_ID = '1QKmA5UX-FM31jEE7UOVTmlCKxQ_Wa1K2oXxulhtkJHE'; 
   const CONFIG_SHEET_descriptions = 'descriptions';
   const data = await getSheetData(CONFIG_SHEET_ID, CONFIG_SHEET_descriptions);
-  console.log('getDescriptions: ', data)
+  // console.log('getDescriptions: ', data)
   return data.map(item => ({
       key: item.key,
       name: item[`name_${language}`],
@@ -159,7 +178,7 @@ export async function getConfiguration(language = 'ru') {
   const CONFIG_SHEET_ID = '1QKmA5UX-FM31jEE7UOVTmlCKxQ_Wa1K2oXxulhtkJHE'; 
   const CONFIG_SHEET_name = 'configuration';
   const data = await getSheetData(CONFIG_SHEET_ID, CONFIG_SHEET_name);
-  console.log('getConfiguration: ', data)
+  // console.log('getConfiguration: ', data)
   return data.map(item => ({
       key: item.key,
       name: item[language]
@@ -176,7 +195,7 @@ export async function getFullSpreadsheetData(year, dataMap) {
     const sheetId = yearData[sheetName].id;
     fetchedData[sheetName] = await getSheetData(sheetId, sheetName);
   }
-  console.log('getFullSpreadsheetData: ', fetchedData)
+  // console.log('getFullSpreadsheetData: ', fetchedData)
   // setData(fetchedData);
   return fetchedData
 }
