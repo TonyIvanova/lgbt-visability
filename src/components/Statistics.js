@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Map from "./shared/Map";
 import {PieChart} from "./shared/PieChart";
 import {BarPlot} from "./shared/BarPlot";
@@ -14,21 +14,26 @@ import {
   useConfiguration,   
   useDescriptions,
   useData,
-  useWhichSubset,
+  useSubset,
   useDataMap
  } from "../contexts/dataContext";
 import { useLanguage } from "../contexts/langContext";
 
 
 export default function Statistics({ topic }) {
-  const [chartData, setChartData] = useState([]);
+  const [pieData, setPieData] = useState([]);
+  const [barData, setBarData] = useState([]);
   const [mapData, setMapData] = useState([]);
   const {dataMap} = useDataMap()
   const {year} = useYear()
   const {language} = useLanguage()
   // console.log(dataMap)
-  const [chartDescription, setChartDescription] = useState("");
+  const [pieDescription, setPieDescription] = useState("");
   const [mapDescription, setMapDescription] = useState("");
+  const [barDescription, setBarDescription] = useState("");
+  const [opennesGroup, setOpennesGroup] = useState("");
+  const [whichSubset, setWhichSubset] = useState('All'); //Trans/Cis
+
   const [selectedQuestion, setSelectedQuestion] = useState("All");
 
   const topicsMap = {
@@ -50,10 +55,16 @@ export default function Statistics({ topic }) {
 // TODO: change to fetConfiguration(language)
 
   useEffect(() => {
-    console.log("Statistics/chartData:", chartData);
-    console.log("Statistics/ mapDescription:", mapDescription);
+    // // console.log("Statistics/pieData:", pieData);
+    // // console.log("Statistics/barData:", barData);
+    // console.log("Statistics/ mapDescription:", pieDescription);
+    // console.log("Statistics/ mapDescription:", barDescription);
+    // console.log("Statistics/ mapDescription:", mapDescription);
     console.log('Statistics/selectedQuestion[year]: ',selectedQuestion)
-}, [chartData, mapDescription,selectedQuestion]);
+}, [
+  // chartData,
+  //  mapDescription,
+   selectedQuestion]);
 
   
 // TODO: change to  useDescriptions[lang]
@@ -73,19 +84,21 @@ export default function Statistics({ topic }) {
       topicsMap[topic]).then((res) => {
       console.log('res:',res)
       setMapData(res)
-      setChartData(parseChartData(res));
+      setPieData(parsePieData(res));
       setMapData(parseMapData(res));
+      setBarData(parseBarData(res));
     });
   }, [topic, selectedQuestion, year, configuration]);
 
 
   const setDescriptions = (res) => {
     const relevantTopic = res.find((value) => value.name === topic);
-    setChartDescription(relevantTopic?.pie);
+    setBarDescription(relevantTopic?.bar);
+    setPieDescription(relevantTopic?.pie);
     setMapDescription(relevantTopic?.map);
   };
 
-  const parseChartData = (res) => {
+  const parseBarData = (res) => {
     if (res?.length === 0) return [];
     const fields = Object.keys(res[0])
       .filter((key) => key !== "District" && key !== "All")
@@ -98,6 +111,22 @@ export default function Statistics({ topic }) {
     });
     return result;
   };
+
+
+  const parsePieData = (res) => {
+    if (res?.length === 0) return [];
+    const fields = Object.keys(res[0])
+      .filter((key) => key !== "District" && key !== "All")
+      .map((key) => {
+        return key;
+      });
+    const values = res.find((row) => row.District === "Все");
+    const result = fields.map((field) => {
+      return { name: field, value: parseFloat(values[field]) };
+    });
+    return result;
+  };
+
 
   const parseMapData = (res) => {
     const result = res.map((row) => {
@@ -113,13 +142,38 @@ export default function Statistics({ topic }) {
     setSelectedQuestion(arcName);
   };
 
-  if (chartData && mapData) {
+
+  const subsetButtons = useMemo(() => {
+    if (language === 'en') {
+      return ['cisgender', 'transgender', 'all'];
+    }
+    if (language === 'ru') {
+      return ['трансгендеры', 'цисгендеры', 'все'];
+    }
+    // default to English if the language doesn't match any known value
+    return ['трансгендеры', 'цисгендеры', 'все'];
+  }, [language]);
+
+  const opennessButtons = useMemo(() => {
+    if (language === 'en') {
+      return ['Family', 'Friends', 'Associates'];
+    }
+    if (language === 'ru') {
+      return ['Семья','Друзья','Учеба/работа'];
+    }
+    // default to English if the language doesn't match any known value
+    return ['Семья','Друзья','Учеба/работа'];
+  }, [language]);
+
+  if (pieData && mapData && barData) {
     return (
       <div className="section">
         <div>
  
         <ButtonGroupLang 
-          buttons={['cisgender','transgender','all']}/>
+          buttons={subsetButtons}
+          doSomethingAfterClick = {setWhichSubset}
+          />
           <Map statistics={mapData} />
           <p className="statistics-description">
             {selectedQuestion !== "All"
@@ -136,15 +190,18 @@ export default function Statistics({ topic }) {
         <div>
         {topic === "Открытость" ? (
           <div>
-          <ButtonGroupLang buttons={['Семья','Друзья','Коллеги/однокурсники']}/>
-          <PieChart data={chartData} onArcClick={handleArcClick} />
-          <BarPlot data={chartData} onArcClick={handleArcClick} />
+          <ButtonGroupLang 
+          buttons={opennessButtons}
+          doSomethingAfterClick = {setOpennesGroup}/>
+          {/* {opennes_group === "Открытость" ? ( */}
+          <PieChart data={pieData} onArcClick={handleArcClick} />
+          {/* <BarPlot data={barData} onArcClick={handleArcClick} /> */}
           </div>
         ):(
-          <BarPlot data={chartData} onArcClick={handleArcClick} />
+          <BarPlot data={barData} onArcClick={handleArcClick} />
         )
          }
-          <p className="statistics-description">{chartDescription}</p>
+          <p className="statistics-description">{pieDescription}</p>
         </div>
       </div>
     );

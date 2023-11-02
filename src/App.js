@@ -15,7 +15,7 @@ import {
   useDataMap,
   useConfiguration,
   useDescriptions,
-  useWhichSubset
+  useSubset
  } from "./contexts/dataContext";
 import { LanguageProvider, useLanguage } from './contexts/langContext';
 import Section from "./components/Section";
@@ -34,7 +34,11 @@ function AppContent() {
   const { data, setData } = useData(); 
   const configuration = useConfiguration()
   const descriptions = useDescriptions()
-  const whichSubset = useWhichSubset()
+  const [whichSubset, setWhichSubset] = useState('All'); //Trans/Cis
+
+  const [opennesGroup, setOpennesGroup] = useState('')
+
+
   
   const years = Object.keys(dataMap);// to get list of years reports exist for
  
@@ -57,7 +61,12 @@ function AppContent() {
   const selectYear = (event) => {
     setYear(event.target.name);
   };
-
+  const selectSubset = (event) => {
+    setWhichSubset(event.target.name);
+  };
+  const selectOpennesGroup = (event) => {
+    setOpennesGroup(event.target.name);
+  };
   
   // Get sections names: from config.xlsx
   useEffect(() => {

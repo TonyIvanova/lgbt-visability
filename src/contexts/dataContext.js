@@ -150,10 +150,10 @@ export const useDescriptions = () => {
   return descriptions ;
 };
 
-export const useWhichSubset = () => {
-  const { whichSubset } = useContext(DataContext);
+export const useSubset = () => {
+  const { whichSubset, setWhichSubset } = useContext(DataContext);
   if (whichSubset === undefined) {
     throw new Error('usewhichSubset must be used within a DataProvider');
   }
-  return  whichSubset ;
+  return  { whichSubset, setWhichSubset } ;
 };

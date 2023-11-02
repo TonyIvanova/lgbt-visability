@@ -87,6 +87,7 @@ export async function getDescriptions(language = 'ru') {
       key: item.key,
       name: item[`name_${language}`],
       map: item[`map_${language}`],
+      bar: item[`bar_${language}`],
       pie: item[`pie_${language}`]
   }));
 }
