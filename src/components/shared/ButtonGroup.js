@@ -84,5 +84,57 @@ export const ButtonGroupLang = ({ buttons, doSomethingAfterClick }) => {
   );
 };
 
+export function ButtonGroupSubset({ buttonsConfig, onButtonClick }) {
+  
+    // We'll use state to keep track of which button was clicked.
+    const [clickedId, setClickedId] = useState(null);
+    
+    return (
+      <div className="button-group2">
+        {buttonsConfig.map((button, i) => (
+          <button 
+            name={button.label}
+            onClick={() => {
+              onButtonClick(button.value);
+              setClickedId(i);
+            }}
+            className={
+              i === clickedId ? "lang active" : "lang"
+            }
+          >
+            {button.label}
+          </button>
+        ))}
+      </div>
+    );
+  }
+  
+  export function ButtonGroupOpennes({ buttonsConfig, onButtonClick }) {
+  
+    // We'll use state to keep track of which button was clicked.
+    const [clickedId, setClickedId] = useState(null);
+    
+    return (
+      <div className="button-group2">
+        {buttonsConfig.map((button, i) => (
+          <button 
+            name={button.label}
+            onClick={() => {
+              onButtonClick(button.value);
+              setClickedId(i);
+            }}
+            className={
+              i === clickedId ? "lang active" : "lang"
+            }
+          >
+            {button.label}
+          </button>
+        ))}
+      </div>
+    );
+  }
+  
+
+
 
 // export default ButtonGroup;

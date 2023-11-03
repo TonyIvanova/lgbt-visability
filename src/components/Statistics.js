@@ -8,7 +8,7 @@ import {
   // getFullSpreadsheetData,
   // getStories
 } from ".././services/googleSheetsService";
-import { ButtonGroupLang } from "./shared/ButtonGroup";
+import { ButtonGroupLang, ButtonGroupSubset } from "./shared/ButtonGroup";
 // import {useDataMap} from "../contexts/dataContext"
 import { useYear } from "../contexts/yearContext"
 import {
@@ -33,7 +33,7 @@ export default function Statistics({ topic }) {
   const [mapDescription, setMapDescription] = useState("");
   const [barDescription, setBarDescription] = useState("");
   const [stories, setStories] = useState("");
-  const [opennesGroup, setOpennesGroup] = useState("All");
+  const [opennessGroup, setOpennessGroup] = useState("All");
   const [whichSubset, setWhichSubset] = useState('All'); //Trans/Cis
 
   const [selectedQuestion, setSelectedQuestion] = useState("All");
@@ -57,8 +57,6 @@ export default function Statistics({ topic }) {
   // },[year])
 
 
-  // TODO: change to fetConfiguration(language)
-
   useEffect(() => {
     // // console.log("Statistics/pieData:", pieData);
     // // console.log("Statistics/barData:", barData);
@@ -74,6 +72,14 @@ export default function Statistics({ topic }) {
     selectedQuestion]);
 
 
+  const selectSubset = (event) => {
+    setWhichSubset(event.target.name);
+  };
+  const selectOpennessGroup = (event) => {
+    setOpennessGroup(event.target.name);
+  };
+
+
   // TODO: change to  useDescriptions[lang]
   useEffect(() => {
     // Get row (topic) from preloaded config.xlsx/descriptions, by language (column)
@@ -87,17 +93,40 @@ export default function Statistics({ topic }) {
       return; // Exit the effect if configuration is not yet available
     }
 
-    getSheetData(dataMap[year]['report']['sheet'],
-      topicsMap[topic]).then((res) => {
-        // console.log('res:',res)
-        setMapData(res)
-        setPieData(parsePieData(res));
-        setMapData(parseMapData(res));
-        setBarData(parseBarData(res));
-      });
+
+    let sheetName = topicsMap[topic];
+    if (whichSubset === 'trans') {
+      sheetName += '_trans';
+    } else if (whichSubset === 'cis') {
+      sheetName += '_cis';
+    }
 
 
-  }, [topic, selectedQuestion, year, configuration]);
+    let opennessSheetName= 'openness_friends';
+    if (opennessGroup === 'family') {
+      sheetName += 'openness_family';
+    } else if (opennessGroup === 'ass') {
+      sheetName += 'openness_associates';
+    }
+
+
+    getSheetData(dataMap[year]['report']['sheet'], sheetName).then((res) => {
+      setMapData(res);
+      setPieData(parsePieData(res));
+      setMapData(parseMapData(res));
+      setBarData(parseBarData(res));
+    });
+
+
+
+
+  }, [
+    topic,
+    year,
+    whichSubset,
+    configuration,
+    selectedQuestion,
+  ]);
 
 
   const setDescriptions = (res) => {
@@ -151,38 +180,70 @@ export default function Statistics({ topic }) {
     setSelectedQuestion(arcName);
   };
 
-
-  const subsetButtons = useMemo(() => {
+  const subsetButtonsConfig = useMemo(() => {
     if (language === 'en') {
-      return ['cisgender', 'transgender', 'all'];
+      return [
+        { label: 'Cisgender', value: 'cis' },
+        { label: 'Transgender', value: 'trans' },
+        { label: 'All', value: 'all' }
+      ];
     }
     if (language === 'ru') {
-      return ['трансгендеры', 'цисгендеры', 'все'];
+      return [
+        { label: 'Трансгендеры', value: 'trans' },
+        { label: 'Цисгендеры', value: 'cis' },
+        { label: 'Все', value: 'all' }
+      ];
     }
-    // default to English if the language doesn't match any known value
-    return ['трансгендеры', 'цисгендеры', 'все'];
+    // default to Russian if the language doesn't match any known value
+    return [
+      { label: 'Трансгендеры', value: 'trans' },
+      { label: 'Цисгендеры', value: 'cis' },
+      { label: 'Все', value: 'all' }
+    ];
   }, [language]);
 
-  const opennessButtons = useMemo(() => {
+
+
+  const opennessButtonsConfig = useMemo(() => {
     if (language === 'en') {
-      return ['Family', 'Friends', 'Associates'];
+      return [
+        { label: 'Family', value: 'family' },
+        { label: 'Friends', value: 'friends' },
+        { label: 'Associates', value: 'ass' }
+      ];
     }
     if (language === 'ru') {
-      return ['Семья', 'Друзья', 'Учеба/работа'];
+      return [
+
+        { label: 'Семья', value: 'family' },
+        { label: 'Друзья', value: 'friends' },
+        { label: 'Учеба/работа', value: 'ass' }
+      ];
     }
-    // default to English if the language doesn't match any known value
-    return ['Семья', 'Друзья', 'Учеба/работа'];
+    // default to Russian if the language doesn't match any known value
+    return [
+      { label: 'Семья', value: 'family' },
+      { label: 'Друзья', value: 'friends' },
+      { label: 'Учеба/работа', value: 'ass' }
+    ];
   }, [language]);
+
+
 
   if (pieData && mapData && barData) {
     return (
       <div className="section">
         <div>
 
-          <ButtonGroupLang
-            buttons={subsetButtons}
-            doSomethingAfterClick={setWhichSubset}
+
+
+          <ButtonGroupSubset
+            buttonsConfig={subsetButtonsConfig}
+            onButtonClick={setWhichSubset}
           />
+
+
           <Map statistics={mapData} />
           <p className="statistics-description">
             {selectedQuestion !== "All"
@@ -199,10 +260,12 @@ export default function Statistics({ topic }) {
         <div>
           {topic === "Открытость" ? (
             <div>
-              <ButtonGroupLang
-                buttons={opennessButtons}
-                doSomethingAfterClick={setOpennesGroup} />
-              {/* {opennes_group === "Открытость" ? ( */}
+
+              <ButtonGroupSubset
+                buttonsConfig={opennessButtonsConfig}
+                onButtonClick={setOpennessGroup}
+              />
+
               <PieChart data={pieData} onArcClick={handleArcClick} />
               {/* <BarPlot data={barData} onArcClick={handleArcClick} /> */}
             </div>

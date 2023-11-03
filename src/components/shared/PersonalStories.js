@@ -12,7 +12,13 @@ export default function PersonalStories({ topic }) {
   const { year, setYear } = useYear();
   const { language } = useLanguage();
 
-
+  const topicsMap = {
+    'Экономическое положение': 'economical_status',
+    'Насилие': 'violence',
+    'Дискриминация': 'discrimination',
+    'Влияние войны в Украине': 'war_effects',
+    'Открытость': 'openness'
+  }
   useEffect(() => {
 
     console.log('PersonaStories/stories: ', stories)
@@ -23,7 +29,10 @@ export default function PersonalStories({ topic }) {
   ]);
 
   useEffect(() => {
+    
     async function fetchStories() {
+      if (topicsMap[topic] === 'openness') return;
+
       const stories = await getStories(dataMap, topic, language,year);
       setStories(stories);
       setStoryIndex(0);
@@ -49,15 +58,6 @@ export default function PersonalStories({ topic }) {
 
 
 
-  // useEffect(() => {
-  //   getSheetData(data, 'df_stories_filtered').then((dat) => {
-  //     const datas = dat.filter((row) => row.name === topic && row.language === language); // filtering based on language
-  //     setStories(datas);
-  //     setStoryIndex(0);
-  //   });
-  //   console.log('Stories: ',stories)
-  // }, [topic, language]); 
-
   const getStory = () => {
     return (
       <div className="personal-stories">
@@ -69,8 +69,8 @@ export default function PersonalStories({ topic }) {
           style={{ width: 24 }}
         />
         <div className="personal-story-card">
-          <p>{stories[storyIndex].text}</p>
-          <p>{stories[storyIndex].author}</p>
+          <p>{stories[storyIndex]?.text}</p>
+          <p>{stories[storyIndex]?.author}</p>
         </div>
         <img
           src={arrow}

@@ -18,6 +18,13 @@ export default function Section({ topic }) {
   const {year, setYear} = useYear();
   const {dataMap} = useDataMap()
   const {language} = useLanguage()
+  const topicsMap = {
+    'Экономическое положение': 'economical_status',
+    'Насилие': 'violence',
+    'Дискриминация': 'discrimination',
+    'Влияние войны в Украине': 'war_effects',
+    'Открытость': 'openness'
+  }
 
 
   useEffect(() => {
@@ -46,14 +53,6 @@ export default function Section({ topic }) {
 
 
 
-
-  // useEffect(() => {
-
-  //   getSheetData('16rkG1h_82MCuImvFkvV8P7N5TsJw5S49avmCuUG3HQ', 'conclusions').then((data) => {
-  //     setConclusions(data.filter((row) => row.name === topic));
-  //   });
-  // }, [topic, year]);
-
   return (
     <div>
       <Statistics topic={topic} />
@@ -71,9 +70,15 @@ export default function Section({ topic }) {
           return <p key={index}>{item.text}</p>;
         })}
       </div>
-      <div>
-        <PersonalStories topic={topic} />
-      </div>
+
+      {
+  topicsMap[topic] !== 'openness' && (
+    <div>
+      <PersonalStories topic={topic} />
+    </div>
+  )
+}
+
     </div>
   );
 }
