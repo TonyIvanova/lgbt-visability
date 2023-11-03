@@ -24,12 +24,12 @@ export default function PersonalStories({ topic }) {
 
   useEffect(() => {
     async function fetchStories() {
-      const stories = await getStories(dataMap, topic, language);
+      const stories = await getStories(dataMap, topic, language,year);
       setStories(stories);
       setStoryIndex(0);
     }
 
-    async function getStories(dataMap, topic, language = 'ru') {
+    async function getStories(dataMap, topic, language,year ) {
       const rawData = await getSheetData(dataMap[year]['report']['sheet'], 'df_stories_filtered');
       console.log('rawData', rawData)
       const mappedData = rawData.map(item => ({
@@ -102,7 +102,12 @@ export default function PersonalStories({ topic }) {
   if (storyIndex != null) {
     return (
       <div className="personal-stories-container">
-        <h2 className="container">Истории</h2>
+         <h2>
+    {language === 'ru' 
+        ? `Истории` 
+        : `Stories`}
+</h2>
+
         {getStory()}
       </div>
     );

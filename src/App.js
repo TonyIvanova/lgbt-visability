@@ -61,12 +61,7 @@ function AppContent() {
   const selectYear = (event) => {
     setYear(event.target.name);
   };
-  const selectSubset = (event) => {
-    setWhichSubset(event.target.name);
-  };
-  const selectOpennesGroup = (event) => {
-    setOpennesGroup(event.target.name);
-  };
+  
 
   // Get sections names: from config.xlsx
   useEffect(() => {
@@ -112,8 +107,12 @@ function AppContent() {
           label={`Ссылка на полную версию отчета за ${year} год`}
           color="grey"
         />
-
-        <h1>Положение лгбт+ людей в россии на {year} год</h1>
+ 
+ <h1>
+    {language === 'ru' 
+        ? `Положение лгбт+ людей в россии на ${year} год` 
+        : `LGBT+ people's situation in Russia in ${year}`}
+</h1>
 
         <ButtonGroup1
           buttons={sections}
@@ -134,7 +133,14 @@ function AppContent() {
     return (
       <div className="App">
         <Header />
-        <h1>Положение лгбт+ людей в россии на {year} год</h1>
+        
+        <h1>
+    {language === 'ru' 
+        ? `Положение лгбт+ людей в россии на ${year} год` 
+        : `LGBT+ people's situation in Russia in ${year}`}
+</h1>
+
+
         <img src={loader} alt=""></img>
         <img src={bg1} alt="" className="background-image-1"></img>
         <img src={bg2} alt="" className="background-image-2"></img>

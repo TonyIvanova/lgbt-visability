@@ -58,7 +58,15 @@ export default function Section({ topic }) {
     <div>
       <Statistics topic={topic} />
       <div className="conclusions">
-        <h2>Выводы</h2>
+      
+
+        <h2>
+    {language === 'ru' 
+        ? `Выводы` 
+        : `Conclusions`}
+</h2>
+
+
         {conclusions.map((item, index) => {
           return <p key={index}>{item.text}</p>;
         })}

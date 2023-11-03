@@ -8,18 +8,24 @@ export default function Header() {
   const {language, setLanguage} = useLanguage(); 
   console.log('Header start');
   console.log(language);
-  const changeLanguage = (lang) => {
-    setLanguage(lang);
-  };
+  // const changeLanguage = (lang) => {
+  //   setLanguage(lang);
+  // };
 
   
+  const changeLanguage = (event) => {
+    console.log(event.target.name);
+    setLanguage(event.target.name);
+  };
+
   return (
     <header className="header">
       <div className="App-header-logo">
         <img src={logo} alt="Logo" />
         <ButtonGroupLang buttons={['ru','en']}
-       onClick={() => changeLanguage()}
+       doSomethingAfterClick = {changeLanguage}
         />
+
       </div>
       <div class="header-buttons-container">
         <a
@@ -28,7 +34,8 @@ export default function Header() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Нужна помощь
+           {language === 'ru' ? 'Нужна помощь' : 'Need Help'}
+ 
         </a>
         <a
           href="https://comingoutspb.org/support/"
@@ -36,7 +43,8 @@ export default function Header() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Хочу помочь
+         {language === 'ru' ? 'Хочу помочь' : 'Want to Help'}
+   
         </a>
       </div>
     </header>
