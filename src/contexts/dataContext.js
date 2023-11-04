@@ -65,6 +65,20 @@ export const DataProvider = ({ children }) => {
     loadConfig();
   }, [language]);
 
+
+  const topicsMap = {
+    "Экономическое положение": "economical_status",
+    "Economical status": "economical_status",
+    "Насилие": "violence",
+    "Violence": "violence",
+    "Дискриминация": "discrimination",
+    "Discrimination": "discrimination",
+    "Влияние войны в Украине": "war_effects",
+    "Effects of war in Ukraine": "war_effects",
+    "Открытость": "openness",
+    "Openness": "openness",
+  };
+
   // useEffect(() => {
   //   async function loadSpreadsheet() {
   //     console.log('loadSpreadsheet start')
