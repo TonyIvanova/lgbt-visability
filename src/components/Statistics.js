@@ -257,7 +257,7 @@ export default function Statistics({ topic }) {
           />
 
 
-          {/* <Map statistics={mapData} /> */}
+          <Map statistics={mapData} />
           <p className="statistics-description">
             {selectedQuestion !== "All"
               ? "Процент респондентов которые сталкивались с: " + ""
