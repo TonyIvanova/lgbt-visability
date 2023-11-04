@@ -35,54 +35,41 @@ export default function Section({ topic }) {
     }
 
     async function getConclusions(dataMap, topic, language) {
-      const rawData = await getSheetData( dataMap[year]['report']['sheet'],  'conclusions');
-      console.log('raw Conclusions', rawData)
+      const rawData = await getSheetData(
+        dataMap[year]["report"]["sheet"],
+        "conclusions"
+      );
       if (!rawData) {
-        console.info("No Conclusions found."); 
-        return []
+        console.info("No Conclusions found.");
+        return [];
       }
-      const mappedData = rawData.map(item => ({
+      const mappedData = rawData.map((item) => ({
         key: item.key,
         name: item[`name_${language}`],
-        text: item[`text_${language}`]
+        text: item[`text_${language}`],
       }));
-      console.log('mapped conclusions', mappedData)
-      return mappedData.filter(story => story.name === topic);
-
+      return mappedData.filter((story) => story.name === topic);
     }
 
     fetchConclusions();
-    console.log('conclusions:::', conclusions)
   }, [topic, language, year, dataMap]);
-
-
 
   return (
     <div>
       <Statistics topic={topic} />
       <div className="conclusions">
-      
-
-        <h2>
-    {language === 'ru' 
-        ? `Выводы` 
-        : `Conclusions`}
-</h2>
-
+        <h2>{language === "ru" ? `Выводы` : `Conclusions`}</h2>
 
         {conclusions.map((item, index) => {
           return <p key={index}>{item.text}</p>;
         })}
       </div>
 
-      {
-  topicsMap[topic] !== 'openness' && (
-    <div>
-      <PersonalStories topic={topic} />
-    </div>
-  )
-}
-
+      {topicsMap[topic] !== "openness" && (
+        <div>
+          <PersonalStories topic={topic} />
+        </div>
+      )}
     </div>
   );
 }

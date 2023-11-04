@@ -106,7 +106,7 @@ export default function Statistics({ topic }) {
     // Checking that we have neccessarry parameterd defined to make an API call.
     if (dataMap[year]["report"]["sheet"] && sheetName) {
       getSheetData(dataMap[year]["report"]["sheet"], sheetName).then((res) => {
-        setMapData(res);
+        // setMapData(res);
         setPieData(parsePieData(res));
         setMapData(parseMapData(res));
         setBarData(parseBarData(res));
@@ -219,6 +219,25 @@ export default function Statistics({ topic }) {
     ];
   }, [language]);
 
+  const charts = () => {
+    return (
+      <>
+        {topic === "Открытость" ? (
+          <div>
+            <ButtonGroupSubset
+              buttonsConfig={opennessButtonsConfig}
+              onButtonClick={setOpennessGroup}
+            />
+            <PieChart data={pieData} onArcClick={handleArcClick} />
+          </div>
+        ) : (
+          <BarPlot data={barData} onArcClick={handleArcClick} />
+        )}
+        <p className="statistics-description">{pieDescription}</p>
+      </>
+    );
+  };
+
   if (pieData && mapData && barData) {
     return (
       <div className="section">
@@ -238,21 +257,7 @@ export default function Statistics({ topic }) {
           </h3>
           <br />
         </div>
-        <div>
-          {topic === "Открытость" ? (
-            <div>
-              <ButtonGroupSubset
-                buttonsConfig={opennessButtonsConfig}
-                onButtonClick={setOpennessGroup}
-              />
-              <PieChart data={pieData} onArcClick={handleArcClick} />
-              {/* <BarPlot data={barData} onArcClick={handleArcClick} /> */}
-            </div>
-          ) : (
-            <BarPlot data={barData} onArcClick={handleArcClick} />
-          )}
-          <p className="statistics-description">{pieDescription}</p>
-        </div>
+        <div>{charts()}</div>
       </div>
     );
   }

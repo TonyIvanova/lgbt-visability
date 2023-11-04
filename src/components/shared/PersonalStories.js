@@ -40,32 +40,30 @@ export default function PersonalStories({ topic }) {
 
     async function getStories(dataMap, topic, language, year) {
       // Check that we have the sheet name
-      if (!dataMap[year]['report']['sheet']) {
+      if (!dataMap[year]["report"]["sheet"]) {
         console.info("We don't have the sheet name");
-        return; 
+        return;
       }
 
-      const rawData = await getSheetData(dataMap[year]['report']['sheet'], 'df_stories_filtered');
-      console.log('rawData', rawData)
-      
+      const rawData = await getSheetData(
+        dataMap[year]["report"]["sheet"],
+        "df_stories_filtered"
+      );
       if (!rawData) {
-        console.info("No stories found.")
-        return []; 
+        console.info("No stories found.");
+        return [];
       }
-      
-      const mappedData = rawData.map(item => ({
+
+      const mappedData = rawData.map((item) => ({
         key: item.key,
         name: item[`name_${language}`],
         text: item[`text_${language}`],
-        author: item[`author_${language}`]
+        author: item[`author_${language}`],
       }));
-      console.log('mappedData', mappedData)
-      return mappedData.filter(story => story.name === topic);
-
+      return mappedData.filter((story) => story.name === topic);
     }
 
     fetchStories();
-    console.log('stories:::', stories)
   }, [topic, language, year, dataMap]);
 
 
