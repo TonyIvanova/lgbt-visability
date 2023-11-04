@@ -16,7 +16,7 @@ export const YearProvider = ({ children }) => {
 
 // Hhook that shorthands the use of context
 export const useYear = () => {
-  console.log('useYear start')
+ // console.log('useYear start')
   const context = useContext(YearContext);
   if (!context) {
     throw new Error("useYear must be used within a YearProvider");

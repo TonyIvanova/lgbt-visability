@@ -27,7 +27,7 @@ export default function Header() {
         />
 
       </div>
-      <div class="header-buttons-container">
+      <div className="header-buttons-container">
         <a
           href="https://comingoutspb.com/we-are-helping/"
           className="button-secondary"

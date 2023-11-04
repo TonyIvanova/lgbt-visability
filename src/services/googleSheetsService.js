@@ -24,6 +24,9 @@ export async function getDataMap() {
 var dataCache = {}
 // Function to get data from a specific sheet from  a corresponding'report.xlsx'
 export function getSheetData(tableId, sheetName) {
+      if (!tableId || !sheetName) {
+        console.log("tableId and sheetName is not provided. Refusing to make an API call.");
+      }
      // Check if data for the requested table and sheet is already in cache
     //  console.log('tableId:',tableId)
     //  console.log('sheetName:',sheetName)
@@ -34,7 +37,10 @@ export function getSheetData(tableId, sheetName) {
         })
     }
     // Transform the raw data from the API into a structured JSON format
-    function transformData(data) {
+  function transformData(data) {
+      if (!data) {
+      console.info("Trying to transform data, but data is not defined.", data); 
+      }
         var jsonData = []
         var colsMap = {}
         // Map column indices to their respective headers
@@ -59,7 +65,6 @@ export function getSheetData(tableId, sheetName) {
 
      // Fetch data from Google Sheets API
     const tableData = new Promise((resolve, reject) => {
-    
       return fetch(`https://sheets.googleapis.com/v4/spreadsheets/${tableId}/values/${sheetName}?key=${API_KEY}`)
         .then(response => response.json())
         

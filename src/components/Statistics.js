@@ -109,14 +109,17 @@ export default function Statistics({ topic }) {
       sheetName += 'openness_associates';
     }
 
+    // Checking that we have neccessarry parameterd defined to make an API call.
+    if (dataMap[year]['report']['sheet'] && sheetName) {
 
-    getSheetData(dataMap[year]['report']['sheet'], sheetName).then((res) => {
-      setMapData(res);
-      setPieData(parsePieData(res));
-      setMapData(parseMapData(res));
-      setBarData(parseBarData(res));
-    });
+      getSheetData(dataMap[year]['report']['sheet'], sheetName).then((res) => {
+        setMapData(res);
+        setPieData(parsePieData(res));
+        setMapData(parseMapData(res));
+        setBarData(parseBarData(res));
+      });
 
+    }; 
 
 
 
@@ -249,12 +252,13 @@ export default function Statistics({ topic }) {
             {selectedQuestion !== "All"
               ? "Процент респондентов которые сталкивались с: " + ""
               : mapDescription}
+         </p>   
             <h3 style={{ margin: 0 }}>
               {selectedQuestion !== "All" ? selectedQuestion : ""}
             </h3>
 
             <br />
-          </p>
+          
         </div>
 
         <div>

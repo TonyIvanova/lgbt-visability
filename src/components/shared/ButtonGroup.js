@@ -94,6 +94,7 @@ export function ButtonGroupSubset({ buttonsConfig, onButtonClick }) {
         {buttonsConfig.map((button, i) => (
           <button 
             name={button.label}
+             key={'button-' + i}
             onClick={() => {
               onButtonClick(button.value);
               setClickedId(i);
@@ -119,6 +120,7 @@ export function ButtonGroupSubset({ buttonsConfig, onButtonClick }) {
         {buttonsConfig.map((button, i) => (
           <button 
             name={button.label}
+            key={'button-' + i}
             onClick={() => {
               onButtonClick(button.value);
               setClickedId(i);

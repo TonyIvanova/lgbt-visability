@@ -38,7 +38,13 @@ export default function PersonalStories({ topic }) {
       setStoryIndex(0);
     }
 
-    async function getStories(dataMap, topic, language,year ) {
+    async function getStories(dataMap, topic, language, year) {
+      // Check that we have the sheet name
+      if (!dataMap[year]['report']['sheet']) {
+        console.info("We don't have the sheet name");
+        return; 
+      }
+
       const rawData = await getSheetData(dataMap[year]['report']['sheet'], 'df_stories_filtered');
       console.log('rawData', rawData)
       const mappedData = rawData.map(item => ({
