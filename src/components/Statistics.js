@@ -140,7 +140,10 @@ export default function Statistics({ topic }) {
   };
 
   const parseBarData = (res) => {
-    if (res?.length === 0) return [];
+    if (!res || res === undefined || res?.length === 0) {
+      console.info("Failed to parse bar data. The response is empty.")
+      return [];
+    }
     const fields = Object.keys(res[0])
       .filter((key) => key !== "District" && key !== "All")
       .map((key) => {
@@ -155,7 +158,10 @@ export default function Statistics({ topic }) {
 
 
   const parsePieData = (res) => {
-    if (res?.length === 0) return [];
+    if (!res || res === undefined || res?.length === 0) {
+      console.info("Failed to parse Pie Data. Response is empty.")
+      return []
+    };
     const fields = Object.keys(res[0])
       .filter((key) => key !== "District" && key !== "All")
       .map((key) => {
@@ -170,6 +176,10 @@ export default function Statistics({ topic }) {
 
 
   const parseMapData = (res) => {
+       if (!res || res === undefined || res?.length === 0) {
+      console.info("Failed to parse Map Data. Response is empty.")
+      return []
+    };
     const result = res.map((row) => {
       return {
         name: row.District,
@@ -247,7 +257,7 @@ export default function Statistics({ topic }) {
           />
 
 
-          <Map statistics={mapData} />
+          {/* <Map statistics={mapData} /> */}
           <p className="statistics-description">
             {selectedQuestion !== "All"
               ? "Процент респондентов которые сталкивались с: " + ""

@@ -32,7 +32,7 @@ function Map({ statistics }) {
 
   const mapElements = useMemo(() => {
     if (statistics.length > 0) {
-      return mapData.features.map((d) => {
+      return mapData.features.map((d, index) => {
         const relevantStatistics = statistics.filter(
           (item) => item.name === d.properties.name
         )[0];
@@ -40,9 +40,8 @@ function Map({ statistics }) {
           ? colorScale(relevantStatistics?.value)
           : "lightgrey";
         return (
-          <>
-            <path
-              key={d.properties.name}
+          <path
+             key={"map-element-" + index}
               name={d.properties.name}
               d={path(d)}
               fill={color}
@@ -60,10 +59,12 @@ function Map({ statistics }) {
                 setRegionDescription("");
                 setRegionValue("");
               }}
-            />
-          </>
-        );
+            />);
       });
+    } else {
+      return <>
+      <p>No map data.</p>
+      </>
     }
   }, [mapData, statistics]);
 

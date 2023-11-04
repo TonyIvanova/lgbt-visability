@@ -38,8 +38,9 @@ export function getSheetData(tableId, sheetName) {
     }
     // Transform the raw data from the API into a structured JSON format
   function transformData(data) {
-      if (!data) {
+      if (!data || data === undefined) {
       console.info("Trying to transform data, but data is not defined.", data); 
+        return;
       }
         var jsonData = []
         var colsMap = {}
@@ -64,7 +65,11 @@ export function getSheetData(tableId, sheetName) {
     }
 
      // Fetch data from Google Sheets API
-    const tableData = new Promise((resolve, reject) => {
+  const tableData = new Promise((resolve, reject) => {
+         if (!tableId || !sheetName || tableId === undefined|| sheetName===undefined) {
+        console.log("tableId and sheetName is not provided. Refusing to make an API call.");
+      }
+
       return fetch(`https://sheets.googleapis.com/v4/spreadsheets/${tableId}/values/${sheetName}?key=${API_KEY}`)
         .then(response => response.json())
         
