@@ -88,7 +88,11 @@ export function ButtonGroupSubset({ buttonsConfig, onButtonClick }) {
   
     // We'll use state to keep track of which button was clicked.
     const [clickedId, setClickedId] = useState(null);
-    
+    const buttonStyle = {
+      fontSize: '1.2em', // Bigger 
+      // fontWeight: '200' , // Fatter 
+      textTransform:'uppercase'
+    };
     return (
       <div className="button-group2">
         {buttonsConfig.map((button, i) => (
@@ -102,6 +106,9 @@ export function ButtonGroupSubset({ buttonsConfig, onButtonClick }) {
             className={
               i === clickedId ? "lang active" : "lang"
             }
+
+            style={buttonStyle}
+            
           >
             {button.label}
           </button>
@@ -114,7 +121,11 @@ export function ButtonGroupSubset({ buttonsConfig, onButtonClick }) {
   
     // We'll use state to keep track of which button was clicked.
     const [clickedId, setClickedId] = useState(null);
-    
+    const buttonStyle = {
+      fontSize: '1.2em', // Bigger 
+      // fontWeight: '200' , // Fatter 
+      textTransform:'uppercase'
+    };
     return (
       <div className="button-group2">
         {buttonsConfig.map((button, i) => (
@@ -128,6 +139,8 @@ export function ButtonGroupSubset({ buttonsConfig, onButtonClick }) {
             className={
               i === clickedId ? "lang active" : "lang"
             }
+
+            style={buttonStyle}
           >
             {button.label}
           </button>
