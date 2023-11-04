@@ -308,7 +308,7 @@ function parseMapData(res){
   const charts = () => {
     return (
       <>
-      if((topic === "Открытость" || topic === "Openness")  ? (
+        {(topic === "Открытость" || topic === "Openness") ? (
           <div>
             <ButtonGroupSubset
               buttonsConfig={opennessButtonsConfig}
@@ -318,12 +318,12 @@ function parseMapData(res){
           </div>
         ) : (
           <BarPlot data={barData} onBarClick={handleArcClick} />
-        ))
+        )}
         <p className="statistics-description">{pieDescription}</p>
       </>
     );
   };
-
+  
   if (pieData && mapData && barData) {
     return (
       <div className="section">
