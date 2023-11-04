@@ -88,24 +88,29 @@ export function getSheetData(tableId, sheetName) {
 
 
   // Function to get info  from 'config.xlsx'
-export async function getDescriptions(language = 'ru') {
-  const CONFIG_SHEET_ID = '1QKmA5UX-FM31jEE7UOVTmlCKxQ_Wa1K2oXxulhtkJHE'; 
-  const CONFIG_SHEET_descriptions = 'descriptions';
-  const data = await getSheetData(CONFIG_SHEET_ID, CONFIG_SHEET_descriptions);
-  // console.log('getDescriptions: ', data)
-  return data.map(item => ({
+export async function getDescriptions(language = "ru") {
+  const CONFIG_SHEET_ID = "1QKmA5UX-FM31jEE7UOVTmlCKxQ_Wa1K2oXxulhtkJHE";
+  const CONFIG_SHEET_descriptions = "descriptions";
+  try {
+    const data = await getSheetData(CONFIG_SHEET_ID, CONFIG_SHEET_descriptions);
+    // console.log('getDescriptions: ', data)
+    return data.map((item) => ({
       key: item.key,
       name: item[`name_${language}`],
       map: item[`map_${language}`],
       bar: item[`bar_${language}`],
-      pie: item[`pie_${language}`]
-  }));
+      pie: item[`pie_${language}`],
+    }));
+  } catch (error) {
+    console.error("Failed to get Descriptions.");
+    return [];
+  }
 }
 
 // export async function getStories(dataMap, topic, language = 'ru') {
 //   // Assuming SPREADSHEET_ID is a global constant or needs to be passed as a parameter.
 //   const rawData = await getSheetData( dataMap[year]['report']['sheet'], 'df_stories_filtered');
-  
+
 //   // Map the raw data to the desired structure
 //   const mappedData = rawData.map(item => ({
 //     key: item.key,
@@ -113,15 +118,13 @@ export async function getDescriptions(language = 'ru') {
 //     text: item[`text_${language}`],
 //     author: item[`author_${language}`]
 //   }));
-  
-  // Filter the stories based on the topic
+
+// Filter the stories based on the topic
 //   const topicStories = mappedData.filter(story => story.name === topic);
-  
+
 //   return topicStories;
 // }
 
-  
- 
 // export async function getDMapData(spreadsheet_id, topic_key) {
 //   const res = await getSheetData(spreadsheet_id, topic_key);
 //   console.log('getDMapData: ', res)
@@ -151,8 +154,6 @@ export async function getDescriptions(language = 'ru') {
 //     return result;
 //   };
 
-
-
 // export async function getPieData(spreadsheet_id, topic_key) {
 //   const res = await getSheetData(spreadsheet_id, topic_key);
 //   console.log('getBarData: ', res)
@@ -169,30 +170,41 @@ export async function getDescriptions(language = 'ru') {
 //     return result;
 //   };
 
+export async function getPieData(topic, language = "ru") {
+  const CONFIG_SHEET_ID = "1QKmA5UX-FM31jEE7UOVTmlCKxQ_Wa1K2oXxulhtkJHE";
+  const CONFIG_SHEET_descriptions = "descriptions";
 
-
-export async function getPieData( topic, language = 'ru',) {
-  const CONFIG_SHEET_ID = '1QKmA5UX-FM31jEE7UOVTmlCKxQ_Wa1K2oXxulhtkJHE'; 
-  const CONFIG_SHEET_descriptions = 'descriptions';
-  const data = await getSheetData(CONFIG_SHEET_ID, CONFIG_SHEET_descriptions);
   // console.log('getDescriptions: ', data)
-  return data.map(item => ({
+  try {
+    const data = await getSheetData(CONFIG_SHEET_ID, CONFIG_SHEET_descriptions);
+    return data.map((item) => ({
       key: item.key,
       name: item[`name_${language}`],
       map: item[`map_${language}`],
-      pie: item[`pie_${language}`]
-  }));
+      pie: item[`pie_${language}`],
+    }));
+  } catch (error) {
+    console.info("Failed to get Map Data");
+    return [];
+  }
 }
 
 export async function getConfiguration(language = 'ru') {
   const CONFIG_SHEET_ID = '1QKmA5UX-FM31jEE7UOVTmlCKxQ_Wa1K2oXxulhtkJHE'; 
   const CONFIG_SHEET_name = 'configuration';
-  const data = await getSheetData(CONFIG_SHEET_ID, CONFIG_SHEET_name);
-  // console.log('getConfiguration: ', data)
-  return data.map(item => ({
-      key: item.key,
-      name: item[language]
-  }));
+  
+  try {
+     const data = await getSheetData(CONFIG_SHEET_ID, CONFIG_SHEET_name);
+     // console.log('getConfiguration: ', data)
+     return data.map((item) => ({
+       key: item.key,
+       name: item[language],
+     }));
+  } catch (error) {
+    console.info("Failed to get Configuration data.") 
+    return []
+  }
+ 
 }
 
 export async function getFullSpreadsheetData(year, dataMap) {
@@ -203,7 +215,12 @@ export async function getFullSpreadsheetData(year, dataMap) {
   
   for (let sheetName in yearData) {
     const sheetId = yearData[sheetName].id;
-    fetchedData[sheetName] = await getSheetData(sheetId, sheetName);
+    try {
+    fetchedData[sheetName] = await getSheetData(sheetId, sheetName);      
+    } catch (error) {
+      console.info("Failed to get data;")
+      console.error(error); 
+    }
   }
   // console.log('getFullSpreadsheetData: ', fetchedData)
   // setData(fetchedData);

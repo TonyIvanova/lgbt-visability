@@ -90,6 +90,11 @@ export default function Statistics({ topic }) {
     }
 
     let sheetName = topicsMap[topic];
+
+    if (sheetName === undefined || sheetName === "undefined") {
+      console.log("Sheet Name is undefined!");
+      return;
+    }
     if (whichSubset === "trans") {
       sheetName += "_trans";
     } else if (whichSubset === "cis") {
@@ -105,12 +110,19 @@ export default function Statistics({ topic }) {
 
     // Checking that we have neccessarry parameterd defined to make an API call.
     if (dataMap[year]["report"]["sheet"] && sheetName) {
-      getSheetData(dataMap[year]["report"]["sheet"], sheetName).then((res) => {
-        // setMapData(res);
-        setPieData(parsePieData(res));
-        setMapData(parseMapData(res));
-        setBarData(parseBarData(res));
-      });
+      try {
+        getSheetData(dataMap[year]["report"]["sheet"], sheetName).then(
+          (res) => {
+            // setMapData(res);
+            setPieData(parsePieData(res));
+            setMapData(parseMapData(res));
+            setBarData(parseBarData(res));
+          }
+        );
+      } catch (error) {
+        console.error("Failed to get sheet data");
+        console.error(error);
+      }
     }
   }, [topic, year, whichSubset, configuration, selectedQuestion]);
 
@@ -170,6 +182,7 @@ export default function Statistics({ topic }) {
   };
 
   const handleArcClick = (arcName) => {
+    console.info("Handaling bar arc click ", arcName);
     setSelectedQuestion(arcName);
   };
 
@@ -231,7 +244,7 @@ export default function Statistics({ topic }) {
             <PieChart data={pieData} onArcClick={handleArcClick} />
           </div>
         ) : (
-          <BarPlot data={barData} onArcClick={handleArcClick} />
+          <BarPlot data={barData} onBarClick={handleArcClick} />
         )}
         <p className="statistics-description">{pieDescription}</p>
       </>

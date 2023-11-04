@@ -45,12 +45,15 @@ export default function PersonalStories({ topic }) {
         return;
       }
 
-      const rawData = await getSheetData(
-        dataMap[year]["report"]["sheet"],
-        "df_stories_filtered"
-      );
-      if (!rawData) {
-        console.info("No stories found.");
+      let rawData;
+      try {
+        rawData = await getSheetData(
+          dataMap[year]["report"]["sheet"],
+          "df_stories_filtered"
+        );
+      } catch (error) {
+        console.info("Failed to get stories");
+        console.error(error);
         return [];
       }
 

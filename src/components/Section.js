@@ -2,30 +2,22 @@ import React, { useState, useEffect } from "react";
 import PersonalStories from "./shared/PersonalStories";
 import { getSheetData, fetchDataMap } from "../services/googleSheetsService";
 import Statistics from "./Statistics";
-import {
-  useDataMap,
-  useDatata,
-  useWhichSubset
-} from "../contexts/dataContext"
-import {
-  useLanguage
-} from "../contexts/langContext"
+import { useDataMap, useDatata, useWhichSubset } from "../contexts/dataContext";
+import { useLanguage } from "../contexts/langContext";
 import { useYear, YearProvider } from "../contexts/yearContext";
-
 
 export default function Section({ topic }) {
   const [conclusions, setConclusions] = useState([]);
-  const {year, setYear} = useYear();
-  const {dataMap} = useDataMap()
-  const {language} = useLanguage()
+  const { year, setYear } = useYear();
+  const { dataMap } = useDataMap();
+  const { language } = useLanguage();
   const topicsMap = {
-    'Экономическое положение': 'economical_status',
-    'Насилие': 'violence',
-    'Дискриминация': 'discrimination',
-    'Влияние войны в Украине': 'war_effects',
-    'Открытость': 'openness'
-  }
-
+    "Экономическое положение": "economical_status",
+    Насилие: "violence",
+    Дискриминация: "discrimination",
+    "Влияние войны в Украине": "war_effects",
+    Открытость: "openness",
+  };
 
   useEffect(() => {
     async function fetchConclusions() {
@@ -35,14 +27,17 @@ export default function Section({ topic }) {
     }
 
     async function getConclusions(dataMap, topic, language) {
-      const rawData = await getSheetData(
-        dataMap[year]["report"]["sheet"],
-        "conclusions"
-      );
-      if (!rawData) {
+      let rawData;
+      try {
+        rawData = await getSheetData(
+          dataMap[year]["report"]["sheet"],
+          "conclusions"
+        );
+      } catch (error) {
         console.info("No Conclusions found.");
         return [];
       }
+
       const mappedData = rawData.map((item) => ({
         key: item.key,
         name: item[`name_${language}`],
