@@ -47,6 +47,12 @@ export default function PersonalStories({ topic }) {
 
       const rawData = await getSheetData(dataMap[year]['report']['sheet'], 'df_stories_filtered');
       console.log('rawData', rawData)
+      
+      if (!rawData) {
+        console.info("No stories found.")
+        return []; 
+      }
+      
       const mappedData = rawData.map(item => ({
         key: item.key,
         name: item[`name_${language}`],

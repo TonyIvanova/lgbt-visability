@@ -37,6 +37,10 @@ export default function Section({ topic }) {
     async function getConclusions(dataMap, topic, language) {
       const rawData = await getSheetData( dataMap[year]['report']['sheet'],  'conclusions');
       console.log('raw Conclusions', rawData)
+      if (!rawData) {
+        console.info("No Conclusions found."); 
+        return []
+      }
       const mappedData = rawData.map(item => ({
         key: item.key,
         name: item[`name_${language}`],
