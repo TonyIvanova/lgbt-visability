@@ -20,47 +20,94 @@ import {
 import { LanguageProvider, useLanguage } from './contexts/langContext';
 import Section from "./components/Section";
 import { useYear, YearProvider } from "./contexts/yearContext";
-import useSpreadsheetData from './services/googleSheetsApi'
+// import useSpreadsheetData from './services/googleSheetsApi'
+import {
+  getSpreadsheetData,
+  getSheetIdByYear,
+  getDescriptions,
+  getConfiguration,
+  // getSheetData,
+  createTopicsMap,
+  getSections,
+  getYears
+} from './services/googleSheetsApi'
+
 export const DataContext = createContext([]);
 // import axios from 'axios';
 
 
 function AppContent() {
-  // console.log('AppContent start')
-  const [sections, setSections] = useState(null);
-  const [topic, setTopic] = useState(null);
   const { language, setLanguage } = useLanguage();
   const { year, setYear } = useYear(); // report year
-  const { dataMap, setDataMap } = useDataMap(); // reports ids
-  const { data, setData } = useData();
-  const configuration = useConfiguration()
-  const descriptions = useDescriptions()
-  const [whichSubset, setWhichSubset] = useState('All'); //Trans/Cis
-  const [opennessGroup, setOpennessGroup] = useState('')
 
 
-  const years = Object.keys(dataMap);// to get list of years reports exist for
-
-
+  const [configData, setConfigData] = useState(null);
+  const [years, setYears] = useState(null);
+  const [topicsMap, setTopicsMap] = useState(null);
+  const [configuration, setConfiguration] = useState(null);
   const API_KEY = process.env.REACT_APP_API_KEY;
   const CONFIG_SPREADSHEET_ID = process.env.REACT_APP_CONFIG_SPREADSHEET_ID;
 
-  const { configData, loading, error } = useSpreadsheetData(CONFIG_SPREADSHEET_ID);
+  //Load CONFIG spreadsheet
+  useEffect(() => {
+    const fetchConfigData = async () => {
+      try {
+        setConfigData(await getSpreadsheetData(CONFIG_SPREADSHEET_ID, API_KEY));
+      
+      } catch (err) {
+        setError(err);
+      }
+    };
+    fetchConfigData();
+  }, [API_KEY]);
+
+//Update what static variable that depend on COMNIG spreadsheet
+  useEffect(() => {
+    setConfiguration( getConfiguration(configData))
+    setTopicsMap( createTopicsMap(configData))
+    setYears( getYears(configData))
+  }, 
+    [configData])
+
+  //
+  const [reportData, setReportData] = useState(null);
+  const [error, setError] = useState(null);
+  
+  // Load year REPORT data when CONFIG and year is changed
+  useEffect(() => {
+    const fetchReportData = async () => {
+      try {
+        const REPORT_SPREADSHEET_ID = getSheetIdByYear(configData, year);
+        setReportData(await getSpreadsheetData(REPORT_SPREADSHEET_ID, API_KEY))
+      } catch (err) {
+        setError(err);
+      }
+    };
+    fetchReportData();
+  }, [year, configData]);
 
 
 
-  // useEffect(() => {
-  //   console.log("Updated sections data:", sections);
-  //   console.log("Updated years data", years);
-  //   console.log("Updated topic data:", topic);
-  //   console.log("Updated year data:", year);
-  //   console.log("Updated configuration data:", configuration);
-  //   console.log("Updated descriptions data:", descriptions);
-  //   // console.log("Updated spreadsheet data:", spreadsheet);
-  //   console.log("Updated data data:", data);
+  const [descriptions, setDescriptions] = useState(null);
+  const [sections, setSections] = useState(null);
+  const [topic, setTopic] = useState(null);
+  // Update sections, topic, descriptions if language changes
+  useEffect(() => {
+    setDescriptions( getDescriptions(configData, language))
+    setSections(getSections(configData, language))
+    setTopic(sections.length > 0 ? sections[0] : null) //default is the first topic
+  }, [language, configData])
 
-  // }, [sections, topic]);
+  const [whichSubset, setWhichSubset] = useState('All'); //Trans/Cis default data subsets
+  const [opennessGroup, setOpennessGroup] = useState('Family'); // Opennes default subset
 
+  if (error) {
+    return <div>Error fetching data: {error.message}</div>;
+  }
+
+  if (!configData || !reportData) {
+    return <div>Loading...</div>;
+  }
 
 
   // Get selected year
@@ -68,23 +115,7 @@ function AppContent() {
     setYear(event.target.name);
   };
 
-
-  // Get sections names: from config.xlsx
-  useEffect(() => {
-    // const fetchTranslations = async () => {
-    // const colName = language === 'en' ? 'en' : 'ru';
-    if (Array.isArray(configuration)) {
-      setSections(configuration.map((row) => row.name));
-      setTopic(configuration[0].name);
-    }
-    // };  
-    // fetchTranslations();
-  }, [language, configuration]);  // Re-fetch translations when the language changes
-
-  const changeLanguage = (lang) => {
-    setLanguage(lang);
-  };
-
+// Get selected topic
   const selectTopic = (event) => {
     console.log(event.target.name);
     setTopic(event.target.name);
@@ -93,13 +124,9 @@ function AppContent() {
 
   const topicComponent = () => {
 
-    if (loading) return <div>Loading spreadsheet data...</div>;
-    if (error) return <div>Error loading data!</div>
     return (
       <>
         <Section topic={topic} />
-
-
       </>
     );
   };
