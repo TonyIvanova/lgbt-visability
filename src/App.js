@@ -59,13 +59,26 @@ function AppContent() {
       }
     };
     fetchConfigData();
-  }, [API_KEY]);
+  }, []);
 
 //Update what static variable that depend on COMNIG spreadsheet
   useEffect(() => {
-    setConfiguration( getConfiguration(configData))
-    setTopicsMap( createTopicsMap(configData))
-    setYears( getYears(configData))
+    const fetchStaticData = async () => {
+
+    if (!configData) return; // Exit early if configData is null
+
+      try {
+     
+    setConfiguration( await getConfiguration(configData))
+    setTopicsMap(await createTopicsMap(configData))
+    setYears(await getYears(configData))
+      
+  } catch (err) {
+    setError(err);
+  }
+};
+fetchStaticData();
+
   }, 
     [configData])
 
@@ -76,8 +89,11 @@ function AppContent() {
   // Load year REPORT data when CONFIG and year is changed
   useEffect(() => {
     const fetchReportData = async () => {
+
+    if (!configData) return; 
+
       try {
-        const REPORT_SPREADSHEET_ID = getSheetIdByYear(configData, year);
+        const REPORT_SPREADSHEET_ID = await getSheetIdByYear(configData, year);
         setReportData(await getSpreadsheetData(REPORT_SPREADSHEET_ID, API_KEY))
       } catch (err) {
         setError(err);
@@ -93,9 +109,18 @@ function AppContent() {
   const [topic, setTopic] = useState(null);
   // Update sections, topic, descriptions if language changes
   useEffect(() => {
-    setDescriptions( getDescriptions(configData, language))
-    setSections(getSections(configData, language))
+    const updateDynamicData = async () => {
+
+    if (!configData) return; 
+      try {
+    setDescriptions(await getDescriptions(configData, language))
+    setSections(await getSections(configData, language))
     setTopic(sections.length > 0 ? sections[0] : null) //default is the first topic
+  } catch (err) {
+    setError(err);
+  }
+};
+updateDynamicData();
   }, [language, configData])
 
   const [whichSubset, setWhichSubset] = useState('All'); //Trans/Cis default data subsets

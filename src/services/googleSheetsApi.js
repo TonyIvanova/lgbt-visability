@@ -7,7 +7,7 @@ const API_KEY = process.env.REACT_APP_API_KEY;
 const CONFIG_SPREADSHEET_ID = process.env.REACT_APP_CONFIG_SPREADSHEET_ID; 
 
  
-export const getSpreadsheetData = async (spreadsheetId, API_KEY) => {
+export async function getSpreadsheetData(spreadsheetId, API_KEY){
   try {
     const response = await axios.get(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}`, {
       params: {
@@ -24,7 +24,7 @@ export const getSpreadsheetData = async (spreadsheetId, API_KEY) => {
 };
 
 
-export function getSheetData(preloadedSpreadsheet, sheetName) {
+export async function getSheetData(preloadedSpreadsheet, sheetName) {
   const sheet = preloadedSpreadsheet.find(sheet => sheet.properties.title === sheetName)
   
   if (!sheet) {
@@ -35,7 +35,7 @@ export function getSheetData(preloadedSpreadsheet, sheetName) {
   return Promise.resolve(jsonData);
 }
 
-export function getDescriptions(preloadedSpreadsheet, language) {
+export async function getDescriptions(preloadedSpreadsheet, language) {
   const SHEET_NAME = 'descriptions'
   try {
     // Find the 'descriptions' sheet from preloaded data
@@ -83,7 +83,7 @@ export function getDescriptions(preloadedSpreadsheet, language) {
 // console.log(descriptions);
 
 
-export function getConfiguration(preloadedSpreadsheet, language) {
+export async function getConfiguration(preloadedSpreadsheet, language) {
   const SHEET_NAME = 'configuration'
   const configurationSheet = getSheetData(preloadedSpreadsheet, SHEET_NAME)
 
@@ -122,7 +122,7 @@ return configurationMap;
 // console.log(configMap);
 
 
-export function getSections(configurationData, language) {
+export async function getSections(configurationData, language) {
   if (!configurationData || !Array.isArray(configurationData)) {
     console.error('Invalid configuration data provided');
     return { sections: [], topic: null };
@@ -188,7 +188,7 @@ return null;
 // const sheetId = getSheetIdByYear(preloadedSpreadsheet, year);
 // console.log(sheetId); // Should log the sheet ID corresponding to the year "2023"
 
-export function createTopicsMap(preloadedSpreadsheetData) {
+export async function createTopicsMap(preloadedSpreadsheetData) {
 
 const SHEET_NAME = "configuration"; // This is the name of your sheet
 let topicsMap = {};
@@ -227,7 +227,7 @@ return topicsMap;
 // const topicsMap = createTopicsMap(configurationData);
 // console.log(topicsMap);
 
-export function getYears(preloadedSpreadsheet) {
+export async function getYears(preloadedSpreadsheet) {
   // Find the 'sheet_ids_by_year' sheet within the preloaded data
   const sheetIdsByYear = getSheetData(preloadedSpreadsheet, 'sheet_ids_by_year');
   if (!sheetIdsByYear) {
