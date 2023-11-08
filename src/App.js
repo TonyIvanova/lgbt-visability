@@ -20,12 +20,13 @@ import {
 import { LanguageProvider, useLanguage } from './contexts/langContext';
 import Section from "./components/Section";
 import { useYear, YearProvider } from "./contexts/yearContext";
-
+import useSpreadsheetData from './services/googleSheetsApi'
 export const DataContext = createContext([]);
+// import axios from 'axios';
+
 
 function AppContent() {
-  console.log('AppContent start')
-  const CONFIG_SHEET_ID = '1QKmA5UX-FM31jEE7UOVTmlCKxQ_Wa1K2oXxulhtkJHE'
+  // console.log('AppContent start')
   const [sections, setSections] = useState(null);
   const [topic, setTopic] = useState(null);
   const { language, setLanguage } = useLanguage();
@@ -35,25 +36,30 @@ function AppContent() {
   const configuration = useConfiguration()
   const descriptions = useDescriptions()
   const [whichSubset, setWhichSubset] = useState('All'); //Trans/Cis
-
   const [opennessGroup, setOpennessGroup] = useState('')
-
 
 
   const years = Object.keys(dataMap);// to get list of years reports exist for
 
 
-  useEffect(() => {
-    console.log("Updated sections data:", sections);
-    console.log("Updated years data", years);
-    console.log("Updated topic data:", topic);
-    console.log("Updated year data:", year);
-    console.log("Updated configuration data:", configuration);
-    console.log("Updated descriptions data:", descriptions);
-    // console.log("Updated spreadsheet data:", spreadsheet);
-    console.log("Updated data data:", data);
+  const API_KEY = process.env.REACT_APP_API_KEY;
+  const CONFIG_SPREADSHEET_ID = process.env.REACT_APP_CONFIG_SPREADSHEET_ID;
 
-  }, [sections, topic]);
+  const { configData, loading, error } = useSpreadsheetData(CONFIG_SPREADSHEET_ID);
+
+
+
+  // useEffect(() => {
+  //   console.log("Updated sections data:", sections);
+  //   console.log("Updated years data", years);
+  //   console.log("Updated topic data:", topic);
+  //   console.log("Updated year data:", year);
+  //   console.log("Updated configuration data:", configuration);
+  //   console.log("Updated descriptions data:", descriptions);
+  //   // console.log("Updated spreadsheet data:", spreadsheet);
+  //   console.log("Updated data data:", data);
+
+  // }, [sections, topic]);
 
 
 
@@ -84,10 +90,16 @@ function AppContent() {
     setTopic(event.target.name);
   };
 
+
   const topicComponent = () => {
+
+    if (loading) return <div>Loading spreadsheet data...</div>;
+    if (error) return <div>Error loading data!</div>
     return (
       <>
         <Section topic={topic} />
+
+
       </>
     );
   };
@@ -96,7 +108,14 @@ function AppContent() {
     return (
       <div className="App">
 
+        <div>
+          <h1>Spreadsheet Data</h1>
+          {/* Convert the spreadsheet data to a string and display it */}
+          <pre>{JSON.stringify(configData, null, 2)}</pre> {/* The 'pre' tag is used to preserve whitespace and formatting */}
+        </div>
+
         <Header />
+
         <ButtonGroup2
           buttons={years}//{["2022", "2023"]}
           doSomethingAfterClick={selectYear}
