@@ -1,6 +1,6 @@
 import "./App.css";
 import { createContext, useEffect, useState } from "react";
-import { getSheetData, dataMap } from "./services/googleSheetsService";
+import { getSections, getSheetData, dataMap } from "./services/googleSheetsService";
 import Header from "./components/Header";
 import bg1 from "./assets/bg1.svg";
 import bg2 from "./assets/bg2.svg";
@@ -23,7 +23,7 @@ function AppContent() {
   };
 
   useEffect(() => {
-    getSheetData(dataMap['2022']['report']['sheet'], 'configuration').then((data) => {
+    getSections('ru').then((data) => {
       setSections(data.map((row) => row.section_title));
       setTopic(data[0].section_title);
     });
