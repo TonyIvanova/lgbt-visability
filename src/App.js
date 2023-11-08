@@ -2,7 +2,13 @@
 
 import "./App.css";
 import { createContext, useEffect, useState } from "react";
-import { getSheetData, fetchDataMap } from "./services/googleSheetsService";
+import { 
+  getSections, 
+  getSheetData, 
+  dataMap,
+  loadYearData,
+  loadConfig
+ } from "./services/googleSheetsService";
 import Header from "./components/Header";
 import bg1 from "./assets/bg1.svg";
 import bg2 from "./assets/bg2.svg";
@@ -30,7 +36,7 @@ function AppContent() {
   const [topic, setTopic] = useState(null);
   const { language, setLanguage } = useLanguage();
   const { year, setYear } = useYear(); // report year
-  const { dataMap, setDataMap } = useDataMap(); // reports ids
+  // const { dataMap, setDataMap } = useDataMap(); // reports ids
   const { data, setData } = useData();
   const configuration = useConfiguration()
   const descriptions = useDescriptions()
@@ -38,22 +44,12 @@ function AppContent() {
 
   const [opennessGroup, setOpennessGroup] = useState('')
 
+  const [yearData, setYearData] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
 
   const years = Object.keys(dataMap);// to get list of years reports exist for
-
-
-  useEffect(() => {
-    console.log("Updated sections data:", sections);
-    console.log("Updated years data", years);
-    console.log("Updated topic data:", topic);
-    console.log("Updated year data:", year);
-    console.log("Updated configuration data:", configuration);
-    console.log("Updated descriptions data:", descriptions);
-    // console.log("Updated spreadsheet data:", spreadsheet);
-    console.log("Updated data data:", data);
-
-  }, [sections, topic]);
 
 
 
@@ -62,17 +58,36 @@ function AppContent() {
     setYear(event.target.name);
   };
 
+  // Load year data 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const data = await loadYearData(year);
+        setYearData(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [year]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   // Get sections names: from config.xlsx
   useEffect(() => {
-    // const fetchTranslations = async () => {
-    // const colName = language === 'en' ? 'en' : 'ru';
-    if (Array.isArray(configuration)) {
-      setSections(configuration.map((row) => row.name));
-      setTopic(configuration[0].name);
-    }
-    // };  
-    // fetchTranslations();
+    getSections('ru').then((data) => {
+      setSections(data.map((row) => row.name));
+      setTopic(data[0].name);
+    })
   }, [language, configuration]);  // Re-fetch translations when the language changes
 
   const changeLanguage = (lang) => {
