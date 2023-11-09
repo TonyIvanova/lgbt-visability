@@ -3,13 +3,18 @@ import Map from "./shared/Map";
 import { PieChart } from "./shared/PieChart";
 import { BarPlot } from "./shared/BarPlot";
 import {
-  getConfiguration,
+  getSectionsByLanguage,
+  getDescriptionsByLanguage,
+  getStoriesByLanguage,
+  getConclusionsByLanguage,
+  getConfigurationByLanguage,
   getSheetData,
-  // getFullSpreadsheetData,
-  // getStories
-} from ".././services/googleSheetsService";
+  dataMap,
+  topicsMap,
+  loadYearData,
+  loadConfig
+} from "../services/googleSheetsService";
 import { ButtonGroupLang, ButtonGroupSubset } from "./shared/ButtonGroup";
-// import {useDataMap} from "../contexts/dataContext"
 import { useYear } from "../contexts/yearContext";
 import {
   useConfiguration,
@@ -22,46 +27,108 @@ import { useLanguage } from "../contexts/langContext";
 import { getDescriptions } from ".././services/googleSheetsService";
 
 
-
-
-
 export default function Statistics({ topic }) {
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const { year } = useYear();
+  const { language } = useLanguage();
+  const [selectedQuestion, setSelectedQuestion] = useState("All");
+
   const [pieData, setPieData] = useState([]);
   const [barData, setBarData] = useState([]);
   const [mapData, setMapData] = useState([]);
-  const { dataMap } = useDataMap();
-  const { year } = useYear();
-  const { language } = useLanguage();
-  // console.log(dataMap)
-  // const [pieDescription, setPieDescription] = useState("");
-  // const [mapDescription, setMapDescription] = useState("");
-  // const [barDescription, setBarDescription] = useState("");
-  const [stories, setStories] = useState("");
   const [opennessGroup, setOpennessGroup] = useState("All");
-  const [whichSubset, setWhichSubset] = useState("All"); //Trans/Cis
+  const [whichSubset, setWhichSubset] = useState("All");
 
-  const [selectedQuestion, setSelectedQuestion] = useState("All");
-  // console.log('Statistics/topic', topic)
-  const topicsMap = {
-    "Экономическое положение": "economical_status",
-    "Economical status": "economical_status",
-    "Насилие": "violence",
-    "Violence": "violence",
-    "Дискриминация": "discrimination",
-    "Discrimination": "discrimination",
-    "Влияние войны в Украине": "war_effects",
-    "Effects of war in Ukraine": "war_effects",
-    "Открытость": "openness",
-    "Openness": "openness",
-  };
-  const [{ mapDescription, barDescription, pieDescription }, refreshDescriptions] = useDescriptions(topic, language);
-  const configuration = getConfiguration();
-  
+  const [sections, setSections] = useState([]);
+  // const [topic, setTopic] = useState([]);
+  const [descriptions, setDescriptions] = useState([]);
+  const [configuration, setConfiguration] = useState([]);
+  const [mapDescription, setMapDescription] = useState('');
+  const [pieDescription, setPieDescription] = useState('');
+  const [barDescription, setBarDescription] = useState('');
+
+  useEffect(() => {
+    let isMounted = true;
+    setLoading(true);
+    const fetchData = async () => {
+      try {
+        const sectionsData = await getSectionsByLanguage(language);
+        const descriptionsData = await getDescriptionsByLanguage(language);
+        const configuration = getConfigurationByLanguage(language);
+        if (isMounted) {
+          setSections(sectionsData);
+          setDescriptions(descriptionsData);
+          setConfiguration(configuration);
+
+          const mapChartDescription = descriptions.find(desc => desc.key === 'mapChartKey')?.pie || "Map Description not available";
+          setMapDescription(mapChartDescription);
+
+          const barChartDescription = descriptions.find(desc => desc.key === 'barChartKey')?.pie || "Bar Description not available";
+          setBarDescription(barChartDescription);
+
+          const pieChartDescription = descriptions.find(desc => desc.key === 'pieChartKey')?.pie || "Pie Description not available";
+          setPieDescription(pieChartDescription);
+
+
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError(err);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+    fetchData();
+    return () => {
+      isMounted = false;
+    };
+  }, [language]);
+
+  const [stories, setStories] = useState([]);
+  const [conclusions, setConclusions] = useState([]);
+  useEffect(() => {
+    let isMounted = true;
+    setLoading(true);
+    const fetchData = async () => {
+      try {
+        const storiesData = await getStoriesByLanguage(language);
+        const conclusionsData = await getConclusionsByLanguage(language); // Implement this function similar to getSectionsByLanguage
+
+        if (isMounted) {
+          setStories(storiesData);
+          setConclusions(conclusionsData);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError(err);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+    fetchData();
+    return () => {
+      isMounted = false;
+    };
+  }, [language]);
+
+
+  // const [{ mapDescription, barDescription, pieDescription }, refreshDescriptions] = useDescriptions(topic, language);
+
+
 
   function getSheetName(topic, whichSubset, opennessGroup) {
     const baseName = topicsMap[topic] || "default";
     let sheetName = baseName;
-  
+
     if (whichSubset !== 'All' && opennessGroup !== 'All') {
       if (baseName === "openness") {
         sheetName += '_' + opennessGroup + '_' + whichSubset;
@@ -73,61 +140,42 @@ export default function Statistics({ topic }) {
     } else if (opennessGroup !== 'All') {
       sheetName += '_' + opennessGroup;
     }
-    
+
     console.log('sheetName', sheetName);
     return sheetName;
   }
-  
 
-  function useDescriptions(topic, language) {
-    const [descriptions, setDescriptions] = useState({
-      mapDescription: '',
-      barDescription: '',
-      pieDescription: ''
-    });
-  
-    const fetchDescriptions = useCallback(async () => {
-      const data = await getDescriptions(language);
-      const relevantTopic = data.find((item) => item.key === topic);
-      
-      if (relevantTopic) {
-        setDescriptions({
-          mapDescription: relevantTopic.map,
-          barDescription: relevantTopic.bar,
-          pieDescription: relevantTopic.pie
-        });
-      }
-    }, [topic, language]);
-  
-    useEffect(() => {
-      fetchDescriptions();
-    }, [fetchDescriptions]);
-  
-    // Return descriptions and a function to refresh them manually if needed
-    return [descriptions, fetchDescriptions];
-  }
-  
-  useEffect(() => {
-    // // console.log("Statistics/pieData:", pieData);
-    // // console.log("Statistics/barData:", barData);
-    // console.log("Statistics/ mapDescription:", pieDescription);
-    // console.log("Statistics/ mapDescription:", barDescription);
-    // console.log("Statistics/ mapDescription:", mapDescription);
-    console.log("Statistics/selectedQuestion[year]: ", selectedQuestion);
-    // console.log('Statistics/stories: ',stories)
-  }, [
-    // chartData,
-    //  mapDescription,
-    stories,
-    selectedQuestion,
-  ]);
+
+  // function useDescriptions(topic, language) {
+
+  //   const fetchDescriptions = useCallback(async () => {
+  //     const relevantTopic = descriptions.find((item) => item.key === topic);
+
+  //     if (relevantTopic) {
+  //       setDescriptions({
+  //         mapDescription: relevantTopic.map,
+  //         barDescription: relevantTopic.bar,
+  //         pieDescription: relevantTopic.pie
+  //       });
+  //     }
+  //   }, [topic, language]);
+
+
+  //   useEffect(() => {
+  //     fetchDescriptions();
+  //   }, [fetchDescriptions]);
+
+  //   // Return descriptions and a function to refresh them manually if needed
+  //   return [descriptions, fetchDescriptions];
+  // }
+
 
   //fetching data based on `topic`, `whichSubset`, `opennessGroup`, `year`, and `language`
   useEffect(() => {
     async function fetchData() {
       const sheetName = getSheetName(topic, whichSubset, opennessGroup);
       console.log(sheetName);
-      
+
       if (dataMap[year]["report"]["sheet"] && sheetName) {
         try {
           const res = await getSheetData(dataMap[year]["report"]["sheet"], sheetName);
@@ -140,17 +188,13 @@ export default function Statistics({ topic }) {
         }
       }
     }
-    
+
     if (configuration) {
       fetchData();
     }
   }, [topic, year, whichSubset, opennessGroup, language, selectedQuestion]);
 
 
-  useEffect(() => {
-    // For example, refreshing descriptions when language changes
-    refreshDescriptions();
-  }, [language, refreshDescriptions]);
 
   const selectSubset = (event) => {
     setWhichSubset(event.target.name);
@@ -166,23 +210,23 @@ export default function Statistics({ topic }) {
     // setDescriptions(descr[topic])
   }, [language]);
 
-  
 
-  
-  
+
+
+
   // useEffect(() => {
-        
+
   // }, [language]);
 
-  
-  
+
+
   useEffect(() => {
     if (!configuration) {
       return; // Exit the effect if configuration is not yet available
     }
     const sheetName = getSheetName(topic, whichSubset, opennessGroup);
     // console.log(sheetName);
-    
+
     // Checking that we have neccessarry parameterd defined to make an API call.
     if (dataMap[year]["report"]["sheet"] && sheetName) {
       try {
@@ -201,56 +245,56 @@ export default function Statistics({ topic }) {
     }
   }, [topic, year, whichSubset, configuration, selectedQuestion]);
 
-  
 
 
-function parseBarData(res){
-  if (!res || res === undefined || res?.length === 0) {
-    console.info("Failed to parse bar data. The response is empty.");
-    return [];
-  }
-  const fields = Object.keys(res[0])
-    .filter((key) => key !== "District" && key !== "All")
-    .map((key) => {
-      return key;
+
+  function parseBarData(res) {
+    if (!res || res === undefined || res?.length === 0) {
+      console.info("Failed to parse bar data. The response is empty.");
+      return [];
+    }
+    const fields = Object.keys(res[0])
+      .filter((key) => key !== "District" && key !== "All")
+      .map((key) => {
+        return key;
+      });
+    const values = res.find((row) => row.District === "Все");
+    const result = fields.map((field) => {
+      return { name: field, value: parseFloat(values[field]) };
     });
-  const values = res.find((row) => row.District === "Все");
-  const result = fields.map((field) => {
-    return { name: field, value: parseFloat(values[field]) };
-  });
-  return result;
-};
+    return result;
+  };
 
-function parsePieData(res){
-  if (!res || res === undefined || res?.length === 0) {
-    console.info("Failed to parse Pie Data. Response is empty.");
-    return [];
-  }
-  const fields = Object.keys(res[0])
-    .filter((key) => key !== "District" && key !== "All")
-    .map((key) => {
-      return key;
+  function parsePieData(res) {
+    if (!res || res === undefined || res?.length === 0) {
+      console.info("Failed to parse Pie Data. Response is empty.");
+      return [];
+    }
+    const fields = Object.keys(res[0])
+      .filter((key) => key !== "District" && key !== "All")
+      .map((key) => {
+        return key;
+      });
+    const values = res.find((row) => row.District === "Все");
+    const result = fields.map((field) => {
+      return { name: field, value: parseFloat(values[field]) };
     });
-  const values = res.find((row) => row.District === "Все");
-  const result = fields.map((field) => {
-    return { name: field, value: parseFloat(values[field]) };
-  });
-  return result;
-};
+    return result;
+  };
 
-function parseMapData(res){
-  if (!res || res === undefined || res?.length === 0) {
-    console.info("Failed to parse Map Data. Response is empty.");
-    return [];
-  }
-  const result = res.map((row) => {
-    return {
-      name: row.District,
-      value: parseFloat(row[selectedQuestion]),
-    };
-  });
-  return result;
-};
+  function parseMapData(res) {
+    if (!res || res === undefined || res?.length === 0) {
+      console.info("Failed to parse Map Data. Response is empty.");
+      return [];
+    }
+    const result = res.map((row) => {
+      return {
+        name: row.District,
+        value: parseFloat(row[selectedQuestion]),
+      };
+    });
+    return result;
+  };
 
 
 
@@ -323,7 +367,7 @@ function parseMapData(res){
       </>
     );
   };
-  
+
   if (pieData && mapData && barData) {
     return (
       <div className="section">

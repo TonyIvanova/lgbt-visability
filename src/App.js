@@ -3,7 +3,10 @@
 import "./App.css";
 import { createContext, useEffect, useState } from "react";
 import { 
-  getSections, 
+  getSectionsByLanguage, 
+  getDescriptionsByLanguage,
+  getStoriesByLanguage,
+  getConclusionsByLanguage,
   getSheetData, 
   dataMap,
   loadYearData,
@@ -17,11 +20,11 @@ import { ButtonGroup1, ButtonGroup2 } from "./components/shared/ButtonGroup";
 import { LinkComponent } from './components/shared/LinkComponent';
 import {
   DataProvider,
-  useData,
-  useDataMap,
-  useConfiguration,
-  useDescriptions,
-  useSubset
+  // useData,
+  // useDataMap,
+  // useConfiguration,
+  // useDescriptions,
+  // useSubset
 } from "./contexts/dataContext";
 import { LanguageProvider, useLanguage } from './contexts/langContext';
 import Section from "./components/Section";
@@ -32,19 +35,13 @@ export const DataContext = createContext([]);
 function AppContent() {
   console.log('AppContent start')
   const CONFIG_SHEET_ID = '1QKmA5UX-FM31jEE7UOVTmlCKxQ_Wa1K2oXxulhtkJHE'
-  const [sections, setSections] = useState(null);
-  const [topic, setTopic] = useState(null);
   const { language, setLanguage } = useLanguage();
   const { year, setYear } = useYear(); // report year
-  // const { dataMap, setDataMap } = useDataMap(); // reports ids
-  const { data, setData } = useData();
-  const configuration = useConfiguration()
-  const descriptions = useDescriptions()
+
   const [whichSubset, setWhichSubset] = useState('All'); //Trans/Cis
-
   const [opennessGroup, setOpennessGroup] = useState('')
+  const [topic, setTopic] = useState('')
 
-  const [yearData, setYearData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -59,12 +56,14 @@ function AppContent() {
   };
 
   // Load year data 
+  const [yearData, setYearData] = useState({});
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         const data = await loadYearData(year);
         setYearData(data);
+        console.log(data)
       } catch (err) {
         setError(err.message);
       } finally {
@@ -74,6 +73,45 @@ function AppContent() {
     fetchData();
   }, [year]);
 
+
+  const [sections, setSections] = useState([]);
+  const [descriptions, setDescriptions] = useState([]);
+  useEffect(() => {
+    let isMounted = true; 
+    setLoading(true);
+    const fetchData = async () => {
+      try {
+        const sectionsData = await getSectionsByLanguage(language);
+        
+        if (isMounted) {
+          setSections(sectionsData);
+         
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError(err);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+    fetchData();
+    return () => {
+      isMounted = false;
+    };
+  }, [language]); 
+
+  const changeLanguage = (lang) => {
+    setLanguage(lang);
+  };
+  const selectTopic = (event) => {
+    console.log(event.target.name);
+    setTopic(event.target.name);
+  };
+
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -81,23 +119,6 @@ function AppContent() {
   if (error) {
     return <div>Error: {error}</div>;
   }
-
-  // Get sections names: from config.xlsx
-  useEffect(() => {
-    getSections('ru').then((data) => {
-      setSections(data.map((row) => row.name));
-      setTopic(data[0].name);
-    })
-  }, [language, configuration]);  // Re-fetch translations when the language changes
-
-  const changeLanguage = (lang) => {
-    setLanguage(lang);
-  };
-
-  const selectTopic = (event) => {
-    console.log(event.target.name);
-    setTopic(event.target.name);
-  };
 
   const topicComponent = () => {
     return (

@@ -15,10 +15,11 @@ async function loadConfig() {
 var configData = await getSheetData(dataMap['config'], 'sheet_ids_by_year')
 configData.forEach(function(itm) {
     dataMap[itm.year] = itm.id
-    console.log('GSHEETS/dataMap:',dataMap)
+    // console.log('GSHEETS/dataMap:',dataMap)
   }
 )
 }
+
 
 //  retrieve data from a gsheet and cache it
 export async function getSheetData(tableId, sheetName) {
@@ -31,11 +32,10 @@ export async function getSheetData(tableId, sheetName) {
   }
 
   // If not a 'config' table, ensure 'config' is loaded
-  if(tableId != dataMap['config']){
+  if(tableId !== dataMap['config']){
     await loadConfig()
   }
 
-  
   // To transform the raw sheet data into a more usable JSON format
   function transformSheetRowsData(rowData) {
     var colsMap = {}
@@ -53,22 +53,22 @@ export async function getSheetData(tableId, sheetName) {
     // transforms {userEnteredValue: {…}, effectiveValue: {…}, formattedValue: 'Дальневосточный федеральный округ', effectiveFormat: {…}}
     // to { columnName1: formattedValue, ... }
     rowData.forEach( (row, rowIdx) => {
-      if(rowIdx == 0) return;
+      if(rowIdx === 0) return;
       var rowObject = {}
       row.values.forEach((cellValue, colIdx) => {
           rowObject[colsMap[colIdx]] = cellValue.formattedValue;
       })
       jsonData.push(rowObject)
     })
-    console.log('jsonData:',jsonData)
+    // console.log('jsonData:',jsonData)
     return jsonData
   }
 
   // iterate sheets
   function fillCachesWithTransformedWorksheetsData(data) {
-      console.log(data)
+      // console.log(data)
       data.sheets.forEach( (sheet) => {//for each sheet in a spreadsheet
-        console.log(sheet)
+        // console.log('sheet',sheet)
         dataCache[tableId+"_"+sheet.properties.title] = transformSheetRowsData(sheet.data[0].rowData)
       })
   }
@@ -84,12 +84,21 @@ export async function getSheetData(tableId, sheetName) {
           return dataCache[tableId+"_"+sheetName]
       })
   });
-console.log(dataCache)
+  console.log('dataCache:',dataCache)
   return worksheetData;
 }
 
+async function getSheetsMetadata(spreadsheetId) {
+  // Fetch the spreadsheet metadata from the Google Sheets API
+  const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?fields=sheets.properties&key=${API_KEY}`);
+  const data = await response.json();
+  // Return the metadata for all sheets in the spreadsheet
+  return data.sheets;
+}
 
-export async function loadYearSheets(year) {
+
+export async function loadYearData(year) {
+  await loadConfig()
   const spreadsheetId = dataMap[year];
   
   if (!spreadsheetId) {
@@ -98,32 +107,158 @@ export async function loadYearSheets(year) {
 
   try {
     // get data for all sheets in the spreadsheet
-    await getSheetData(spreadsheetId);
+    const sheetsMetadata = await getSheetsMetadata(spreadsheetId);
+    // Now fetch data for each sheet and store it in cache
+    for (const sheet of sheetsMetadata) {
+      await getSheetData(spreadsheetId, sheet.properties.title);
+    }
+    console.log('dataCache:',dataCache)
     return 'All sheets data fetched and stored in cache.';
   } catch (error) {
     console.error(`Error fetching data for year ${year}:`, error);
     throw error; // Re-throw the error if you want calling code to handle it
   }
 }
-// Example usage:
-// loadAndStoreDataForYear(2022).then(message => {
-//   console.log(message); // Logs: All sheets data fetched and stored in cache.
-//   // Now you can use the data from the cache as required.
-// }).catch(error => {
-//   // Handle any errors
-// });
-
 // Loads data to cache for a given year by fetching the corresponding Google Sheet ID from dataMap
-export async function loadYearData(year, sheetName) {
-  await loadConfig()
-  return getSheetData(dataMap[year], sheetName)
+// export async function loadYearData(year, sheetName) {
+//   await loadConfig()
+//   return getSheetData(dataMap[year], sheetName)
+// }
+
+export async function getSectionsByLanguage(lang) {
+  const configKey = 'config'; // Key for the config in dataMap
+  const sectionsSheetName = 'configuration'; // The sheet name where sections are stored
+  const cacheKey = `${dataMap[configKey]}_${sectionsSheetName}`;
+
+  if (dataCache[cacheKey]) {
+    // Data is in cache, map and return it
+    return dataCache[cacheKey].map(item => [item.key, item[lang]]);
+  } else {
+    // Data is not in cache, fetch and cache it
+    try {
+      const data = await getSheetData(dataMap[configKey], sectionsSheetName);
+      // map and return it
+      return data.map(item => [item.key, item[lang]]);
+    } catch (error) {
+      console.error('Error fetching sections data:', error);
+      throw error;
+    }
+  }
 }
 
-export async function getSections(lang) {
-  return getSheetData(dataMap['configuration'], 'configuration').then(data => {
-    return data.map((itm)=>[itm.key, itm[lang]])
-  })
+
+export async function getDescriptionsByLanguage(language) {
+  // Assuming dataMap and dataCache are accessible here
+  const configKey = 'config'; // Use the appropriate key for descriptions in your dataMap
+  const spreadsheetId = dataMap[configKey];
+  const cacheKey = `${spreadsheetId}_descriptions`;
+
+  const descriptionsData = dataCache[cacheKey];
+  if (!descriptionsData) {
+    throw new Error('Descriptions data is not available in the cache.');
+  }
+
+  // Map the descriptions to the specified language
+  const descriptions = descriptionsData.map(desc => ({
+    key: desc.key,
+    name: desc[`name_${language}`],
+    bar: desc[`bar_${language}`],
+    map: desc[`map_${language}`],
+    pie: desc[`pie_${language}`] || "none", // Fallback to "none" if undefined
+  }));
+
+  return descriptions;
 }
+
+
+export async function getConclusionsByLanguage(year, language) {
+  // Assuming dataMap and dataCache are accessible here
+  const configKey = year; // Use the appropriate key for descriptions in your dataMap
+  const spreadsheetId = dataMap[configKey];
+  const cacheKey = `${spreadsheetId}_conclusions`;
+
+  const conclusionsData = dataCache[cacheKey];
+  if (!conclusionsData) {
+    throw new Error('Conclusions data is not available in the cache.');
+  }
+
+  const conclusions = conclusionsData.map(desc => ({
+    key: desc.key,
+    name: desc[`name_${language}`],
+    text: desc[`text_${language}`] || "none", // Fallback to "none" if undefined
+  }));
+
+  return conclusions;
+}
+
+
+export async function getStoriesByLanguage(year, language) {
+  // Assuming dataMap and dataCache are accessible here
+  const configKey = year; // Use the appropriate key for descriptions in your dataMap
+  const spreadsheetId = dataMap[configKey];
+  const cacheKey = `${spreadsheetId}_df_stories_filtered`;
+
+  const storiesData = dataCache[cacheKey];
+  if (!storiesData) {
+    throw new Error('Stories data is not available in the cache.');
+  }
+
+  // Map the descriptions to the specified language
+  const stories = storiesData.map(desc => ({
+    key: desc.key,
+    name: desc[`name_${language}`],
+    text: desc[`text_${language}`],
+    author: desc[`author_${language}`] || "none", // Fallback to "none" if undefined
+  }));
+
+  return stories;
+}
+
+
+
+export async function getConfigurationByLanguage(language) {
+  // Assuming dataMap and dataCache are accessible here
+  const configKey = 'config'; // Use the appropriate key for descriptions in your dataMap
+  const spreadsheetId = dataMap[configKey];
+  const cacheKey = `${spreadsheetId}_configuration`;
+
+  const configurationData = dataCache[cacheKey];
+  if (!configurationData) {
+    throw new Error('Stories data is not available in the cache.');
+  }
+
+  const configuration = configurationData.map((item) => ({
+    key: item.key,
+    name: item[language], 
+  }));
+  return configuration;
+}
+
+export async function makeTopicsMap() {
+  const configKey = 'config'; // Use the appropriate key for configuration in your dataMap
+  const spreadsheetId = dataMap[configKey];
+  const cacheKey = `${spreadsheetId}_configuration`;
+
+  const configurationData = dataCache[cacheKey];
+  if (!configurationData) {
+    throw new Error('Configuration data is not available in the cache.');
+  }
+
+  const topicsMap = {};
+
+  // Build the map by iterating over the configuration data
+  configurationData.forEach((item) => {
+    // For each configuration item, map both the English and Russian terms to the key
+    topicsMap[item['ru']] = item.key;
+    topicsMap[item['en']] = item.key;
+  });
+
+  return topicsMap;
+}
+export const topicsMap = makeTopicsMap()
+
+// Example usage:
+// const descriptions = getDescriptionsByLanguage('ru');
 
 
 // const API_KEY = 'AIzaSyD71dPGb38J0b2Y4XC7tShKP0JQ_H9rGPM';
