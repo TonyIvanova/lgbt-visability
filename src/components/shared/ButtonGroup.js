@@ -8,6 +8,11 @@ export const ButtonGroup1 = ({ buttons, doSomethingAfterClick }) => {
     doSomethingAfterClick(event);
   };
 
+  if (!Array.isArray(buttons)) {
+    console.error('The buttons prop must be an array.', buttons.key);
+    return null; // or some fallback UI
+  }
+
   return (
     <div className="button-group">
       {buttons.map((buttonLabel, i) => (
@@ -30,12 +35,12 @@ export const ButtonGroup1 = ({ buttons, doSomethingAfterClick }) => {
 
 
 
-export const ButtonGroup2 = ({ buttons, doSomethingAfterClick }) => {
+export const ButtonGroup2 = ({ buttons, onButtonClick }) => {
   const [clickedId, setClickedId] = useState(0);
 
   const handleClick = (event, id) => {
     setClickedId(id);
-    doSomethingAfterClick(event);
+    onButtonClick(event);
   };
 
   return (
@@ -58,12 +63,12 @@ export const ButtonGroup2 = ({ buttons, doSomethingAfterClick }) => {
   );
 };
 
-export const ButtonGroupLang = ({ buttons, doSomethingAfterClick }) => {
+export const ButtonGroupLang = ({ buttons, onButtonClick }) => {
   const [clickedId, setClickedId] = useState(0);
 
   const handleClick = (event, id) => {
     setClickedId(id);
-    doSomethingAfterClick(event);
+    onButtonClick(event);
   };
 
   return (

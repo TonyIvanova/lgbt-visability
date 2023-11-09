@@ -3,10 +3,10 @@
 import "./App.css";
 import { createContext, useEffect, useState } from "react";
 import { 
-  getSectionsByLanguage, 
-  getDescriptionsByLanguage,
-  getStoriesByLanguage,
-  getConclusionsByLanguage,
+  getSections, 
+  getDescriptions,
+  getStories,
+  getConclusions,
   getSheetData, 
   dataMap,
   loadYearData,
@@ -81,10 +81,11 @@ function AppContent() {
     setLoading(true);
     const fetchData = async () => {
       try {
-        const sectionsData = await getSectionsByLanguage(language);
+        const sectionsData = await getSections(language);
         
         if (isMounted) {
           setSections(sectionsData);
+          setTopic(sectionsData[0].name)
          
         }
       } catch (err) {
@@ -135,7 +136,7 @@ function AppContent() {
         <Header />
         <ButtonGroup2
           buttons={years}//{["2022", "2023"]}
-          doSomethingAfterClick={selectYear}
+          onButtonClick={selectYear}
         />
 
         <LinkComponent
@@ -152,7 +153,7 @@ function AppContent() {
 
         <ButtonGroup1
           buttons={sections}
-          doSomethingAfterClick={selectTopic}
+          onButtonClick={selectTopic}
         />
 
         <div className="topic-component">{topicComponent()}</div>

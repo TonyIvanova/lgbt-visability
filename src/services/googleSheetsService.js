@@ -119,272 +119,230 @@ export async function loadYearData(year) {
     throw error; // Re-throw the error if you want calling code to handle it
   }
 }
-// Loads data to cache for a given year by fetching the corresponding Google Sheet ID from dataMap
-// export async function loadYearData(year, sheetName) {
-//   await loadConfig()
-//   return getSheetData(dataMap[year], sheetName)
-// }
 
-export async function getSectionsByLanguage(lang) {
-  const configKey = 'config'; // Key for the config in dataMap
-  const sectionsSheetName = 'configuration'; // The sheet name where sections are stored
-  const cacheKey = `${dataMap[configKey]}_${sectionsSheetName}`;
-
-  if (dataCache[cacheKey]) {
-    // Data is in cache, map and return it
-    return dataCache[cacheKey].map(item => [item.key, item[lang]]);
-  } else {
-    // Data is not in cache, fetch and cache it
-    try {
-      const data = await getSheetData(dataMap[configKey], sectionsSheetName);
-      // map and return it
-      return data.map(item => [item.key, item[lang]]);
-    } catch (error) {
-      console.error('Error fetching sections data:', error);
-      throw error;
-    }
-  }
+export async function getSections(language) {
+  await loadConfig()
+  return getSheetData(dataMap['config'], 'configuration').then(data => {
+    return data.map((itm)=>[itm.key, itm[language]])
+  })
+  // return getSheetData(dataMap['config'], 'configuration').then(data => {
+  //   return data.reduce(function(acc, itm) {
+  //    acc[itm.key]=itm[lang];
+  //    console.log('Sections:',acc)
+  //    return acc
+  //   }, {})
+  // })
 }
 
 
-export async function getDescriptionsByLanguage(language) {
-  // Assuming dataMap and dataCache are accessible here
-  const configKey = 'config'; // Use the appropriate key for descriptions in your dataMap
-  const spreadsheetId = dataMap[configKey];
-  const cacheKey = `${spreadsheetId}_descriptions`;
+export async function getDescriptions(language) {
+  await loadConfig()
+  return getSheetData(dataMap['config'], 'descriptions').then(data => {
 
-  const descriptionsData = dataCache[cacheKey];
-  if (!descriptionsData) {
-    throw new Error('Descriptions data is not available in the cache.');
-  }
-
-  // Map the descriptions to the specified language
-  const descriptions = descriptionsData.map(desc => ({
-    key: desc.key,
-    name: desc[`name_${language}`],
-    bar: desc[`bar_${language}`],
-    map: desc[`map_${language}`],
-    pie: desc[`pie_${language}`] || "none", // Fallback to "none" if undefined
-  }));
-
-  return descriptions;
-}
-
-
-export async function getConclusionsByLanguage(year, language) {
-  // Assuming dataMap and dataCache are accessible here
-  const configKey = year; // Use the appropriate key for descriptions in your dataMap
-  const spreadsheetId = dataMap[configKey];
-  const cacheKey = `${spreadsheetId}_conclusions`;
-
-  const conclusionsData = dataCache[cacheKey];
-  if (!conclusionsData) {
-    throw new Error('Conclusions data is not available in the cache.');
-  }
-
-  const conclusions = conclusionsData.map(desc => ({
-    key: desc.key,
-    name: desc[`name_${language}`],
-    text: desc[`text_${language}`] || "none", // Fallback to "none" if undefined
-  }));
-
-  return conclusions;
-}
-
-
-export async function getStoriesByLanguage(year, language) {
-  // Assuming dataMap and dataCache are accessible here
-  const configKey = year; // Use the appropriate key for descriptions in your dataMap
-  const spreadsheetId = dataMap[configKey];
-  const cacheKey = `${spreadsheetId}_df_stories_filtered`;
-
-  const storiesData = dataCache[cacheKey];
-  if (!storiesData) {
-    throw new Error('Stories data is not available in the cache.');
-  }
-
-  // Map the descriptions to the specified language
-  const stories = storiesData.map(desc => ({
-    key: desc.key,
-    name: desc[`name_${language}`],
-    text: desc[`text_${language}`],
-    author: desc[`author_${language}`] || "none", // Fallback to "none" if undefined
-  }));
-
-  return stories;
+    return data.reduce(function(acc, itm) {
+        acc[itm.key]['key']||= {}
+        acc[itm.key]['name']=itm["name_"+language];
+        acc[itm.key]['bar']=itm["bar_"+language];
+        acc[itm.key]['map']=itm["map"+language];
+        acc[itm.key]['pie']=itm["pie_"+language];
+        console.log('descriptions:',acc)
+        return acc
+    }, {})
+  })
 }
 
 
 
-export async function getConfigurationByLanguage(language) {
-  // Assuming dataMap and dataCache are accessible here
-  const configKey = 'config'; // Use the appropriate key for descriptions in your dataMap
-  const spreadsheetId = dataMap[configKey];
-  const cacheKey = `${spreadsheetId}_configuration`;
-
-  const configurationData = dataCache[cacheKey];
-  if (!configurationData) {
-    throw new Error('Stories data is not available in the cache.');
-  }
-
-  const configuration = configurationData.map((item) => ({
-    key: item.key,
-    name: item[language], 
-  }));
-  return configuration;
+export async function getConclusions(year, language) {
+  await loadConfig()
+  return getSheetData(dataMap[year], 'conclusions').then(data => {
+    return data.reduce(function(acc, itm) {
+     acc[itm.key] ||= {}
+     acc[itm.key]['name']=itm["name_"+language];
+     acc[itm.key]['text']=itm["text_"+language];
+     console.log('Conclusions:',acc)
+     return acc
+    }, {})
+  })
 }
+
+//TODO: filted out empty rows 
+
+export async function getStories(year, language) {
+  await loadConfig()
+  return getSheetData(dataMap[year], 'df_stories_filtered').then(data => {
+    return data.reduce(function(acc, itm) {
+     acc[itm.key] ||= {}
+     acc[itm.key]['name']=itm["name_"+language];
+     acc[itm.key]['text']=itm["text_"+language];
+     acc[itm.key]['author']=itm["author_"+language];
+     console.log('Stories:',acc)
+     return acc
+    }, {})
+  })
+}
+
+
+
+export async function getConfiguration(language) {
+  await loadConfig()
+  return getSheetData(dataMap['config'], 'configuration').then(data => {
+
+    return data.reduce(function(acc, itm) {
+        acc[itm.key]['key']||= {}
+        acc[itm.key]['name']=itm[language];
+        console.log('Configuration:',acc)
+        return acc
+    }, {})
+  })
+}
+
+
 
 export async function makeTopicsMap() {
-  const configKey = 'config'; // Use the appropriate key for configuration in your dataMap
-  const spreadsheetId = dataMap[configKey];
-  const cacheKey = `${spreadsheetId}_configuration`;
+  await loadConfig()
+  return getSheetData(dataMap['config'], 'configuration').then(data => {
 
-  const configurationData = dataCache[cacheKey];
-  if (!configurationData) {
-    throw new Error('Configuration data is not available in the cache.');
-  }
-
+    return data.reduce(function(itm) {
+       
   const topicsMap = {};
 
   // Build the map by iterating over the configuration data
-  configurationData.forEach((item) => {
+  data.forEach((item) => {
     // For each configuration item, map both the English and Russian terms to the key
-    topicsMap[item['ru']] = item.key;
-    topicsMap[item['en']] = item.key;
+    topicsMap[item['ru']] = itm.key;
+    topicsMap[item['en']] = itm.key;
   });
 
+  console.log('topicsMap:',topicsMap)
   return topicsMap;
+
+    }, {})
+  })
 }
+
 export const topicsMap = makeTopicsMap()
 
-// Example usage:
-// const descriptions = getDescriptionsByLanguage('ru');
 
+export async function getMapData(year, sheetName
+   ) {
+  await loadConfig()
+ return getSheetData(dataMap[year],sheetName).then(data => {
+  const mapData = data.map(row => {
+    return {
+      name: row.District,
+      value: parseFloat(row.All) || 0 // Ensuring the value is a number, defaulting to 0 if not
+    };
+  }).filter(item => item.name !== 'Все'); // Exclude 'Все'
+    })
+}
 
-// const API_KEY = 'AIzaSyD71dPGb38J0b2Y4XC7tShKP0JQ_H9rGPM';
-
-// // Defining a data map for specific years and associated sheet ids from 'config.xlsx'
-// export async function getDataMap() {
-//   const CONFIG_SHEET_ID = '1QKmA5UX-FM31jEE7UOVTmlCKxQ_Wa1K2oXxulhtkJHE'; 
-//   const CONFIG_SHEET_NAME = 'years_data';
-//   const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${CONFIG_SHEET_ID}/values/${CONFIG_SHEET_NAME}?key=${API_KEY}`);
-//     const data = await response.json();
-//     let tempDataMap = {};
-//     for(let i = 1; i < data.values.length; i++) {
-//         let year = data.values[i][0];
-//         let sheetId = data.values[i][1];
-//         tempDataMap[year] = { report: { sheet: sheetId } };
-//     }
-//     // console.log('gheetService/getDataMap: ', tempDataMap)
-//     return tempDataMap;
-//   }
-
-
-
-//   // Cache to store fetched sheet data to avoid unnecessary API calls.
-// var dataCache = {}
-// // Function to get data from a specific sheet from  a corresponding'report.xlsx'
-// export function getSheetData(tableId, sheetName) {
-//       if (!tableId || !sheetName) {
-//         console.log("tableId and sheetName is not provided. Refusing to make an API call.");
-//       }
-//      // Check if data for the requested table and sheet is already in cache
-//     //  console.log('tableId:',tableId)
-//     //  console.log('sheetName:',sheetName)
-//      if(dataCache[tableId+"_"+sheetName]) {
-//         // If yes - return the cached data   
-//         return new Promise((resolve, reject) => {
-//             resolve(dataCache[tableId+"_"+sheetName]);
-//         })
-//     }
-//     // Transform the raw data from the API into a structured JSON format
-//   function transformData(data) {
-//       if (!data || data === undefined) {
-//       console.info("Trying to transform data, but data is not defined.", data); 
-//         return;
-//       }
-//         var jsonData = []
-//         var colsMap = {}
-//         // Map column indices to their respective headers
-//         // console.log('gsheetService/data',data)
-//         // console.log('data[0]',data[0])
-        
-//         data[0].forEach( (item, idx) => {
-//             colsMap[idx] = item
-//         })
-//         // Transform each row into an object
-//         data.forEach( (row, rowIdx) => {
-//            // Skip the header row
-//             if(rowIdx == 0) return;
-//             var rowObject = {}
-//             row.forEach((cellValue, colIdx) => {
-//                 rowObject[colsMap[colIdx]] = cellValue;
-//             })
-//             jsonData.push(rowObject)
-//         })
-//         return jsonData;
-//     }
-
-//      // Fetch data from Google Sheets API
-//   const tableData = new Promise((resolve, reject) => {
-//          if (!tableId || !sheetName || tableId === undefined|| sheetName===undefined) {
-//         console.log("tableId and sheetName is not provided. Refusing to make an API call.");
-//       }
-
-//       return fetch(`https://sheets.googleapis.com/v4/spreadsheets/${tableId}/values/${sheetName}?key=${API_KEY}`)
-//         .then(response => response.json())
-        
-//         // Cache the transformed data
-//         .then(data => {
-//           // console.log('sghs/data',data)
-//             dataCache[tableId+"_"+sheetName] = transformData(data.values)
-//             resolve(dataCache[tableId+"_"+sheetName])
-//             return
-//         })
-//     });
-  
-//     return tableData;
-//   }
- 
-
-
-//   // Function to get info  from 'config.xlsx'
-// export async function getDescriptions(language = "ru") {
-//   const CONFIG_SHEET_ID = "1QKmA5UX-FM31jEE7UOVTmlCKxQ_Wa1K2oXxulhtkJHE";
-//   const CONFIG_SHEET_descriptions = "descriptions";
-//   try {
-//     const data = await getSheetData(CONFIG_SHEET_ID, CONFIG_SHEET_descriptions);
-//     // console.log('getDescriptions: ', data)
-//     return data.map((item) => ({
-//       key: item.key,
-//       name: item[`name_${language}`],
-//       map: item[`map_${language}`],
-//       bar: item[`bar_${language}`],
-//       pie: item[`pie_${language}`],
-//     }));
-//   } catch (error) {
-//     console.error("Failed to get Descriptions.");
+// function parseMapData(res) {
+//   if (!res || res === undefined || res?.length === 0) {
+//     console.info("Failed to parse Map Data. Response is empty.");
 //     return [];
 //   }
-// }
+//   const result = res.map((row) => {
+//     return {
+//       name: row.District,
+//       value: parseFloat(row[selectedQuestion]),
+//     };
+//   });
+//   return result;
+// };
 
-// // export async function getStories(dataMap, topic, language = 'ru') {
-// //   // Assuming SPREADSHEET_ID is a global constant or needs to be passed as a parameter.
-// //   const rawData = await getSheetData( dataMap[year]['report']['sheet'], 'df_stories_filtered');
+ //TODOP: get opennes map data
 
-// //   // Map the raw data to the desired structure
-// //   const mappedData = rawData.map(item => ({
-// //     key: item.key,
-// //     name: item[`name_${language}`],
-// //     text: item[`text_${language}`],
-// //     author: item[`author_${language}`]
-// //   }));
+export async function getBarData(year, sheetName) {
+  await loadConfig();
+  return getSheetData(dataMap[year], sheetName).then(data => {
+    // Find the row where the district is 'Все'
+    const rowVse = data.find(row => row.District === 'Все');
 
-// // Filter the stories based on the topic
-// //   const topicStories = mappedData.filter(story => story.name === topic);
+    // Check if row exists and create an array of objects with name and value properties
+    if (rowVse) {
+      // Create a result array excluding the 'District' and 'All' properties
+      const barData = Object.entries(rowVse).reduce((acc, [key, value]) => {
+        if (key !== 'District' && key !== 'All') {
+          acc.push({
+            name: key,
+            value: parseFloat(value) || 0 // Ensuring the value is a number
+          });
+        }
+        return acc;
+      }, []);
+      console.log('barData:',barData)
+      return barData;
+    } else {
+      // Handle the case where no 'Все' row is found
+      throw new Error("Row 'Все' not found.");
+    }
+  });
+}
+// if (!res || res === undefined || res?.length === 0) {
+// function parseBarData(res) {
+//   if (!res || res === undefined || res?.length === 0) {
+//     console.info("Failed to parse bar data. The response is empty.");
+//     return [];
+//   }
+//   const fields = Object.keys(res[0])
+//     .filter((key) => key !== "District" && key !== "All")
+//     .map((key) => {
+//       return key;
+//     });
+//   const values = res.find((row) => row.District === "Все");
+//   const result = fields.map((field) => {
+//     return { name: field, value: parseFloat(values[field]) };
+//   });
+//   return result;
+// };
 
-// //   return topicStories;
-// // }
+
+
+export async function getPieData(year, sheetName) {
+  await loadConfig();
+  return getSheetData(dataMap[year], sheetName).then(data => {
+    // Find the row where the district is 'Все'
+    const rowVse = data.find(row => row.District === 'Все');
+
+    // Check if row exists and create an array of objects with name and value properties
+    if (rowVse) {
+      // Create a result array excluding the 'District' and 'All' properties
+      const pieData = Object.entries(rowVse).reduce((acc, [key, value]) => {
+        if (key !== 'District' && key !== 'All') {
+          acc.push({
+            name: key,
+            value: parseFloat(value) || 0 // Ensuring the value is a number
+          });
+        }
+        return acc;
+      }, []);
+console.log('pieData:',pieData)
+      return pieData;
+    } else {
+      // Handle the case where no 'Все' row is found
+      throw new Error("Row 'Все' not found.");
+    }
+  });
+}
+// function parsePieData(res) {
+//   if (!res || res === undefined || res?.length === 0) {
+//     console.info("Failed to parse Pie Data. Response is empty.");
+//     return [];
+//   }
+//   const fields = Object.keys(res[0])
+//     .filter((key) => key !== "District" && key !== "All")
+//     .map((key) => {
+//       return key;
+//     });
+//   const values = res.find((row) => row.District === "Все");
+//   const result = fields.map((field) => {
+//     return { name: field, value: parseFloat(values[field]) };
+//   });
+//   return result;
+// };
+
+
 
 // // export async function getDMapData(spreadsheet_id, topic_key) {
 // //   const res = await getSheetData(spreadsheet_id, topic_key);
@@ -449,43 +407,6 @@ export const topicsMap = makeTopicsMap()
 //     return [];
 //   }
 // }
-
-// export async function getConfiguration(language = 'ru') {
-//   const CONFIG_SHEET_ID = '1QKmA5UX-FM31jEE7UOVTmlCKxQ_Wa1K2oXxulhtkJHE'; 
-//   const CONFIG_SHEET_name = 'configuration';
-  
-//   try {
-//      const data = await getSheetData(CONFIG_SHEET_ID, CONFIG_SHEET_name);
-//      // console.log('getConfiguration: ', data)
-//      return data.map((item) => ({
-//        key: item.key,
-//        name: item[language],
-//      }));
-//   } catch (error) {
-//     console.info("Failed to get Configuration data.") 
-//     return []
-//   }
- 
-// }
-
-// export async function getFullSpreadsheetData(year, dataMap) {
-//   const yearData = dataMap[year];
-//   if (!yearData) return;
-
-//   const fetchedData = {};
-  
-//   for (let sheetName in yearData) {
-//     const sheetId = yearData[sheetName].id;
-//     try {
-//     fetchedData[sheetName] = await getSheetData(sheetId, sheetName);      
-//     } catch (error) {
-//       console.info("Failed to get data;")
-//       console.error(error); 
-//     }
-//   }
-//   // console.log('getFullSpreadsheetData: ', fetchedData)
-//   // setData(fetchedData);
-//   return fetchedData
 // }
 
 

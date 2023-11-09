@@ -1,73 +1,32 @@
 import React, { useState, useEffect } from "react";
 import arrow from "./../../assets/arrow.svg";
-import { getSheetData } from "../../services/googleSheetsService";
-import { useData, useDataMap } from "../../contexts/dataContext"
+import { 
+  getSheetData,
+getStories,
+topicsMap, 
+dataMap 
+} from "../../services/googleSheetsService";
+// import { useData, useDataMap } from "../../contexts/dataContext"
 import { useYear } from "../../contexts/yearContext";
 import { useLanguage } from "../../contexts/langContext";
 
 export default function PersonalStories({ topic }) {
   const [storyIndex, setStoryIndex] = useState(null);
   const [stories, setStories] = useState([]);
-  const { dataMap } = useDataMap()
   const { year, setYear } = useYear();
   const { language } = useLanguage();
 
-  const topicsMap = {
-    'Экономическое положение': 'economical_status',
-    'Насилие': 'violence',
-    'Дискриминация': 'discrimination',
-    'Влияние войны в Украине': 'war_effects',
-    'Открытость': 'openness'
-  }
-  useEffect(() => {
-
-    console.log('PersonaStories/stories: ', stories)
-  }, [
-    // chartData,
-    //  mapDescription,
-    stories
-  ]);
 
   useEffect(() => {
-    
     async function fetchStories() {
       if (topicsMap[topic] === 'openness') return;
 
-      const stories = await getStories(dataMap, topic, language,year);
+      const stories = await getStories(year, language);
       setStories(stories);
       setStoryIndex(0);
     }
-
-    async function getStories(dataMap, topic, language, year) {
-      // Check that we have the sheet name
-      if (!dataMap[year]["report"]["sheet"]) {
-        console.info("We don't have the sheet name");
-        return;
-      }
-
-      let rawData;
-      try {
-        rawData = await getSheetData(
-          dataMap[year]["report"]["sheet"],
-          "df_stories_filtered"
-        );
-      } catch (error) {
-        console.info("Failed to get stories");
-        console.error(error);
-        return [];
-      }
-
-      const mappedData = rawData.map((item) => ({
-        key: item.key,
-        name: item[`name_${language}`],
-        text: item[`text_${language}`],
-        author: item[`author_${language}`],
-      }));
-      return mappedData.filter((story) => story.name === topic);
-    }
-
     fetchStories();
-  }, [topic, language, year, dataMap]);
+  }, [topic, language, year]);
 
 
 
