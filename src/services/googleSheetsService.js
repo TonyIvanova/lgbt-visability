@@ -78,13 +78,13 @@ export async function getSheetData(tableId, sheetName) {
     return fetch(`https://sheets.googleapis.com/v4/spreadsheets/${tableId}/?key=${API_KEY}&includeGridData=true`)
       .then(response => response.json())
       .then(data => {
-          console.log(data)
+          // console.log(data)
           fillCachesWithTransformedWorksheetsData(data)
           resolve(dataCache[tableId+"_"+sheetName])
           return dataCache[tableId+"_"+sheetName]
       })
   });
-  console.log('dataCache:',dataCache)
+  // console.log('dataCache:',dataCache)
   return worksheetData;
 }
 
@@ -112,7 +112,7 @@ export async function loadYearData(year) {
     for (const sheet of sheetsMetadata) {
       await getSheetData(spreadsheetId, sheet.properties.title);
     }
-    console.log('dataCache:',dataCache)
+    // console.log('dataCache:',dataCache)
     return 'All sheets data fetched and stored in cache.';
   } catch (error) {
     console.error(`Error fetching data for year ${year}:`, error);
@@ -135,51 +135,107 @@ export async function getSections(language) {
 }
 
 
-export async function getDescriptions(language) {
-  await loadConfig()
+// export async function getDescriptions(language) {
+//   await loadConfig()
+//   return getSheetData(dataMap['config'], 'descriptions').then(data => {
+
+//     return data.reduce(function(acc, itm) {
+//         acc[itm.key]['key']||= {}
+//         acc[itm.key]['name']=itm["name_"+language];
+//         acc[itm.key]['bar']=itm["bar_"+language];
+//         acc[itm.key]['map']=itm["map"+language];
+//         acc[itm.key]['pie']=itm["pie_"+language];
+//         console.log('descriptions:',acc)
+//         return acc
+//     }, {})
+//   })
+// }
+
+
+//TODO: doesnt see topicKey passed]
+export async function getDescriptions(language, topicKey='violence') {
+  console.log('Loading configuration...');
+  await loadConfig();
+  console.log(`Fetching descriptions for language: ${language} and topic: ${topicKey}...`);
+
   return getSheetData(dataMap['config'], 'descriptions').then(data => {
+    // console.log('Raw descriptions data fetched:', data);
 
-    return data.reduce(function(acc, itm) {
-        acc[itm.key]['key']||= {}
-        acc[itm.key]['name']=itm["name_"+language];
-        acc[itm.key]['bar']=itm["bar_"+language];
-        acc[itm.key]['map']=itm["map"+language];
-        acc[itm.key]['pie']=itm["pie_"+language];
-        console.log('descriptions:',acc)
-        return acc
-    }, {})
-  })
+    // Filter out the row where `key` equals `topicsMap[topic]`
+    const filteredData = data.filter(itm => itm.key === topicKey);
+    console.log(`Filtered descriptions data, removed topic ${topicKey}:`, filteredData);
+
+    const descriptions = filteredData.reduce((acc, itm) => {
+     
+      acc['bar'] = itm["bar_" + language];
+      acc['map'] = itm["map_" + language];
+      acc['name'] = itm["name_" + language];
+      acc['pie'] = itm["pie_" + language];
+      return acc;
+    }, {});
+
+    // Log the final descriptions object after reduce
+    console.log('Processed descriptions:', descriptions);
+
+    return descriptions;
+  }).catch(error => {
+    // Log and throw any errors encountered during the fetch
+    console.error('Error fetching descriptions:', error);
+    throw error;
+  });
 }
 
 
 
-export async function getConclusions(year, language) {
-  await loadConfig()
+
+export async function getConclusions(year, language, topicKey = 'economical_status') {
+  console.log(`Loading conclusions for year: ${year}, language: ${language}...`);
+  await loadConfig();
+
   return getSheetData(dataMap[year], 'conclusions').then(data => {
-    return data.reduce(function(acc, itm) {
-     acc[itm.key] ||= {}
-     acc[itm.key]['name']=itm["name_"+language];
-     acc[itm.key]['text']=itm["text_"+language];
-     console.log('Conclusions:',acc)
-     return acc
-    }, {})
-  })
+    console.log('Raw conclusions data fetched:', data);
+
+    // Filter out rows that do not match the topicKey or where the 'text' field for the language is empty
+    const filteredData = data.filter(itm => itm.key === topicKey && itm["text_" + language]?.trim());
+
+    // Reduce the filtered data into an array of conclusion objects
+    const conclusions = filteredData.map(itm => ({
+      name: itm["name_" + language],
+      text: itm["text_" + language]
+    }));
+
+    console.log('Processed conclusions:', conclusions);
+    return conclusions;
+  }).catch(error => {
+    console.error('Error fetching conclusions:', error);
+    throw error;
+  });
 }
 
-//TODO: filted out empty rows 
+export async function getStories(year, language, topicKey = 'violence') {
+  console.log(`Loading stories for year: ${year}, language: ${language}...`);
+  await loadConfig();
 
-export async function getStories(year, language) {
-  await loadConfig()
   return getSheetData(dataMap[year], 'df_stories_filtered').then(data => {
-    return data.reduce(function(acc, itm) {
-     acc[itm.key] ||= {}
-     acc[itm.key]['name']=itm["name_"+language];
-     acc[itm.key]['text']=itm["text_"+language];
-     acc[itm.key]['author']=itm["author_"+language];
-     console.log('Stories:',acc)
-     return acc
-    }, {})
-  })
+    console.log('Raw stories data fetched:', data);
+
+    // Filter out rows that match the topicKey
+    const filteredData = data.filter(itm => itm.key === topicKey);
+    console.log('Filtered stories data:', filteredData);
+
+    // Map the filtered data into an array of story objects
+    const stories = filteredData.map(itm => ({
+      name: itm["name_" + language],
+      text: itm["text_" + language],
+      author: itm["author_" + language]
+    }));
+
+    console.log('Processed stories:', stories);
+    return stories;
+  }).catch(error => {
+    console.error('Error fetching stories:', error);
+    throw error;
+  });
 }
 
 
@@ -191,7 +247,7 @@ export async function getConfiguration(language) {
     return data.reduce(function(acc, itm) {
         acc[itm.key]['key']||= {}
         acc[itm.key]['name']=itm[language];
-        console.log('Configuration:',acc)
+        console.log('getConfiguration:',acc)
         return acc
     }, {})
   })
@@ -214,7 +270,7 @@ export async function makeTopicsMap() {
     topicsMap[item['en']] = itm.key;
   });
 
-  console.log('topicsMap:',topicsMap)
+  // console.log('makeTopicsMap:',topicsMap)
   return topicsMap;
 
     }, {})
@@ -224,18 +280,44 @@ export async function makeTopicsMap() {
 export const topicsMap = makeTopicsMap()
 
 
-export async function getMapData(year, sheetName
-   ) {
-  await loadConfig()
- return getSheetData(dataMap[year],sheetName).then(data => {
-  const mapData = data.map(row => {
-    return {
-      name: row.District,
-      value: parseFloat(row.All) || 0 // Ensuring the value is a number, defaulting to 0 if not
-    };
-  }).filter(item => item.name !== 'Все'); // Exclude 'Все'
-    })
+// export async function getMapData(year, sheetName
+//    ) {
+//   await loadConfig()
+//  return getSheetData(dataMap[year],sheetName).then(data => {
+//   const mapData = data.map(row => {
+//     return {
+//       name: row.District,
+//       value: parseFloat(row.All) || 0 // Ensuring the value is a number, defaulting to 0 if not
+//     };
+//   }).filter(item => item.name !== 'Все'); // Exclude 'Все'
+//     })
+// }
+
+export async function getMapData(year, sheetName) {
+  await loadConfig();
+  console.log(`Fetching mapData for year: ${year}, sheetName: ${sheetName}`);
+  
+  return getSheetData(dataMap[year], sheetName).then(data => {
+    // console.log('Raw data fetched:', data);
+    
+    const mapData = data
+      .map(row => {
+        const value = parseFloat(row.All) || 0; // Parse the 'All' column value
+        return {
+          name: row.District,
+          value: value
+        };
+      })
+      .filter(item => item.name !== 'Все'); // Exclude 'Все' from the results
+    
+    console.log('getMapData:', mapData);
+    return mapData;
+  }).catch(error => {
+    console.error('Error fetching map data:', error);
+    throw error; // Re-throw the error to handle it further up the call chain
+  });
 }
+
 
 // function parseMapData(res) {
 //   if (!res || res === undefined || res?.length === 0) {

@@ -18,9 +18,13 @@ export default function Section({ topic }) {
 
   useEffect(() => {
     async function fetchConclusions() {
-      const conclusions = await getConclusions(year, language);
-      setConclusions(conclusions);
-      // setConclusionIndex(0);
+      try {
+        const conclusionsData = await getConclusions(year, language,topicsMap[topic]);
+        setConclusions(conclusionsData);
+      } catch (error) {
+        console.error('Failed to fetch conclusions:', error);
+        setConclusions([]); // Ensure it's always an array
+      }
     }
     fetchConclusions();
   }, [topic, language, year]);

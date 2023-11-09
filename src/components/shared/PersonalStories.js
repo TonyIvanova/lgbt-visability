@@ -21,7 +21,7 @@ export default function PersonalStories({ topic }) {
     async function fetchStories() {
       if (topicsMap[topic] === 'openness') return;
 
-      const stories = await getStories(year, language);
+      const stories = await getStories(year, language,topicsMap[topic]);
       setStories(stories);
       setStoryIndex(0);
     }

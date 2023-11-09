@@ -61,7 +61,7 @@ export default function Statistics({ topic }) {
         const configuration = getConfiguration(language);
         if (isMounted) {
           setSections(sectionsData);
-          setDescriptions(descriptionsData);
+          setDescriptions(descriptionsData, topic);
           setConfiguration(configuration);
 
           const mapChartDescription = descriptions.find(desc => desc.key === 'mapChartKey')?.pie || "Map Description not available";
