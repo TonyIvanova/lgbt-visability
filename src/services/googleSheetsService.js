@@ -2,50 +2,116 @@
 // const { year, setYear } = useYear();
 
 export const dataMap = {
-    '2022': {
-      'report':{
-        'sheet': '1Sxztfp24OnyH-TchGXBKV4R1Tm0jQk8Xd4qOQ9JFfd0',
-      }
-    }
+    'configuration': '1QKmA5UX-FM31jEE7UOVTmlCKxQ_Wa1K2oXxulhtkJHE',
   }
 
 var dataCache = {}
 
-export function getSheetData(tableId, sheetName) {
+async function loadConfiguration() {
+  var configData = await getSheetData(dataMap['configuration'], 'sheet_ids_by_year')
+  configData.forEach(function(itm) {
+      dataMap[itm.year] = itm.id
+    }
+  )
+}
+
+export async function getSheetData(tableId, sheetName) {
     const API_KEY = 'AIzaSyD71dPGb38J0b2Y4XC7tShKP0JQ_H9rGPM';
+    console.log("Geting "+ sheetName + " from " + tableId)
 
     if(dataCache[tableId+"_"+sheetName]) {
         return new Promise((resolve, reject) => {
             resolve(dataCache[tableId+"_"+sheetName]);
         })
     }
-    function transformData(data) {
-        var jsonData = []
-        var colsMap = {}
-        data[0].forEach( (item, idx) => {
-            colsMap[idx] = item
-        })
-        data.forEach( (row, rowIdx) => {
-            if(rowIdx == 0) return;
-            var rowObject = {}
-            row.forEach((cellValue, colIdx) => {
-                rowObject[colsMap[colIdx]] = cellValue;
-            })
-            jsonData.push(rowObject)
-        })
-        return jsonData;
+
+    if(tableId != dataMap['configuration']){
+      await loadConfiguration()
     }
 
-    const tableData = new Promise((resolve, reject) => {
-      return fetch(`https://sheets.googleapis.com/v4/spreadsheets/${tableId}/values/${sheetName}?key=${API_KEY}`)
+    // transforms [{values: [{userEnteredValue: {…}, effectiveValue: {…}, formattedValue: 'Дальневосточный федеральный округ', effectiveFormat: {…}}], ...]
+    function transformSheetRowsData(rowData) {
+      if(!rowData) {
+        debugger
+        return
+      }
+      var colsMap = {}
+      var jsonData = []
+      if(!rowData) {
+        return jsonData
+      }
+      console.log(rowData)
+
+      // extracts first row
+      rowData[0].values.forEach( (item, idx) => {
+        colsMap[idx] = item.formattedValue
+      })
+
+      // transforms {userEnteredValue: {…}, effectiveValue: {…}, formattedValue: 'Дальневосточный федеральный округ', effectiveFormat: {…}}
+      // to { columnName1: formattedValue, ... }
+      rowData.forEach( (row, rowIdx) => {
+        if(rowIdx == 0) return;
+        var rowObject = {}
+        row.values.forEach((cellValue, colIdx) => {
+            rowObject[colsMap[colIdx]] = cellValue.formattedValue;
+        })
+        var allUndef = Object.values(rowObject).reduce(
+          function(acc, itm) {
+            return  acc ||= itm === undefined
+          }, false
+        )
+        if(!allUndef) { 
+          jsonData.push(rowObject)
+        }
+      })
+      return jsonData
+    }
+
+    function fillCachesWithTransformedWorksheetsData(data) {
+        data.sheets.forEach( (sheet) => {
+          dataCache[tableId+"_"+sheet.properties.title] = transformSheetRowsData(sheet.data[0].rowData)
+          console.log(tableId+"_"+sheet.properties.title, dataCache[tableId+"_"+sheet.properties.title])
+        })
+    }
+
+    const worksheetData = new Promise((resolve, reject) => {
+      console.log("Querying API for "+ sheetName +" in " + tableId)
+      return fetch(`https://sheets.googleapis.com/v4/spreadsheets/${tableId}/?key=${API_KEY}&includeGridData=true`)
         .then(response => response.json())
         .then(data => {
-            dataCache[tableId+"_"+sheetName] = transformData(data.values)
+            console.log(data)
+            fillCachesWithTransformedWorksheetsData(data)
             resolve(dataCache[tableId+"_"+sheetName])
-            return
+            return dataCache[tableId+"_"+sheetName]
         })
     });
   
-    return tableData;
+    return worksheetData;
   }
-  
+
+  export async function loadYearData(year, sheetName) {
+    await loadConfiguration()
+    return getSheetData(dataMap[year], sheetName)
+  }
+
+  export async function getSections(lang) {
+    await loadConfiguration()
+    return getSheetData(dataMap['configuration'], 'configuration').then(data => {
+      return data.reduce(function(acc, itm) {
+       acc[itm.key]=itm[lang];
+       return acc
+      }, {})
+    })
+  }
+
+  export async function getConclusions(year, lang) {
+    await loadConfiguration()
+    return getSheetData(dataMap[year], 'conclusions').then(data => {
+      return data.reduce(function(acc, itm) {
+       acc[itm.key] ||= {}
+       acc[itm.key]['name']=itm["name_"+lang];
+       acc[itm.key]['text']=itm["text_"+lang];
+       return acc
+      }, {})
+    })
+  }
