@@ -55,20 +55,22 @@ export async function getSheetData(tableId, sheetName) {
         row.values.forEach((cellValue, colIdx) => {
             rowObject[colsMap[colIdx]] = cellValue.formattedValue;
         })
-        jsonData.push(rowObject)
+        var allUndef = Object.values(rowObject).reduce(
+          function(acc, itm) {
+            return  acc ||= itm === undefined
+          }, false
+        )
+        if(!allUndef) { 
+          jsonData.push(rowObject)
+        }
       })
       return jsonData
     }
 
     function fillCachesWithTransformedWorksheetsData(data) {
-        if(!data) {
-          debugger
-          return
-        }
-        console.log(data)
         data.sheets.forEach( (sheet) => {
-          console.log(sheet)
           dataCache[tableId+"_"+sheet.properties.title] = transformSheetRowsData(sheet.data[0].rowData)
+          console.log(tableId+"_"+sheet.properties.title, dataCache[tableId+"_"+sheet.properties.title])
         })
     }
 
