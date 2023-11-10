@@ -87,7 +87,7 @@ export async function getSheetData(tableId, sheetName) {
       return response.json();
     })
       .then(data => {
-          console.log('API response:', data);
+          // console.log('API response:', data);
           fillCachesWithTransformedWorksheetsData(data)
           resolve(dataCache[tableId+"_"+sheetName])
           return dataCache[tableId+"_"+sheetName]
@@ -154,20 +154,27 @@ export async function getDescriptions(language, topicKey='violence') {
     // console.log('Raw descriptions data fetched:', data);
 
     // Filter out the row where `key` equals `topicsMap[topic]`
-    const filteredData = data.filter(itm => itm.key === topicKey);
+    const filteredData = data.filter(itm => itm.key === topicKey)
     // console.log(`Filtered descriptions data, removed topic ${topicKey}:`, filteredData);
 
-    const descriptions = filteredData.reduce((acc, itm) => {
+    // const descriptions = filteredData.reduce((acc, itm) => {
      
-      acc['bar'] = itm["bar_" + language];
-      acc['map'] = itm["map_" + language];
-      acc['name'] = itm["name_" + language];
-      acc['pie'] = itm["pie_" + language];
-      return acc;
-    }, {});
+    //   acc['bar'] = itm["bar_" + language];
+    //   acc['map'] = itm["map_" + language];
+    //   acc['name'] = itm["name_" + language];
+    //   acc['pie'] = itm["pie_" + language];
+    //   return acc;
+    // }, {});
+    const descriptions = filteredData.map(itm => ({ // Map over each item and transform it into an object
+      key: itm.key,
+      bar: itm[`bar_${language}`],
+      map: itm[`map_${language}`],
+      name: itm[`name_${language}`],
+      pie: itm[`pie_${language}`]
+    }));
 
     // Log the final descriptions object after reduce
-    console.log('Processed descriptions:', descriptions);
+    console.log(`Processed ${topicKey} descriptions:`, descriptions);
 
     return descriptions;
   }).catch(error => {
@@ -265,7 +272,7 @@ export async function makeTopicsMap() {
     topicsMap[item['en']] = itm.key;
   });
 
-  console.log('makeTopicsMap:',topicsMap)
+  // console.log('makeTopicsMap:',topicsMap)
   return topicsMap;
 
     }, {})
@@ -289,7 +296,7 @@ export async function getYears() {
     // Assuming each item in the data array has a 'year' property
     const years = data.map(itm => itm.year); // Collect all the 'year' values
 
-    console.log('Processed years:', years);
+    // console.log('Processed years:', years);
     return years; // Return the array of years
   }).catch(error => {
     console.error('Error fetching years:', error);

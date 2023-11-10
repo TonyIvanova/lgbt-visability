@@ -51,31 +51,6 @@ export default function Statistics({ topic }) {
   const [pieDescription, setPieDescription] = useState('');
   const [barDescription, setBarDescription] = useState('');
 
-  // useEffect(() => {
-  //   if (!topicsMap) {
-  //     return; // Do not fetch data until topicsMap is loaded
-  //   }
-
-  //   let isMounted = true;
-  //   setLoading(true);
-  //   const fetchData = async () => {
-  //     try {
-  //       const sectionsData = await getSections(language);
-  //       const descriptionsData = await getDescriptions(language,topicsMap[topic]);
-  //       // const configuration = getConfiguration(language);
-  //       if (isMounted) {
-  //         setSections(sectionsData);
-  //         setDescriptions(descriptionsData);
-  //         // setConfiguration(configuration);
-
-  //         const mapChartDescription = descriptions.find(desc => desc.key === 'map')?.pie || "Map Description not available";
-  //         setMapDescription(mapChartDescription);
-
-  //         const barChartDescription = descriptions.find(desc => desc.key === 'bar')?.pie || "Bar Description not available";
-  //         setBarDescription(barChartDescription);
-
-  //         const pieChartDescription = descriptions.find(desc => desc.key === 'pie')?.pie || "Pie Description not available";
-  //         setPieDescription(pieChartDescription);
   useEffect(() => {
     if (!topicsMap) {
       return; // Do not fetch data until topicsMap is loaded
@@ -86,22 +61,9 @@ export default function Statistics({ topic }) {
   
     const fetchData = async () => {
       try {
-        const sectionsData = await getSections(language);
         const descriptionsData = await getDescriptions(language, topicsMap[topic]);
-        
         if (isMounted) {
-          setSections(sectionsData);
           setDescriptions(descriptionsData);
-  
-          // Use the latest descriptionsData here instead of the stale descriptions state
-          const mapChartDescription = descriptionsData.find(desc => desc.key === 'map')?.map || "Map Description not available";
-          setMapDescription(mapChartDescription);
-  
-          const barChartDescription = descriptionsData.find(desc => desc.key === 'bar')?.bar || "Bar Description not available";
-          setBarDescription(barChartDescription);
-  
-          const pieChartDescription = descriptionsData.find(desc => desc.key === 'pie')?.pie || "Pie Description not available";
-          setPieDescription(pieChartDescription);
         }
       } catch (err) {
         if (isMounted) {
@@ -113,31 +75,24 @@ export default function Statistics({ topic }) {
         }
       }
     };
-  
     fetchData();
-  
     return () => {
       isMounted = false;
     };
-  }, [language, topicsMap, topic]); // Added dependencies here
+  }, [language, topicsMap, topic]);
   
+  // This useEffect will run when the descriptions state updates
+  useEffect(() => {
+    const mapChartDescription = descriptions.find(desc => desc.key === 'map')?.map || "Map Description not available";
+    setMapDescription(mapChartDescription);
+    const barChartDescription = descriptions.find(desc => desc.key === 'bar')?.bar || "Bar Description not available";
+    setBarDescription(barChartDescription);
+    const pieChartDescription = descriptions.find(desc => desc.key === 'pie')?.pie || "Pie Description not available";
+    setPieDescription(pieChartDescription);    
+  }, [descriptions]); 
+  //TODO: fix it, data not filtering
 
-  //       }
-  //     } catch (err) {
-  //       if (isMounted) {
-  //         setError(err);
-  //       }
-  //     } finally {
-  //       if (isMounted) {
-  //         setLoading(false);
-  //       }
-  //     }
-  //   };
-  //   fetchData();
-  //   return () => {
-  //     isMounted = false;
-  //   };
-  // }, [language]);
+  
 
   const [stories, setStories] = useState([]);
   const [conclusions, setConclusions] = useState([]);
@@ -173,8 +128,6 @@ export default function Statistics({ topic }) {
   }, [language]);
 
 
-  // const [{ mapDescription, barDescription, pieDescription }, refreshDescriptions] = useDescriptions(topic, language);
-
 
   function getSheetName(topicKey, genderSubset, opennessSubset) {
     const baseName = topicKey || "violence";
@@ -201,60 +154,32 @@ export default function Statistics({ topic }) {
     return sheetName;
 }
 
-  // useEffect(() => {
-  //   async function fetchData() {
-  //     if (!topicsMap) {
-  //       return; // Do not fetch data until topicsMap is loaded
-  //     }
-  //     const sheetName = getSheetName(topicsMap[topic], genderSubset, opennessSubset);
-  //     console.log(sheetName);
-
-  //     if ( sheetName) {
-  //       try {
-  //         setPieData(getPieData(year,sheetName));
-  //         setMapData(getMapData(year,sheetName, selectedQuestion))// TODO: separate hook?
-  //         setBarData(getBarData(year,sheetName));
-  //         //TODO: get avg income data
-  //       } catch (error) {
-  //         console.error("Failed to get sheet data");
-  //         console.error(error);
-  //       }
-  //     }
-  //   }
-
-  //   if (topicsMap) {
-  //     fetchData();
-  //   }
-  // }, [topic, year, genderSubset, opennessSubset, language, selectedQuestion]);
-
-
   useEffect(() => {
     if (!topicsMap) {
       return; // Exit the effect if topicsMap is not yet available
     }
-    const sheetName = getSheetName(topic, genderSubset, opennessSubset);
-    // console.log(sheetName);
-
-    if (sheetName) {
+  
+    const fetchData = async () => {
       try {
-        getSheetData(dataMap[year], sheetName).then(
-          (res) => {
-            setMapData(getMapData(year,sheetName));
-            // setBarData(getBarData(year,sheetName));
-            setBarData(Array.isArray(getBarData(year,sheetName)) ? barData : []);
-            setPieData(getPieData(year,sheetName));
-          }
-        );
+        const sheetName = getSheetName(topic, genderSubset, opennessSubset);
+        if (sheetName) {
+          const mapDataResponse = await getMapData(year, sheetName);
+          setMapData(mapDataResponse);
+  
+          const barDataResponse = await getBarData(year, sheetName);
+          setBarData(Array.isArray(barDataResponse) ? barDataResponse : []);
+  
+          const pieDataResponse = await getPieData(year, sheetName);
+          setPieData(pieDataResponse);
+        }
       } catch (error) {
-        console.error("Failed to get sheet data");
-        console.error(error);
+        console.error("Failed to get sheet data:", error);
       }
-    }
-  }, [topic,
-     year, 
-     genderSubset, 
-     selectedQuestion
-  ]);
+    };
+  
+    fetchData();
+  }, [topicsMap, topic, year, genderSubset, opennessSubset, selectedQuestion]);
+  
 
   const selectGenderSubset = (event) => {
     setGenderSubset(event.target.name);
@@ -267,8 +192,27 @@ export default function Statistics({ topic }) {
     setSelectedQuestion("All");
   }, [language]);
 
+  
+  useEffect(() => {
+    // // console.log("Statistics/pieData:", pieData);
+    // // console.log("Statistics/barData:", barData);
+    // console.log("Statistics/ mapDescription:", pieDescription);
+    // console.log("Statistics/ mapDescription:", barDescription);
+    console.log("Statistics/ updated descriptions:", descriptions);
+    console.log("Statistics/updated mapDescription:", mapDescription);
+    console.log("Statistics/updated mapData: ", mapData);
+  }, [
+    mapData,
+    mapDescription
+  ]);
 
-
+  // function useLogOnUpdate(value, label) {
+  //   useEffect(() => {
+  //     console.log(`${label} updated:`, value);
+  //   }, [value]); // The effect runs every time 'value' changes
+  // }
+  // useLogOnUpdate(mapDescription, 'mapDescription');
+  // useLogOnUpdate(mapData, 'mapData');
 
 
   const handleArcClick = (arcName) => {
@@ -346,7 +290,10 @@ export default function Statistics({ topic }) {
     );
   };
 
-  if (pieData && mapData && barData) {
+  if (
+    mapData 
+    // && mapDescription
+    ) {
     return (
       <div className="section">
         <div>

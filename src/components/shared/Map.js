@@ -1,11 +1,14 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useEffect,useState } from "react";
 import * as d3 from "d3";
 import * as d3geo from "d3-geo";
-import mapData from "./../../assets/geodata/mapData.json";
+import geoData from "./../../assets/geodata/mapData.json";
 
 function Map({ statistics }) {
+// Check if mapData is being passed correctly as statistics
+useEffect(() => {
+  console.log('mapData passed to Map component:', statistics);
+}, [statistics]);
 
-  console.log('Statistics in Map component:', statistics);
   // Map
   const [regionDescription, setRegionDescription] = useState("");
   const [regionValue, setRegionValue] = useState("");
@@ -34,7 +37,7 @@ function Map({ statistics }) {
 
   const mapElements = useMemo(() => {
     if (statistics.length > 0) {
-      return mapData.features.map((d, index) => {
+      return geoData.features.map((d, index) => {
         const relevantStatistics = statistics.filter(
           (item) => item.name === d.properties.name
         )[0];
@@ -68,7 +71,7 @@ function Map({ statistics }) {
       <p>No map data.</p>
       </>
     }
-  }, [mapData, statistics]);
+  }, [geoData, statistics]);
 
   // Legend
 
