@@ -208,7 +208,7 @@ export async function getDescriptions(language, topicKey='violence') {
     //   return acc;
     // }, {});
     const descriptions = filteredData.map(itm => ({ // Map over each item and transform it into an object
-      // key: itm.key,
+      key: itm.key,
       bar: itm[`bar_${language}`],
       map: itm[`map_${language}`],
       name: itm[`name_${language}`],

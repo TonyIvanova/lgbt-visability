@@ -84,13 +84,19 @@ export default function Statistics({ topic, topicsMap }) {
   
   // This useEffect will run when the descriptions state updates
   useEffect(() => {
-    const mapChartDescription = descriptions.find(desc => desc.key === 'map')?.map || "Map Description not available";
+    // Assuming that `topic` corresponds to the `key` in your descriptions array
+    const currentTopicDescription = descriptions.find(desc => desc.key === topicsMap[topic]);
+  
+    const mapChartDescription = currentTopicDescription?.map || "Map Description not available";
     setMapDescription(mapChartDescription);
-    const barChartDescription = descriptions.find(desc => desc.key === 'bar')?.bar || "Bar Description not available";
+  
+    const barChartDescription = currentTopicDescription?.bar || "Bar Description not available";
     setBarDescription(barChartDescription);
-    const pieChartDescription = descriptions.find(desc => desc.key === 'pie')?.pie || "Pie Description not available";
-    setPieDescription(pieChartDescription);    
-  }, [descriptions]); 
+  
+    const pieChartDescription = currentTopicDescription?.pie || "Pie Description not available";
+    setPieDescription(pieChartDescription);
+  }, [descriptions, topicsMap, topic]);
+  
   //TODO: fix it, data not filtering
 
   
