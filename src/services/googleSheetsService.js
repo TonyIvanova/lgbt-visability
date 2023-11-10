@@ -71,7 +71,14 @@ export async function getSheetData(tableId, sheetName) {
       row.values.forEach((cellValue, colIdx) => {
           rowObject[colsMap[colIdx]] = cellValue.formattedValue;
       })
-      jsonData.push(rowObject)
+      var allUndef = Object.values(rowObject).reduce(
+        function(acc, itm) {
+          return  acc ||= itm === undefined
+        }, false
+      )
+      if(!allUndef) { 
+        jsonData.push(rowObject)
+      }
     })
     // console.log('jsonData:',jsonData)
     return jsonData
