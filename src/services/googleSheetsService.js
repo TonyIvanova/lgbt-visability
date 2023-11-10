@@ -73,8 +73,8 @@ export async function getSheetData(tableId, sheetName) {
       })
       var allUndef = Object.values(rowObject).reduce(
         function(acc, itm) {
-          return  acc ||= itm === undefined
-        }, false
+          return  acc &&= itm === undefined
+        }, true
       )
       if(!allUndef) { 
         jsonData.push(rowObject)
