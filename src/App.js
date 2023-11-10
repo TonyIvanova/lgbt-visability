@@ -15,6 +15,8 @@ import {
   getYears
  } from "./services/googleSheetsService";
 import Header from "./components/Header";
+
+import Expander from "./components/Expander";
 import bg1 from "./assets/bg1.svg";
 import bg2 from "./assets/bg2.svg";
 import loader from "./assets/loader.gif";
@@ -43,7 +45,6 @@ function AppContent() {
   const years = getYears()//Object.keys(dataMap);// to get list of years reports exist for
   const { language, setLanguage } = useLanguage();
   const { year, setYear } = useYear(); // report year
-  const [topicsMap, setTopicsMap] = useState({});
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -58,6 +59,10 @@ function AppContent() {
   const [sections, setSections] = useState([]);
   const [descriptions, setDescriptions] = useState([]);
 
+  const [isExpanded, setIsExpanded] = useState(false);
+
+
+  const [topicsMap, setTopicsMap] = useState({});
   useEffect(() => {
     makeTopicsMap().then(map => {
       setTopicsMap(map);
@@ -143,6 +148,10 @@ function AppContent() {
   ]);
 
 
+  const toggleExpander = () => {
+    setIsExpanded(!isExpanded);
+  };
+
 
   if (loading) {
     return <div>Loading...</div>;
@@ -157,16 +166,16 @@ function AppContent() {
   Object.values(topicsMap).every(value => value !== undefined);
   //Check if all necessary data is loaded
   // const isDataReady = sections.length > 0 && years.length > 0  && isTopicsMapPopulated; 
-  const isDataReady = isTopicsMapPopulated; 
+ 
 
 
   const topicComponent = () => {
     return (
       <>
-       {isDataReady ? (
+       {isTopicsMapPopulated ? (
         <Section topic={topic} topicsMap={topicsMap}/>
         ) : (
-          <div>APP/Loading sections  topicsMap...</div>
+          <div>APP/Loading  topicsMap...</div>
         )}
       </>
     );
@@ -175,7 +184,7 @@ function AppContent() {
   if (sections && years) {
     return (
       <div className="App">
-
+ 
         <Header />
         <ButtonGroup2
           // buttons={years || ["2022"]}//{["2022", "2023"]}
@@ -200,6 +209,11 @@ function AppContent() {
           onButtonClick={selectTopic}
         />
 
+<div style={{ display: 'flex', justifyContent: 'center' }}>
+   
+<Expander year={year}/>
+</div>
+
         <div className="topic-component">{topicComponent()}</div>
         {/* <DataContext.Provider value={{ data, conclusions }}> */}
         <img src={bg1} alt="" className="background-image-1"></img>
@@ -220,7 +234,6 @@ function AppContent() {
             ? `Положение лгбт+ людей в россии на ${year} год`
             : `LGBT+ people's situation in Russia in ${year}`}
         </h1>
-
 
         <img src={loader} alt=""></img>
         <img src={bg1} alt="" className="background-image-1"></img>

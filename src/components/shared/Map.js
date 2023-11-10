@@ -3,7 +3,7 @@ import * as d3 from "d3";
 import * as d3geo from "d3-geo";
 import geoData from "./../../assets/geodata/mapData.json";
 
-function Map({ statistics }) {
+function Map({ statistics, topicsMap }) {
 // Check if mapData is being passed correctly as statistics
 useEffect(() => {
   console.log('mapData passed to Map component:', statistics);

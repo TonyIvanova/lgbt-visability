@@ -52,6 +52,10 @@ export default function Statistics({ topic, topicsMap }) {
   const [pieDescription, setPieDescription] = useState('');
   const [barDescription, setBarDescription] = useState('');
 
+  // const [stories, setStories] = useState([]);
+  const [conclusions, setConclusions] = useState([]);
+
+  // Get all descriptions for language
   useEffect(() => {
     if (!topicsMap) {
       return; // Do not fetch data until topicsMap is loaded
@@ -82,27 +86,22 @@ export default function Statistics({ topic, topicsMap }) {
     };
   }, [language, topicsMap, topic]);
   
-  // This useEffect will run when the descriptions state updates
-  useEffect(() => {
-    // Assuming that `topic` corresponds to the `key` in your descriptions array
-    const currentTopicDescription = descriptions.find(desc => desc.key === topicsMap[topic]);
   
+  // Parse map/bar/pie descriptions
+  useEffect(() => {
+    const currentTopicDescription = descriptions.find(desc => desc.key === topicsMap[topic]);
+
     const mapChartDescription = currentTopicDescription?.map || "Map Description not available";
     setMapDescription(mapChartDescription);
-  
     const barChartDescription = currentTopicDescription?.bar || "Bar Description not available";
     setBarDescription(barChartDescription);
-  
     const pieChartDescription = currentTopicDescription?.pie || "Pie Description not available";
     setPieDescription(pieChartDescription);
   }, [descriptions, topicsMap, topic]);
   
-  //TODO: fix it, data not filtering
 
   
-
-  const [stories, setStories] = useState([]);
-  const [conclusions, setConclusions] = useState([]);
+// Get conclusions by language & year
   useEffect(() => {
     if (!topicsMap) {
       return; // Do not fetch data until topicsMap is loaded
@@ -137,8 +136,8 @@ export default function Statistics({ topic, topicsMap }) {
   }, [language]);
 
 
-
-  function getSheetName(topicKey, genderSubset, opennessSubset) {
+// Generate a sheetName given selections
+function getSheetName(topicKey, genderSubset, opennessSubset) {
     const baseName = topicKey || "violence";
     let sheetName = baseName;
 
@@ -163,7 +162,8 @@ export default function Statistics({ topic, topicsMap }) {
     return sheetName;
 }
 
-  useEffect(() => {
+// Get data given topic, subsets, year & selectedQuestion 
+useEffect(() => {
     if (!topicsMap) {
       return; // Exit the effect if topicsMap is not yet available
     }
@@ -172,13 +172,14 @@ export default function Statistics({ topic, topicsMap }) {
       try {
         const sheetName = getSheetName(topic, genderSubset, opennessSubset);
         if (sheetName) {
-          const mapDataResponse = await getMapData(year, sheetName);
+          const mapDataResponse = await getMapData(year, sheetName,selectedQuestion);
+          console.log('Fetched mapData:', mapDataResponse);
           setMapData(mapDataResponse);
   
-          const barDataResponse = await getBarData(year, sheetName);
+          const barDataResponse = await getBarData(year, sheetName,selectedQuestion);
           setBarData(Array.isArray(barDataResponse) ? barDataResponse : []);
   
-          const pieDataResponse = await getPieData(year, sheetName);
+          const pieDataResponse = await getPieData(year, sheetName,selectedQuestion);
           setPieData(pieDataResponse);
         }
       } catch (error) {
@@ -187,7 +188,14 @@ export default function Statistics({ topic, topicsMap }) {
     };
   
     fetchData();
-  }, [topicsMap, topic, year, genderSubset, opennessSubset, selectedQuestion]);
+  }, [
+    topicsMap, 
+    topic, 
+    year,
+     genderSubset, 
+     opennessSubset, 
+     selectedQuestion
+    ]);
   
 
   const selectGenderSubset = (event) => {
@@ -202,6 +210,11 @@ export default function Statistics({ topic, topicsMap }) {
   }, [language]);
 
   
+  const handleArcClick = (arcName) => {
+    console.info("STATISTICS/Handling bar arc click ", arcName);
+    setSelectedQuestion(arcName);
+  };
+
   useEffect(() => {
     // // console.log("Statistics/pieData:", pieData);
     // // console.log("Statistics/barData:", barData);
@@ -210,9 +223,11 @@ export default function Statistics({ topic, topicsMap }) {
     console.log("Statistics/ updated descriptions:", descriptions);
     console.log("Statistics/updated mapDescription:", mapDescription);
     console.log("Statistics/updated mapData: ", mapData);
+    console.log("Statistics/updated selectedQuestion: ", selectedQuestion);
   }, [
     mapData,
-    mapDescription
+    mapDescription,
+    selectedQuestion
   ]);
 
   // function useLogOnUpdate(value, label) {
@@ -224,10 +239,6 @@ export default function Statistics({ topic, topicsMap }) {
   // useLogOnUpdate(mapData, 'mapData');
 
 
-  const handleArcClick = (arcName) => {
-    console.info("Handaling bar arc click ", arcName);
-    setSelectedQuestion(arcName);
-  };
 
   const subsetButtonsConfig = useMemo(() => {
     if (language === "en") {
@@ -267,6 +278,8 @@ export default function Statistics({ topic, topicsMap }) {
         { label: "Учеба/работа", value: "ass" },
       ];
     }
+    //TODO: move to service & populate from Config gsheet
+
     // default to Russian if the language doesn't match any known value
     return [
       { label: "Семья", value: "family" },
@@ -301,7 +314,8 @@ export default function Statistics({ topic, topicsMap }) {
 
   if (
     mapData 
-    // && mapDescription
+    && mapDescription 
+    //&& selectedQuestion
     ) {
     return (
       <div className="section">
