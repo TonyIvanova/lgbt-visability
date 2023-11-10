@@ -14,7 +14,7 @@ export default function Section({ topic }) {
   const [conclusions, setConclusions] = useState([]);
   const { year, setYear } = useYear();
   const { language } = useLanguage();
-  
+
 
   useEffect(() => {
     async function fetchConclusions() {

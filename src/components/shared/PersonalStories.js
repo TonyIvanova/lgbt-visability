@@ -19,7 +19,11 @@ export default function PersonalStories({ topic }) {
 
   useEffect(() => {
     async function fetchStories() {
+      if (!topicsMap) {
+        return; // Do not fetch data until topicsMap is loaded
+      }
       if (topicsMap[topic] === 'openness') return;
+      
 
       const stories = await getStories(year, language,topicsMap[topic]);
       setStories(stories);

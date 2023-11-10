@@ -4,6 +4,8 @@ import * as d3geo from "d3-geo";
 import mapData from "./../../assets/geodata/mapData.json";
 
 function Map({ statistics }) {
+
+  console.log('Statistics in Map component:', statistics);
   // Map
   const [regionDescription, setRegionDescription] = useState("");
   const [regionValue, setRegionValue] = useState("");

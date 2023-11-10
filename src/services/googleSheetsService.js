@@ -123,7 +123,7 @@ export async function loadYearData(year) {
 export async function getSections(language) {
   await loadConfig()
   return getSheetData(dataMap['config'], 'configuration').then(data => {
-    return data.map((itm)=>[itm.key, itm[language]])
+    return data.map((itm)=>[itm[language]])
   })
   // return getSheetData(dataMap['config'], 'configuration').then(data => {
   //   return data.reduce(function(acc, itm) {
@@ -135,35 +135,18 @@ export async function getSections(language) {
 }
 
 
-// export async function getDescriptions(language) {
-//   await loadConfig()
-//   return getSheetData(dataMap['config'], 'descriptions').then(data => {
-
-//     return data.reduce(function(acc, itm) {
-//         acc[itm.key]['key']||= {}
-//         acc[itm.key]['name']=itm["name_"+language];
-//         acc[itm.key]['bar']=itm["bar_"+language];
-//         acc[itm.key]['map']=itm["map"+language];
-//         acc[itm.key]['pie']=itm["pie_"+language];
-//         console.log('descriptions:',acc)
-//         return acc
-//     }, {})
-//   })
-// }
-
-
 //TODO: doesnt see topicKey passed]
 export async function getDescriptions(language, topicKey='violence') {
-  console.log('Loading configuration...');
+  // console.log('Loading configuration...');
   await loadConfig();
-  console.log(`Fetching descriptions for language: ${language} and topic: ${topicKey}...`);
+  // console.log(`Fetching descriptions for language: ${language} and topic: ${topicKey}...`);
 
   return getSheetData(dataMap['config'], 'descriptions').then(data => {
     // console.log('Raw descriptions data fetched:', data);
 
     // Filter out the row where `key` equals `topicsMap[topic]`
     const filteredData = data.filter(itm => itm.key === topicKey);
-    console.log(`Filtered descriptions data, removed topic ${topicKey}:`, filteredData);
+    // console.log(`Filtered descriptions data, removed topic ${topicKey}:`, filteredData);
 
     const descriptions = filteredData.reduce((acc, itm) => {
      
@@ -186,14 +169,12 @@ export async function getDescriptions(language, topicKey='violence') {
 }
 
 
-
-
 export async function getConclusions(year, language, topicKey = 'economical_status') {
-  console.log(`Loading conclusions for year: ${year}, language: ${language}...`);
+  // console.log(`Loading conclusions for year: ${year}, language: ${language}...`);
   await loadConfig();
 
   return getSheetData(dataMap[year], 'conclusions').then(data => {
-    console.log('Raw conclusions data fetched:', data);
+    // console.log('Raw conclusions data fetched:', data);
 
     // Filter out rows that do not match the topicKey or where the 'text' field for the language is empty
     const filteredData = data.filter(itm => itm.key === topicKey && itm["text_" + language]?.trim());
@@ -204,7 +185,7 @@ export async function getConclusions(year, language, topicKey = 'economical_stat
       text: itm["text_" + language]
     }));
 
-    console.log('Processed conclusions:', conclusions);
+    // console.log('Processed conclusions:', conclusions);
     return conclusions;
   }).catch(error => {
     console.error('Error fetching conclusions:', error);
@@ -213,15 +194,15 @@ export async function getConclusions(year, language, topicKey = 'economical_stat
 }
 
 export async function getStories(year, language, topicKey = 'violence') {
-  console.log(`Loading stories for year: ${year}, language: ${language}...`);
+  // console.log(`Loading stories for year: ${year}, language: ${language}...`);
   await loadConfig();
 
   return getSheetData(dataMap[year], 'df_stories_filtered').then(data => {
-    console.log('Raw stories data fetched:', data);
+    // console.log('Raw stories data fetched:', data);
 
     // Filter out rows that match the topicKey
     const filteredData = data.filter(itm => itm.key === topicKey);
-    console.log('Filtered stories data:', filteredData);
+    // console.log('Filtered stories data:', filteredData);
 
     // Map the filtered data into an array of story objects
     const stories = filteredData.map(itm => ({
@@ -230,7 +211,7 @@ export async function getStories(year, language, topicKey = 'violence') {
       author: itm["author_" + language]
     }));
 
-    console.log('Processed stories:', stories);
+    // console.log('Processed stories:', stories);
     return stories;
   }).catch(error => {
     console.error('Error fetching stories:', error);
@@ -239,30 +220,35 @@ export async function getStories(year, language, topicKey = 'violence') {
 }
 
 
+// export async function getConfiguration(language) {
+//   await loadConfig()
+//   return getSheetData(dataMap['config'], 'configuration').then(data => {
 
-export async function getConfiguration(language) {
-  await loadConfig()
-  return getSheetData(dataMap['config'], 'configuration').then(data => {
+//     const res = data.map(itm => ({
+//       key: itm[key],
+//       name: itm[language]
+     
+//     }));
 
-    return data.reduce(function(acc, itm) {
-        acc[itm.key]['key']||= {}
-        acc[itm.key]['name']=itm[language];
-        console.log('getConfiguration:',acc)
-        return acc
-    }, {})
-  })
-}
+//     // console.log('Processed stories:', stories);
+//     return res;
+
+//   }).catch(error => {
+//     console.error('Error fetching stories:', error);
+//     throw error;
+//   });
+// }
 
 
 
 export async function makeTopicsMap() {
   await loadConfig()
   return getSheetData(dataMap['config'], 'configuration').then(data => {
+ 
+    const topicsMap = {};
 
     return data.reduce(function(itm) {
-       
-  const topicsMap = {};
-
+      
   // Build the map by iterating over the configuration data
   data.forEach((item) => {
     // For each configuration item, map both the English and Russian terms to the key
@@ -270,30 +256,42 @@ export async function makeTopicsMap() {
     topicsMap[item['en']] = itm.key;
   });
 
-  // console.log('makeTopicsMap:',topicsMap)
+  console.log('makeTopicsMap:',topicsMap)
   return topicsMap;
 
     }, {})
   })
 }
 
-export const topicsMap = makeTopicsMap()
+export let topicsMap = {};
+
+makeTopicsMap().then(map => {
+  topicsMap = map;
+}).catch(error => {
+  console.error('Failed to make topics map:', error);
+});
 
 
-// export async function getMapData(year, sheetName
-//    ) {
-//   await loadConfig()
-//  return getSheetData(dataMap[year],sheetName).then(data => {
-//   const mapData = data.map(row => {
-//     return {
-//       name: row.District,
-//       value: parseFloat(row.All) || 0 // Ensuring the value is a number, defaulting to 0 if not
-//     };
-//   }).filter(item => item.name !== 'Все'); // Exclude 'Все'
-//     })
-// }
 
-export async function getMapData(year, sheetName) {
+export async function getYears() {
+  await loadConfig();
+
+  return getSheetData(dataMap['config'], 'sheet_ids_by_year').then(data => {
+    // Assuming each item in the data array has a 'year' property
+    const years = data.map(itm => itm.year); // Collect all the 'year' values
+
+    console.log('Processed years:', years);
+    return years; // Return the array of years
+  }).catch(error => {
+    console.error('Error fetching years:', error);
+    throw error; // Propagate the error
+  });
+}
+
+
+//TODO: maybe refactor so that map data is fetche for all columns
+//and from it them preselected based on selected Question
+export async function getMapData(year, sheetName, selectedQuestion='All') {
   await loadConfig();
   console.log(`Fetching mapData for year: ${year}, sheetName: ${sheetName}`);
   
@@ -302,7 +300,7 @@ export async function getMapData(year, sheetName) {
     
     const mapData = data
       .map(row => {
-        const value = parseFloat(row.All) || 0; // Parse the 'All' column value
+        const value = parseFloat(row[selectedQuestion]) || 0; // Parse the 'All' column value
         return {
           name: row.District,
           value: value
@@ -318,20 +316,6 @@ export async function getMapData(year, sheetName) {
   });
 }
 
-
-// function parseMapData(res) {
-//   if (!res || res === undefined || res?.length === 0) {
-//     console.info("Failed to parse Map Data. Response is empty.");
-//     return [];
-//   }
-//   const result = res.map((row) => {
-//     return {
-//       name: row.District,
-//       value: parseFloat(row[selectedQuestion]),
-//     };
-//   });
-//   return result;
-// };
 
  //TODOP: get opennes map data
 
@@ -407,90 +391,3 @@ console.log('pieData:',pieData)
     }
   });
 }
-// function parsePieData(res) {
-//   if (!res || res === undefined || res?.length === 0) {
-//     console.info("Failed to parse Pie Data. Response is empty.");
-//     return [];
-//   }
-//   const fields = Object.keys(res[0])
-//     .filter((key) => key !== "District" && key !== "All")
-//     .map((key) => {
-//       return key;
-//     });
-//   const values = res.find((row) => row.District === "Все");
-//   const result = fields.map((field) => {
-//     return { name: field, value: parseFloat(values[field]) };
-//   });
-//   return result;
-// };
-
-
-
-// // export async function getDMapData(spreadsheet_id, topic_key) {
-// //   const res = await getSheetData(spreadsheet_id, topic_key);
-// //   console.log('getDMapData: ', res)
-// //   return res.map((row) => ({
-// //     name: row.District,
-// //     value: parseFloat(row[selectedQuestion]),
-// //   }));
-
-// // }
-
-// // export async function getBarData(spreadsheet_id, topic_key) {
-// //   const res = await getSheetData(spreadsheet_id, topic_key);
-// //   console.log('getBarData: ', res)
-// //   if (res?.length === 0) return [];
-// //   //get qiuestions
-// //     const fields = Object.keys(res[0])
-// //       .filter((key) => key !== "District" && key !== "All")
-// //       .map((key) => {
-// //         return key;
-// //       });
-// //      //get row Vse districts
-// //     const values = res.find((row) => row.District === "Все");
-// //     const result = fields.map((field) => {
-// //       //name=district value=for Question
-// //       return { name: field, value: parseFloat(values[field]) };
-// //     });
-// //     return result;
-// //   };
-
-// // export async function getPieData(spreadsheet_id, topic_key) {
-// //   const res = await getSheetData(spreadsheet_id, topic_key);
-// //   console.log('getBarData: ', res)
-// //   if (res?.length === 0) return [];
-// //     const fields = Object.keys(res[0])
-// //       .filter((key) => key !== "District" && key !== "All")
-// //       .map((key) => {
-// //         return key;
-// //       });
-// //     const values = res.find((row) => row.District === "Все");
-// //     const result = fields.map((field) => {
-// //       return { name: field, value: parseFloat(values[field]) };
-// //     });
-// //     return result;
-// //   };
-
-// export async function getPieData(topic, language = "ru") {
-//   const CONFIG_SHEET_ID = "1QKmA5UX-FM31jEE7UOVTmlCKxQ_Wa1K2oXxulhtkJHE";
-//   const CONFIG_SHEET_descriptions = "descriptions";
-
-//   // console.log('getDescriptions: ', data)
-//   try {
-//     const data = await getSheetData(CONFIG_SHEET_ID, CONFIG_SHEET_descriptions);
-//     return data.map((item) => ({
-//       key: item.key,
-//       name: item[`name_${language}`],
-//       map: item[`map_${language}`],
-//       pie: item[`pie_${language}`],
-//     }));
-//   } catch (error) {
-//     console.info("Failed to get Map Data");
-//     return [];
-//   }
-// }
-// }
-
-
-
- 

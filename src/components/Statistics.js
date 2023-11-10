@@ -7,7 +7,7 @@ import {
   getDescriptions,
   getStories,
   getConclusions,
-  getConfiguration,
+  // getConfiguration,
   getSheetData,
   dataMap,
   topicsMap,
@@ -18,7 +18,7 @@ import {
 import { ButtonGroupLang, ButtonGroupSubset } from "./shared/ButtonGroup";
 import { useYear } from "../contexts/yearContext";
 import {
-  useConfiguration,
+  // useConfiguration,
   // useDescriptions,
   // useData,
 
@@ -46,23 +46,27 @@ export default function Statistics({ topic }) {
 
   const [sections, setSections] = useState([]);
   const [descriptions, setDescriptions] = useState([]);
-  const [configuration, setConfiguration] = useState([]);
+  // const [configuration, setConfiguration] = useState([]);
   const [mapDescription, setMapDescription] = useState('');
   const [pieDescription, setPieDescription] = useState('');
   const [barDescription, setBarDescription] = useState('');
 
   useEffect(() => {
+    if (!topicsMap) {
+      return; // Do not fetch data until topicsMap is loaded
+    }
+
     let isMounted = true;
     setLoading(true);
     const fetchData = async () => {
       try {
         const sectionsData = await getSections(language);
-        const descriptionsData = await getDescriptions(language);
-        const configuration = getConfiguration(language);
+        const descriptionsData = await getDescriptions(language,topicsMap[topic]);
+        // const configuration = getConfiguration(language);
         if (isMounted) {
           setSections(sectionsData);
-          setDescriptions(descriptionsData, topic);
-          setConfiguration(configuration);
+          setDescriptions(descriptionsData);
+          // setConfiguration(configuration);
 
           const mapChartDescription = descriptions.find(desc => desc.key === 'mapChartKey')?.pie || "Map Description not available";
           setMapDescription(mapChartDescription);
@@ -94,15 +98,18 @@ export default function Statistics({ topic }) {
   const [stories, setStories] = useState([]);
   const [conclusions, setConclusions] = useState([]);
   useEffect(() => {
+    if (!topicsMap) {
+      return; // Do not fetch data until topicsMap is loaded
+    }
     let isMounted = true;
     setLoading(true);
     const fetchData = async () => {
       try {
-        const storiesData = await getStories(language);
-        const conclusionsData = await getConclusions(language); // Implement this function similar to getSectionsByLanguage
+        // const storiesData = await getStories(language);
+        const conclusionsData = await getConclusions(language); 
 
         if (isMounted) {
-          setStories(storiesData);
+          // setStories(storiesData);
           setConclusions(conclusionsData);
         }
       } catch (err) {
@@ -125,8 +132,8 @@ export default function Statistics({ topic }) {
   // const [{ mapDescription, barDescription, pieDescription }, refreshDescriptions] = useDescriptions(topic, language);
 
 
-  function getSheetName(topic, genderSubset, opennessSubset) {
-    const baseName = topicsMap[topic] || "violence";
+  function getSheetName(topicKey, genderSubset, opennessSubset) {
+    const baseName = topicKey || "violence";
     let sheetName = baseName;
 
     if (baseName === "openness") { // If the topic is 'openness'
@@ -150,30 +157,60 @@ export default function Statistics({ topic }) {
     return sheetName;
 }
 
-  useEffect(() => {
-    async function fetchData() {
-      const sheetName = getSheetName(topic, genderSubset, opennessSubset);
-      console.log(sheetName);
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     if (!topicsMap) {
+  //       return; // Do not fetch data until topicsMap is loaded
+  //     }
+  //     const sheetName = getSheetName(topicsMap[topic], genderSubset, opennessSubset);
+  //     console.log(sheetName);
 
-      if ( sheetName) {
-        try {
-          setPieData(getPieData(sheetName));
-          setMapData(getMapData(sheetName))// TODO:(parseMapData(res, selectedQuestion));
-          setBarData(getBarData(sheetName));
-          //TODO: get avg income data
-        } catch (error) {
-          console.error("Failed to get sheet data");
-          console.error(error);
-        }
+  //     if ( sheetName) {
+  //       try {
+  //         setPieData(getPieData(year,sheetName));
+  //         setMapData(getMapData(year,sheetName, selectedQuestion))// TODO: separate hook?
+  //         setBarData(getBarData(year,sheetName));
+  //         //TODO: get avg income data
+  //       } catch (error) {
+  //         console.error("Failed to get sheet data");
+  //         console.error(error);
+  //       }
+  //     }
+  //   }
+
+  //   if (topicsMap) {
+  //     fetchData();
+  //   }
+  // }, [topic, year, genderSubset, opennessSubset, language, selectedQuestion]);
+
+
+  useEffect(() => {
+    if (!topicsMap) {
+      return; // Exit the effect if topicsMap is not yet available
+    }
+    const sheetName = getSheetName(topic, genderSubset, opennessSubset);
+    // console.log(sheetName);
+
+    if (sheetName) {
+      try {
+        getSheetData(dataMap[year], sheetName).then(
+          (res) => {
+            setMapData(getMapData(year,sheetName));
+            // setBarData(getBarData(year,sheetName));
+            setBarData(Array.isArray(getBarData(year,sheetName)) ? barData : []);
+            setPieData(getPieData(year,sheetName));
+          }
+        );
+      } catch (error) {
+        console.error("Failed to get sheet data");
+        console.error(error);
       }
     }
-
-    if (configuration) {
-      fetchData();
-    }
-  }, [topic, year, genderSubset, opennessSubset, language, selectedQuestion]);
-
-
+  }, [topic,
+     year, 
+     genderSubset, 
+     selectedQuestion
+  ]);
 
   const selectGenderSubset = (event) => {
     setGenderSubset(event.target.name);
@@ -188,28 +225,6 @@ export default function Statistics({ topic }) {
 
 
 
-  useEffect(() => {
-    if (!configuration) {
-      return; // Exit the effect if configuration is not yet available
-    }
-    const sheetName = getSheetName(topic, genderSubset, opennessSubset);
-    // console.log(sheetName);
-
-    if (sheetName) {
-      try {
-        getSheetData(dataMap[year], sheetName).then(
-          (res) => {
-            setMapData(getMapData(year,sheetName));
-            setBarData(getBarData(year,sheetName));
-            setPieData(getPieData(year,sheetName));
-          }
-        );
-      } catch (error) {
-        console.error("Failed to get sheet data");
-        console.error(error);
-      }
-    }
-  }, [topic, year, genderSubset, configuration, selectedQuestion]);
 
 
   const handleArcClick = (arcName) => {
@@ -266,17 +281,22 @@ export default function Statistics({ topic }) {
   const charts = () => {
     return (
       <>
-        {(topic === "Открытость" || topic === "Openness") ? (
+       {
+        (topic === "Открытость" || topic === "Openness") ? (
           <div>
             <ButtonGroupSubset
               buttonsConfig={opennessButtonsConfig}
               onButtonClick={selectOpennessSubset}
             />
-            <PieChart data={pieData} onArcClick={handleArcClick} />
+
+         
+           <PieChart data={pieData} onArcClick={handleArcClick} />
+           
           </div>
         ) : (
           <BarPlot data={barData} onBarClick={handleArcClick} />
-        )}
+        )
+  }
         <p className="statistics-description">{pieDescription}</p>
       </>
     );
@@ -290,7 +310,8 @@ export default function Statistics({ topic }) {
             buttonsConfig={subsetButtonsConfig}
             onButtonClick={selectGenderSubset}
           />
-          <Map statistics={mapData} />
+          {mapData.length > 0 && <Map statistics={mapData} />}
+
           <p className="statistics-description">
             {selectedQuestion !== "All"
               ? "Процент респондентов которые сталкивались с: " + ""

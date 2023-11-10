@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 
-export const ButtonGroup1 = ({ buttons, doSomethingAfterClick }) => {
+export const ButtonGroup1 = ({ buttons, onButtonClick }) => {
   const [clickedId, setClickedId] = useState(0);
 
   const handleClick = (event, id) => {
     setClickedId(id);
-    doSomethingAfterClick(event);
+    onButtonClick(event);
   };
+  console.log('Year Buttons prop:', buttons);
 
   if (!Array.isArray(buttons)) {
     console.error('The buttons prop must be an array.', buttons.key);
@@ -45,7 +46,7 @@ export const ButtonGroup2 = ({ buttons, onButtonClick }) => {
 
   return (
     <div className="button-group">
-      {buttons.map((buttonLabel, i) => (
+      {Array.isArray(buttons) && buttons.map((buttonLabel, i) => (
         <button
           key={i}
           name={buttonLabel}

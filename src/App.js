@@ -10,7 +10,8 @@ import {
   getSheetData, 
   dataMap,
   loadYearData,
-  loadConfig
+  loadConfig,
+  getYears
  } from "./services/googleSheetsService";
 import Header from "./components/Header";
 import bg1 from "./assets/bg1.svg";
@@ -46,7 +47,7 @@ function AppContent() {
   const [error, setError] = useState(null);
 
 
-  const years = Object.keys(dataMap);// to get list of years reports exist for
+  const years = getYears()//Object.keys(dataMap);// to get list of years reports exist for
 
 
 
@@ -86,6 +87,8 @@ function AppContent() {
         if (isMounted) {
           setSections(sectionsData);
           setTopic(sectionsData[0].name)
+          console.log('app.topic;',topic)
+          console.log('app.sections;',sections)
          
         }
       } catch (err) {
@@ -129,13 +132,14 @@ function AppContent() {
     );
   };
 
-  if (sections) {
+  if (sections && years) {
     return (
       <div className="App">
 
         <Header />
         <ButtonGroup2
-          buttons={years}//{["2022", "2023"]}
+          // buttons={years || ["2022"]}//{["2022", "2023"]}
+          buttons={["2022", "2023"]} //TODO: fix later fetching years 
           onButtonClick={selectYear}
         />
 
