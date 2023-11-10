@@ -33,24 +33,21 @@ export async function getSheetData(tableId, sheetName) {
   var loader = false
   console.log("getSheetData " + tableId + "  " + sheetName)
    // Check if is in cache first 
-  while(dataCache[tableId+"_"+sheetName] == 'loading'){
+  if(dataCache[tableId] == undefined){
+    loader = true
+    dataCache[tableId] ='loading'
+  } else {
+    while(dataCache[tableId] == 'loading'){
     await sleep()
+    }
   }
-
   if((dataCache[tableId+"_"+sheetName] && typeof dataCache[tableId+"_"+sheetName] == 'object') ) {
+    dataCache[tableId] = "loaded"
       return new Promise((resolve, reject) => { // returns a Promise that resolves to the requested data
           resolve(dataCache[tableId+"_"+sheetName]);
       })
-  } 
-  else {
-    loader = true
-    dataCache[tableId+"_"+sheetName] = "loading"
   }
 
-  // If not a 'config' table, ensure 'config' is loaded
-  if(tableId !== dataMap['config']){
-    await loadConfig()
-  }
 
   // To transform the raw sheet data into a more usable JSON format
   function transformSheetRowsData(rowData) {
@@ -97,7 +94,7 @@ export async function getSheetData(tableId, sheetName) {
     console.log("Waiting for cache on ", tableId, sheetName)
     var myInterval = null
     const waitFunc = function () {
-      if(dataCache[tableId+"_"+sheetName] && dataCache[tableId+"_"+sheetName] != 'loading' || loader){
+      if(dataCache[tableId+"_"+sheetName] && dataCache[tableId] == 'loaded' || loader){
         clearInterval(myInterval)
         return func()
       }
@@ -116,6 +113,7 @@ export async function getSheetData(tableId, sheetName) {
       .then(data => {
           console.log('API response:', tableId);
           fillCachesWithTransformedWorksheetsData(data)
+          dataCache[tableId] = 'loaded'
           resolve(dataCache[tableId+"_"+sheetName])
           return dataCache[tableId+"_"+sheetName]
       })
