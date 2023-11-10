@@ -163,7 +163,7 @@ export async function loadYearData(year) {
   try {
     // get data for all sheets in the spreadsheet
     getSheetData(spreadsheetId, "economical_status")
-    // console.log('dataCache:',dataCache)
+    console.log('dataCache:',dataCache)
     return 'All sheets data fetched and stored in cache.';
   } catch (error) {
     console.error(`Error fetching data for year ${year}:`, error);
@@ -174,7 +174,7 @@ export async function loadYearData(year) {
 export async function getSections(language) {
   await loadConfig()
   return getSheetData(dataMap['config'], 'configuration').then(data => {
-    return data.map((itm)=>[itm[language]])
+    return data.map((itm)=>itm[language])
   })
   // return getSheetData(dataMap['config'], 'configuration').then(data => {
   //   return data.reduce(function(acc, itm) {
@@ -314,8 +314,8 @@ export async function makeTopicsMap() {
   // Build the map by iterating over the configuration data
   data.forEach((item) => {
     // For each configuration item, map both the English and Russian terms to the key
-    topicsMap[item['ru']] = itm.key;
-    topicsMap[item['en']] = itm.key;
+    topicsMap[item['ru']] = item.key;
+    topicsMap[item['en']] = item.key;
   });
 
   // console.log('makeTopicsMap:',topicsMap)

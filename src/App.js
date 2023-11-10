@@ -100,7 +100,7 @@ function AppContent() {
         
         if (isMounted) {
           setSections(sectionsData);
-          setTopic(sectionsData[0][0])
+          setTopic(sectionsData[0])
          
         }
       } catch (err) {
@@ -124,7 +124,7 @@ function AppContent() {
     setLanguage(lang);
   };
   const selectTopic = (event) => {
-    console.log(event.target.name);
+    console.log('APP/selectTopic',event.target.name);
     setTopic(event.target.name);
   };
 
@@ -156,7 +156,9 @@ function AppContent() {
   const isTopicsMapPopulated = Object.keys(topicsMap).length > 0 && 
   Object.values(topicsMap).every(value => value !== undefined);
   //Check if all necessary data is loaded
-  const isDataReady = sections.length > 0 && years.length > 0  && isTopicsMapPopulated; 
+  // const isDataReady = sections.length > 0 && years.length > 0  && isTopicsMapPopulated; 
+  const isDataReady = isTopicsMapPopulated; 
+
 
   const topicComponent = () => {
     return (
@@ -164,7 +166,7 @@ function AppContent() {
        {isDataReady ? (
         <Section topic={topic} topicsMap={topicsMap}/>
         ) : (
-          <div>Loading sections and years...</div>
+          <div>APP/Loading sections  topicsMap...</div>
         )}
       </>
     );
