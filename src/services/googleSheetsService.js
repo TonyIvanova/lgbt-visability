@@ -1,5 +1,5 @@
 // googleSpredsheetService.js
-const API_KEY = process.env.REACT_APP_API_KEY; 
+const API_KEY = process.env.REACT_APP_API_KEY;
 
 // Object for mapping spreadsheets to their ids in Google Drive
 export const dataMap = {
@@ -10,25 +10,41 @@ export const dataMap = {
 // Cache object for storing fetched data to reduce API calls
 var dataCache = {}
 
-// get from config/sheet_ids_by_year:  year -> id
-async function loadConfig() {
-var configData = await getSheetData(dataMap['config'], 'sheet_ids_by_year')
-configData.forEach(function(itm) {
-    dataMap[itm.year] = itm.id
-    // console.log('GSHEETS/dataMap:',dataMap)
-  }
-)
+const DEF_DELAY = 100;
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms || DEF_DELAY));
 }
 
+// get from config/sheet_ids_by_year:  year -> id
+async function loadConfig() {
+  console.log("loadConfig")
+
+  var configData = await getSheetData(dataMap['config'], 'sheet_ids_by_year')
+  configData.forEach(function(itm) {
+      dataMap[itm.year] = itm.id
+      // console.log('GSHEETS/dataMap:',dataMap)
+    }
+  )
+}
 
 //  retrieve data from a gsheet and cache it
 export async function getSheetData(tableId, sheetName) {
-
+  var loader = false
+  console.log("getSheetData " + tableId + "  " + sheetName)
    // Check if is in cache first 
-  if(dataCache[tableId+"_"+sheetName]) {
+  while(dataCache[tableId+"_"+sheetName] == 'loading'){
+    await sleep()
+  }
+
+  if((dataCache[tableId+"_"+sheetName] && typeof dataCache[tableId+"_"+sheetName] == 'object') ) {
       return new Promise((resolve, reject) => { // returns a Promise that resolves to the requested data
           resolve(dataCache[tableId+"_"+sheetName]);
       })
+  } 
+  else {
+    loader = true
+    dataCache[tableId+"_"+sheetName] = "loading"
   }
 
   // If not a 'config' table, ensure 'config' is loaded
@@ -77,8 +93,19 @@ export async function getSheetData(tableId, sheetName) {
       })
   }
 
-  // get data from each sheet
-  const worksheetData = new Promise((resolve, reject) => {
+  function waitForCacheAndExec(tableId, sheetName, func) {
+    console.log("Waiting for cache on ", tableId, sheetName)
+    var myInterval = null
+    const waitFunc = function () {
+      if(dataCache[tableId+"_"+sheetName] && dataCache[tableId+"_"+sheetName] != 'loading' || loader){
+        clearInterval(myInterval)
+        return func()
+      }
+    }
+    myInterval = setInterval(waitFunc, 50);
+  }
+
+  function fetchData(tableId, resolve, reject) {
     return fetch(`https://sheets.googleapis.com/v4/spreadsheets/${tableId}/?key=${API_KEY}&includeGridData=true`)
     .then(response => {
       if (!response.ok) {
@@ -87,11 +114,25 @@ export async function getSheetData(tableId, sheetName) {
       return response.json();
     })
       .then(data => {
-          // console.log('API response:', data);
+          console.log('API response:', tableId);
           fillCachesWithTransformedWorksheetsData(data)
           resolve(dataCache[tableId+"_"+sheetName])
           return dataCache[tableId+"_"+sheetName]
       })
+  }
+
+  // get data from each sheet
+  const worksheetData = new Promise((resolve, reject) => {
+    console.log("promise")
+    return waitForCacheAndExec(tableId, sheetName, function() {
+      if(typeof dataCache[tableId+"_"+sheetName] == 'object') {
+        resolve(dataCache[tableId+"_"+sheetName])
+      } else {
+        fetchData(tableId, resolve, reject)
+      }
+    })
+    
+
   });
   // console.log('dataCache:',dataCache)
   return worksheetData;
@@ -188,7 +229,6 @@ export async function getDescriptions(language, topicKey='violence') {
 export async function getConclusions(year, language, topicKey = 'economical_status') {
   // console.log(`Loading conclusions for year: ${year}, language: ${language}...`);
   await loadConfig();
-
   return getSheetData(dataMap[year], 'conclusions').then(data => {
     // console.log('Raw conclusions data fetched:', data);
 

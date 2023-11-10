@@ -105,7 +105,7 @@ export default function Statistics({ topic }) {
     const fetchData = async () => {
       try {
         // const storiesData = await getStories(language);
-        const conclusionsData = await getConclusions(language); 
+        const conclusionsData = await getConclusions(year, language); 
 
         if (isMounted) {
           // setStories(storiesData);
