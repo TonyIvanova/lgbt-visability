@@ -226,7 +226,7 @@ export async function getConclusions(year, language, topicKey = 'economical_stat
       text: itm["text_" + language]
     }));
 
-    console.log('Processed conclusions:', conclusions);
+    // console.log('Processed conclusions:', conclusions);
     return conclusions;
   }).catch(error => {
     console.error('Error fetching conclusions:', error);
@@ -239,6 +239,7 @@ export async function getStories(year, language, topicKey ) {
   await loadConfig();
 
   return getSheetData(dataMap[year], 'df_stories_filtered').then(data => {
+    //TODO: remove df_ prefix everywhere
     // console.log('Raw stories data fetched:', data);
     // console.log('GetStories/lang:', language);
     // console.log('GetStories/year:', year);
@@ -260,6 +261,30 @@ export async function getStories(year, language, topicKey ) {
     return stories;
   }).catch(error => {
     console.error('Error fetching stories:', error);
+    throw error;
+  });
+}
+
+
+
+export async function getSampleData(year ) {
+  console.log(`Loading sample for year: ${year}`);
+  await loadConfig();
+
+  return getSheetData(dataMap[year], 'sample').then(data => {
+   
+    // console.log('Filtered sample data:', filteredData);
+
+    // Map the filtered data into an array of sample objects
+    const sample = data.map(itm => ({
+      key: itm.key,
+      value: itm.value
+    }));
+
+    console.log('Processed sample:', sample);
+    return sample;
+  }).catch(error => {
+    console.error('Error fetching sample data:', error);
     throw error;
   });
 }

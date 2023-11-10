@@ -11,8 +11,8 @@ import { useYear } from "../../contexts/yearContext";
 import { useLanguage } from "../../contexts/langContext";
 
 export default function PersonalStories({ topic, topicsMap }) {
-  console.log('PS/topicsMap:',topicsMap)
-  console.log('Section/topic:',topic)
+  // console.log('PS/topicsMap:',topicsMap)
+  // console.log('Section/topic:',topic)
   const [storyIndex, setStoryIndex] = useState(null);
   const [stories, setStories] = useState([]);
   const { year, setYear } = useYear();
@@ -31,9 +31,9 @@ export default function PersonalStories({ topic, topicsMap }) {
     const fetchData = async () => {
       if (topicsMap) {
       try {
-        console.log('PersStories/topicsMap[topic]', topicsMap[topic])
-        console.log('PersStories/topicsMap[]', topicsMap)
-        console.log('PersStories/[topic]', topic)
+        // console.log('PersStories/topicsMap[topic]', topicsMap[topic])
+        // console.log('PersStories/topicsMap[]', topicsMap)
+        // console.log('PersStories/[topic]', topic)
         const stories = await getStories(year, language,topicsMap[topic]);
         
        

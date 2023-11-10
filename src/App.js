@@ -12,7 +12,8 @@ import {
   makeTopicsMap,
   loadYearData,
   loadConfig,
-  getYears
+  getYears,
+  getSampleData
  } from "./services/googleSheetsService";
 import Header from "./components/Header";
 
@@ -60,7 +61,7 @@ function AppContent() {
   const [descriptions, setDescriptions] = useState([]);
 
   const [isExpanded, setIsExpanded] = useState(false);
-
+  const [sampleData, setSampleData] = useState([])
 
   const [topicsMap, setTopicsMap] = useState({});
   useEffect(() => {
@@ -73,7 +74,23 @@ function AppContent() {
     });
   }, []);
 
-  
+  //Get sample data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const data = await getSampleData(year);
+        setSampleData(data);
+        console.log(data)
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [year]);
+
   // Get selected year
   const selectYear = (event) => {
     setYear(event.target.name);
@@ -134,13 +151,11 @@ function AppContent() {
   };
 
   useEffect(() => {
-    
-  console.log('APP/updated sections:',sections)
-
-  console.log('APP/updated sections.length:',sections.length)
-
-  console.log('APP/updated topic:',topic)
-    console.log("APP/updated topicsMap: ", topicsMap);
+  console.log('APP/updated sample:',sampleData)  
+  // console.log('APP/updated sections:',sections)
+  // console.log('APP/updated sections.length:',sections.length)
+  // console.log('APP/updated topic:',topic)
+  //   console.log("APP/updated topicsMap: ", topicsMap);
   }, [
     topicsMap,
     topic,
@@ -211,7 +226,7 @@ function AppContent() {
 
 <div style={{ display: 'flex', justifyContent: 'center' }}>
    
-<Expander year={year}/>
+<Expander year={year} data = {sampleData}/>
 </div>
 
         <div className="topic-component">{topicComponent()}</div>

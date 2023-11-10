@@ -30,8 +30,8 @@ import { useLanguage } from "../contexts/langContext";
 
 
 export default function Statistics({ topic, topicsMap }) {
-  console.log('STATISTICS/topicsMap:',topicsMap)
-  console.log('STATISTICS/topic:',topic)
+  // console.log('STATISTICS/topicsMap:',topicsMap)
+  // console.log('STATISTICS/topic:',topic)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -158,7 +158,7 @@ function getSheetName(topicKey, genderSubset, opennessSubset) {
         }
         
     }
-    console.log('sheetName', sheetName);
+    // console.log('sheetName', sheetName);
     return sheetName;
 }
 
@@ -173,7 +173,7 @@ useEffect(() => {
         const sheetName = getSheetName(topic, genderSubset, opennessSubset);
         if (sheetName) {
           const mapDataResponse = await getMapData(year, sheetName,selectedQuestion);
-          console.log('Fetched mapData:', mapDataResponse);
+          // console.log('Fetched mapData:', mapDataResponse);
           setMapData(mapDataResponse);
   
           const barDataResponse = await getBarData(year, sheetName,selectedQuestion);
@@ -220,8 +220,8 @@ useEffect(() => {
     // // console.log("Statistics/barData:", barData);
     // console.log("Statistics/ mapDescription:", pieDescription);
     // console.log("Statistics/ mapDescription:", barDescription);
-    console.log("Statistics/ updated descriptions:", descriptions);
-    console.log("Statistics/updated mapDescription:", mapDescription);
+    // console.log("Statistics/ updated descriptions:", descriptions);
+    // console.log("Statistics/updated mapDescription:", mapDescription);
     console.log("Statistics/updated mapData: ", mapData);
     console.log("Statistics/updated selectedQuestion: ", selectedQuestion);
   }, [
