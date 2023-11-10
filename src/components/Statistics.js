@@ -10,7 +10,7 @@ import {
   // getConfiguration,
   getSheetData,
   dataMap,
-  topicsMap,
+  // topicsMap,
   loadYearData,
   loadConfig,
   getBarData, getMapData, getPieData
@@ -29,8 +29,9 @@ import { useLanguage } from "../contexts/langContext";
 // import { getDescriptions } from ".././services/googleSheetsService";
 
 
-export default function Statistics({ topic }) {
-
+export default function Statistics({ topic, topicsMap }) {
+  console.log('STATISTICS/topicsMap:',topicsMap)
+  console.log('STATISTICS/topic:',topic)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -103,6 +104,7 @@ export default function Statistics({ topic }) {
     let isMounted = true;
     setLoading(true);
     const fetchData = async () => {
+      if (topicsMap) {
       try {
         // const storiesData = await getStories(language);
         const conclusionsData = await getConclusions(year, language); 
@@ -120,6 +122,7 @@ export default function Statistics({ topic }) {
           setLoading(false);
         }
       }
+    }
     };
     fetchData();
     return () => {
@@ -301,7 +304,7 @@ export default function Statistics({ topic }) {
             buttonsConfig={subsetButtonsConfig}
             onButtonClick={selectGenderSubset}
           />
-          {mapData.length > 0 && <Map statistics={mapData} />}
+          {mapData.length > 0 && <Map statistics={mapData} topicsMap={topicsMap}/>}
 
           <p className="statistics-description">
             {selectedQuestion !== "All"

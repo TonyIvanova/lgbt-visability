@@ -2,15 +2,21 @@ import React, { useState, useEffect } from "react";
 import PersonalStories from "./shared/PersonalStories";
 import { 
   getSheetData, 
-  dataMap, topicsMap,
+  dataMap,
+  //  topicsMap,
   getDescriptions, getConclusions,
  } from "../services/googleSheetsService";
 import Statistics from "./Statistics";
-import { useDataMap, useDatata, useWhichSubset } from "../contexts/dataContext";
+import { 
+  useDataMap, 
+  useDatata, 
+  useWhichSubset 
+} from "../contexts/dataContext";
 import { useLanguage } from "../contexts/langContext";
 import { useYear, YearProvider } from "../contexts/yearContext";
 
-export default function Section({ topic }) {
+export default function Section({ topic, topicsMap }) {
+  console.log('Section/topicsMap:',topicsMap)
   const [conclusions, setConclusions] = useState([]);
   const { year, setYear } = useYear();
   const { language } = useLanguage();
@@ -31,7 +37,7 @@ export default function Section({ topic }) {
 
   return (
     <div>
-      <Statistics topic={topic} />
+      <Statistics topic={topic} topicsMap={topicsMap} />
       <div className="conclusions">
         <h2>{language === "ru" ? `Выводы` : `Conclusions`}</h2>
 
@@ -42,7 +48,7 @@ export default function Section({ topic }) {
 
       {topicsMap[topic] !== "openness" && (
         <div>
-          <PersonalStories topic={topic} />
+          <PersonalStories topic={topic} topicsMap={topicsMap}/>
         </div>
       )}
     </div>

@@ -3,34 +3,84 @@ import arrow from "./../../assets/arrow.svg";
 import { 
   getSheetData,
 getStories,
-topicsMap, 
+// topicsMap, 
 dataMap 
 } from "../../services/googleSheetsService";
 // import { useData, useDataMap } from "../../contexts/dataContext"
 import { useYear } from "../../contexts/yearContext";
 import { useLanguage } from "../../contexts/langContext";
 
-export default function PersonalStories({ topic }) {
+export default function PersonalStories({ topic, topicsMap }) {
+  console.log('PS/topicsMap:',topicsMap)
+  console.log('Section/topic:',topic)
   const [storyIndex, setStoryIndex] = useState(null);
   const [stories, setStories] = useState([]);
   const { year, setYear } = useYear();
   const { language } = useLanguage();
 
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    async function fetchStories() {
-      if (!topicsMap) {
-        return; // Do not fetch data until topicsMap is loaded
-      }
-      if (topicsMap[topic] === 'openness') return;
-      
-
-      const stories = await getStories(year, language,topicsMap[topic]);
-      setStories(stories);
-      setStoryIndex(0);
+    if (!topicsMap) {
+      return; // Do not fetch data until topicsMap is loaded
     }
-    fetchStories();
-  }, [topic, language, year]);
+    if (topicsMap[topic] === 'openness') return;
+    let isMounted = true;
+    setLoading(true);
+    const fetchData = async () => {
+      if (topicsMap) {
+      try {
+        console.log('PersStories/topicsMap[topic]', topicsMap[topic])
+        console.log('PersStories/topicsMap[]', topicsMap)
+        console.log('PersStories/[topic]', topic)
+        const stories = await getStories(year, language,topicsMap[topic]);
+        
+       
+
+        if (isMounted) {
+          setStories(stories);
+          setStoryIndex(0);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError(err);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    }
+    };
+    fetchData();
+    return () => {
+      isMounted = false;
+    };
+  }, [topic, language, year, topicsMap]);
+
+
+  // useEffect(() => {
+  //   async function fetchStories() {
+  //     if (!topicsMap && !topic) {
+  //       return; // Do not fetch data until topicsMap is loaded
+  //     }
+  //     // if (topicsMap[topic] === 'openness') return;
+      
+  //     // if (topicsMap && topic) {
+  //       if (topicsMap[topic] === 'openness') return;
+
+  //       console.log('PersStories/topicsMap[topic]', topicsMap[topic])
+  //       console.log('PersStories/topicsMap[]', topicsMap)
+  //       console.log('PersStories/[topic]', topic)
+  //       const stories = await getStories(year, language,topicsMap[topic]);
+        
+  //       setStories(stories);
+  //       setStoryIndex(0);
+  //     }
+  //   // }
+  //   fetchStories();
+  // }, [topic, language, year, topicsMap]);
 
 
 

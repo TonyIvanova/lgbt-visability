@@ -1,7 +1,7 @@
 // App.js
 
 import "./App.css";
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState, useContext } from "react";
 import { 
   getSections, 
   getDescriptions,
@@ -9,6 +9,7 @@ import {
   getConclusions,
   getSheetData, 
   dataMap,
+  makeTopicsMap,
   loadYearData,
   loadConfig,
   getYears
@@ -21,6 +22,7 @@ import { ButtonGroup1, ButtonGroup2 } from "./components/shared/ButtonGroup";
 import { LinkComponent } from './components/shared/LinkComponent';
 import {
   DataProvider,
+  useTopicsMap
   // useData,
   // useDataMap,
   // useConfiguration,
@@ -36,28 +38,43 @@ export const DataContext = createContext([]);
 function AppContent() {
   console.log('AppContent start')
   const CONFIG_SHEET_ID = '1QKmA5UX-FM31jEE7UOVTmlCKxQ_Wa1K2oXxulhtkJHE'
+  
+
+  const years = getYears()//Object.keys(dataMap);// to get list of years reports exist for
   const { language, setLanguage } = useLanguage();
   const { year, setYear } = useYear(); // report year
-
-  const [whichSubset, setWhichSubset] = useState('All'); //Trans/Cis
-  const [opennessGroup, setOpennessGroup] = useState('')
-  const [topic, setTopic] = useState('')
+  const [topicsMap, setTopicsMap] = useState({});
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [genderSubset, setGenderSubset] = useState('All'); //Trans/Cis
+  const [opennessSubset, setOpennessSubset] = useState('')
+  const [topic, setTopic] = useState('')
 
-  const years = getYears()//Object.keys(dataMap);// to get list of years reports exist for
 
+  const [yearData, setYearData] = useState({});
 
+  const [sections, setSections] = useState([]);
+  const [descriptions, setDescriptions] = useState([]);
 
+  useEffect(() => {
+    makeTopicsMap().then(map => {
+      setTopicsMap(map);
+      setLoading(false);
+    }).catch(err => {
+      setError(err);
+      setLoading(false);
+    });
+  }, []);
+
+  
   // Get selected year
   const selectYear = (event) => {
     setYear(event.target.name);
   };
 
   // Load year data 
-  const [yearData, setYearData] = useState({});
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -74,9 +91,6 @@ function AppContent() {
     fetchData();
   }, [year]);
 
-
-  const [sections, setSections] = useState([]);
-  const [descriptions, setDescriptions] = useState([]);
   useEffect(() => {
     let isMounted = true; 
     setLoading(true);
@@ -86,9 +100,7 @@ function AppContent() {
         
         if (isMounted) {
           setSections(sectionsData);
-          setTopic(sectionsData[0].name)
-          console.log('app.topic;',topic)
-          console.log('app.sections;',sections)
+          setTopic(sectionsData[0][0])
          
         }
       } catch (err) {
@@ -107,6 +119,7 @@ function AppContent() {
     };
   }, [language]); 
 
+  
   const changeLanguage = (lang) => {
     setLanguage(lang);
   };
@@ -114,6 +127,21 @@ function AppContent() {
     console.log(event.target.name);
     setTopic(event.target.name);
   };
+
+  useEffect(() => {
+    
+  console.log('APP/updated sections:',sections)
+
+  console.log('APP/updated sections.length:',sections.length)
+
+  console.log('APP/updated topic:',topic)
+    console.log("APP/updated topicsMap: ", topicsMap);
+  }, [
+    topicsMap,
+    topic,
+    sections
+  ]);
+
 
 
   if (loading) {
@@ -124,10 +152,20 @@ function AppContent() {
     return <div>Error: {error}</div>;
   }
 
+//Check in topicsMap has undefined values
+  const isTopicsMapPopulated = Object.keys(topicsMap).length > 0 && 
+  Object.values(topicsMap).every(value => value !== undefined);
+  //Check if all necessary data is loaded
+  const isDataReady = sections.length > 0 && years.length > 0  && isTopicsMapPopulated; 
+
   const topicComponent = () => {
     return (
       <>
-        <Section topic={topic} />
+       {isDataReady ? (
+        <Section topic={topic} topicsMap={topicsMap}/>
+        ) : (
+          <div>Loading sections and years...</div>
+        )}
       </>
     );
   };

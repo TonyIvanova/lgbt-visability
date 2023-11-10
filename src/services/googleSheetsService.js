@@ -31,7 +31,7 @@ async function loadConfig() {
 //  retrieve data from a gsheet and cache it
 export async function getSheetData(tableId, sheetName) {
   var loader = false
-  console.log("getSheetData " + tableId + "  " + sheetName)
+  // console.log("getSheetData " + tableId + "  " + sheetName)
    // Check if is in cache first 
   if(dataCache[tableId] == undefined){
     loader = true
@@ -98,7 +98,7 @@ export async function getSheetData(tableId, sheetName) {
   }
 
   function waitForCacheAndExec(tableId, sheetName, func) {
-    console.log("Waiting for cache on ", tableId, sheetName)
+    // console.log("Waiting for cache on ", tableId, sheetName)
     var myInterval = null
     const waitFunc = function () {
       if(dataCache[tableId+"_"+sheetName] && dataCache[tableId] == 'loaded' || loader){
@@ -128,7 +128,7 @@ export async function getSheetData(tableId, sheetName) {
 
   // get data from each sheet
   const worksheetData = new Promise((resolve, reject) => {
-    console.log("promise")
+    // console.log("promise")
     return waitForCacheAndExec(tableId, sheetName, function() {
       if(typeof dataCache[tableId+"_"+sheetName] == 'object') {
         resolve(dataCache[tableId+"_"+sheetName])
@@ -208,7 +208,7 @@ export async function getDescriptions(language, topicKey='violence') {
     //   return acc;
     // }, {});
     const descriptions = filteredData.map(itm => ({ // Map over each item and transform it into an object
-      key: itm.key,
+      // key: itm.key,
       bar: itm[`bar_${language}`],
       map: itm[`map_${language}`],
       name: itm[`name_${language}`],
@@ -242,7 +242,7 @@ export async function getConclusions(year, language, topicKey = 'economical_stat
       text: itm["text_" + language]
     }));
 
-    // console.log('Processed conclusions:', conclusions);
+    console.log('Processed conclusions:', conclusions);
     return conclusions;
   }).catch(error => {
     console.error('Error fetching conclusions:', error);
@@ -250,28 +250,32 @@ export async function getConclusions(year, language, topicKey = 'economical_stat
   });
 }
 
-export async function getStories(year, language, topicKey = 'violence') {
+export async function getStories(year, language, topicKey ) {
   // console.log(`Loading stories for year: ${year}, language: ${language}...`);
   await loadConfig();
 
   return getSheetData(dataMap[year], 'df_stories_filtered').then(data => {
-    // console.log('Raw stories data fetched:', data);
-
-    // Filter out rows that match the topicKey
+    console.log('Raw stories data fetched:', data);
+    console.log('GetStories/lang:', language);
+    console.log('GetStories/year:', year);
+    // Filter out rows that match the topicKey\
+    console.log('GetStories/topicKey:', topicKey);
+    
+    
     const filteredData = data.filter(itm => itm.key === topicKey);
     // console.log('Filtered stories data:', filteredData);
 
     // Map the filtered data into an array of story objects
     const stories = filteredData.map(itm => ({
-      name: itm["name_" + language],
+      // name: itm["name_" + language],
       text: itm["text_" + language],
       author: itm["author_" + language]
     }));
 
-    // console.log('Processed stories:', stories);
+    console.log('Processed stories:', stories);
     return stories;
   }).catch(error => {
-    console.error('Error fetching stories:', error);
+    // console.error('Error fetching stories:', error);
     throw error;
   });
 }
@@ -298,6 +302,7 @@ export async function getStories(year, language, topicKey = 'violence') {
 
 
 
+
 export async function makeTopicsMap() {
   await loadConfig()
   return getSheetData(dataMap['config'], 'configuration').then(data => {
@@ -320,13 +325,14 @@ export async function makeTopicsMap() {
   })
 }
 
-export let topicsMap = {};
+// export let topicsMap = {};
 
-makeTopicsMap().then(map => {
-  topicsMap = map;
-}).catch(error => {
-  console.error('Failed to make topics map:', error);
-});
+// makeTopicsMap().then(map => {
+//   topicsMap = map;
+// }).catch(error => {
+//   console.error('Failed to make topics map:', error);
+// });
+
 
 
 

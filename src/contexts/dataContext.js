@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   dataMap,
-  // topicsMap,
+  makeTopicsMap,
   // getConfiguration,
   // getDescriptions,
 } from '../services/googleSheetsService';
@@ -28,15 +28,26 @@ export const DataProvider = ({ children }) => {
   const [configuration, setConfiguration] = useState({});
   const [whichSubset, setWhichSubset] = useState('All'); //Trans/Cis
 
-
+  const [topicsMap, setTopicsMap] = useState({});
+  useEffect(() => {
+    makeTopicsMap().then(map => {
+      setTopicsMap(map);
+      setLoading(false);
+    }).catch(err => {
+      setError(err);
+      setLoading(false);
+    });
+  }, []);
+  
 
   return (
     <DataContext.Provider value={{
-      data, setData,
-      dataMap,
+      topicsMap,
+      // data, setData,
+      // dataMap,
       loading, error,
-      descriptions,
-      configuration,
+      // descriptions,
+      // configuration,
       // whichSubset, setWhichSubset 
     }}>
       {children}
@@ -53,6 +64,8 @@ export const useData = () => {
   // }
   // return {data, setData};
 
+
+  
   const context = useContext(DataContext);
   if (context === undefined) {
     throw new Error('useData must be used within a DataProvider');
@@ -60,6 +73,10 @@ export const useData = () => {
   return context;
 
 
+};
+
+export const useTopicsMap= () => {
+  return useContext(DataContext);
 };
 
 // export const useSpreadsheet = () => {
