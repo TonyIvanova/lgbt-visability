@@ -51,33 +51,57 @@ export default function Statistics({ topic }) {
   const [pieDescription, setPieDescription] = useState('');
   const [barDescription, setBarDescription] = useState('');
 
+  // useEffect(() => {
+  //   if (!topicsMap) {
+  //     return; // Do not fetch data until topicsMap is loaded
+  //   }
+
+  //   let isMounted = true;
+  //   setLoading(true);
+  //   const fetchData = async () => {
+  //     try {
+  //       const sectionsData = await getSections(language);
+  //       const descriptionsData = await getDescriptions(language,topicsMap[topic]);
+  //       // const configuration = getConfiguration(language);
+  //       if (isMounted) {
+  //         setSections(sectionsData);
+  //         setDescriptions(descriptionsData);
+  //         // setConfiguration(configuration);
+
+  //         const mapChartDescription = descriptions.find(desc => desc.key === 'map')?.pie || "Map Description not available";
+  //         setMapDescription(mapChartDescription);
+
+  //         const barChartDescription = descriptions.find(desc => desc.key === 'bar')?.pie || "Bar Description not available";
+  //         setBarDescription(barChartDescription);
+
+  //         const pieChartDescription = descriptions.find(desc => desc.key === 'pie')?.pie || "Pie Description not available";
+  //         setPieDescription(pieChartDescription);
   useEffect(() => {
     if (!topicsMap) {
       return; // Do not fetch data until topicsMap is loaded
     }
-
+  
     let isMounted = true;
     setLoading(true);
+  
     const fetchData = async () => {
       try {
         const sectionsData = await getSections(language);
-        const descriptionsData = await getDescriptions(language,topicsMap[topic]);
-        // const configuration = getConfiguration(language);
+        const descriptionsData = await getDescriptions(language, topicsMap[topic]);
+        
         if (isMounted) {
           setSections(sectionsData);
           setDescriptions(descriptionsData);
-          // setConfiguration(configuration);
-
-          const mapChartDescription = descriptions.find(desc => desc.key === 'mapChartKey')?.pie || "Map Description not available";
+  
+          // Use the latest descriptionsData here instead of the stale descriptions state
+          const mapChartDescription = descriptionsData.find(desc => desc.key === 'map')?.map || "Map Description not available";
           setMapDescription(mapChartDescription);
-
-          const barChartDescription = descriptions.find(desc => desc.key === 'barChartKey')?.pie || "Bar Description not available";
+  
+          const barChartDescription = descriptionsData.find(desc => desc.key === 'bar')?.bar || "Bar Description not available";
           setBarDescription(barChartDescription);
-
-          const pieChartDescription = descriptions.find(desc => desc.key === 'pieChartKey')?.pie || "Pie Description not available";
+  
+          const pieChartDescription = descriptionsData.find(desc => desc.key === 'pie')?.pie || "Pie Description not available";
           setPieDescription(pieChartDescription);
-
-
         }
       } catch (err) {
         if (isMounted) {
@@ -89,11 +113,31 @@ export default function Statistics({ topic }) {
         }
       }
     };
+  
     fetchData();
+  
     return () => {
       isMounted = false;
     };
-  }, [language]);
+  }, [language, topicsMap, topic]); // Added dependencies here
+  
+
+  //       }
+  //     } catch (err) {
+  //       if (isMounted) {
+  //         setError(err);
+  //       }
+  //     } finally {
+  //       if (isMounted) {
+  //         setLoading(false);
+  //       }
+  //     }
+  //   };
+  //   fetchData();
+  //   return () => {
+  //     isMounted = false;
+  //   };
+  // }, [language]);
 
   const [stories, setStories] = useState([]);
   const [conclusions, setConclusions] = useState([]);

@@ -67,6 +67,10 @@ export async function getSheetData(tableId, sheetName) {
   // iterate sheets
   function fillCachesWithTransformedWorksheetsData(data) {
       // console.log(data)
+      if (!data || !Array.isArray(data.sheets)) {
+        console.error('Data is not in the expected format:', data);
+        return; // or throw an error
+      }
       data.sheets.forEach( (sheet) => {//for each sheet in a spreadsheet
         // console.log('sheet',sheet)
         dataCache[tableId+"_"+sheet.properties.title] = transformSheetRowsData(sheet.data[0].rowData)
@@ -76,9 +80,14 @@ export async function getSheetData(tableId, sheetName) {
   // get data from each sheet
   const worksheetData = new Promise((resolve, reject) => {
     return fetch(`https://sheets.googleapis.com/v4/spreadsheets/${tableId}/?key=${API_KEY}&includeGridData=true`)
-      .then(response => response.json())
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
       .then(data => {
-          // console.log(data)
+          console.log('API response:', data);
           fillCachesWithTransformedWorksheetsData(data)
           resolve(dataCache[tableId+"_"+sheetName])
           return dataCache[tableId+"_"+sheetName]
