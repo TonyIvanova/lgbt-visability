@@ -162,11 +162,7 @@ export async function loadYearData(year) {
 
   try {
     // get data for all sheets in the spreadsheet
-    const sheetsMetadata = await getSheetsMetadata(spreadsheetId);
-    // Now fetch data for each sheet and store it in cache
-    for (const sheet of sheetsMetadata) {
-      await getSheetData(spreadsheetId, sheet.properties.title);
-    }
+    getSheetData(spreadsheetId, "economical_status")
     // console.log('dataCache:',dataCache)
     return 'All sheets data fetched and stored in cache.';
   } catch (error) {
