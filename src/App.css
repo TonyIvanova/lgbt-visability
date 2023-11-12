@@ -372,3 +372,19 @@ header {
 .map-tooltip > p {
   padding: 0; 
 }
+.map-tooltip .tip {
+  position: absolute;
+  border-top-right-radius: 1rem;
+  border-top-left-radius: 1rem;
+  top: 0%;
+  left: 50%;
+  width: 1rem;
+  height: 0.5rem;
+  transform: translate(-50%, -100%);
+  background-color: #F4F3EE90;
+  pointer-events: none;
+}
+
+.map-tooltip.hidden {
+  opacity: 0;
+}

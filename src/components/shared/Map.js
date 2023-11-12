@@ -100,11 +100,7 @@ useEffect(() => {
         <svg className="map">
           <g className="map">{mapElements}</g>
         </svg>
-        {/* Additional div element styles and properties might need to be adjusted or removed based on your JavaScript environment */}
-        {/* <div style={{pointerEvents: 'none', width: 'calc(100% - 14px - 6.5px)',
-          height: 'calc(100% - 15.5px - 10px)', background: `url(${Mask})`, display: 'inline-block',
-          backgroundSize: '100% 100%', position: 'absolute', left: 'calc(14px + 1.5px)',
-          top: 'calc(15.5px + 2px)'}}></div> */}
+        
         <div className={`map-tooltip ${!regionDescription && 'hidden'}`} ref={mapTooltip}>
           <div className="tip"></div>
           {regionDescription && <>

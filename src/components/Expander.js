@@ -24,28 +24,29 @@ function Expander({ year, data }) {
   };
 
   return (
-    <div style={{ width: '960px', backgroundColor: '#f0f0f0', margin: '10 auto' }}>
+    <div style={{ width: '920px', backgroundColor: '#f0f0f0', margin: '10 auto' ,borderRadius: '5px'}}>
 
-      <button style={{ width: '960px', backgroundColor: '#f0f0f0', border: 'none' }}
+      <button style={{ width: '920px', height:'40px', 
+        backgroundColor: '#f0f0f0', border: 'none' ,borderRadius: '5px'
+        }}
         onClick={toggleExpander}>
 
         {isExpanded
           ? <>▲ </>
           : <>▼ </>}
 
-        {language === 'ru' ? 'Информация о выборке' : 'Sample Information'}
+        {language === 'ru' ? 'Информация о респондентах' : 'Respondents information'}
       </button>
 
       {isExpanded && (
-        <div>
+        <div  style={{ maxHeight: '450px', overflowY: 'auto' }}>
           <h3>
             {language === 'ru'
-              ? `Информация о выборке за ${year} год`
-              : `Sample Information for the Year ${year}`}
+              ? `Информация о респондентах за ${year} год`
+              : `Respondents Information for the year ${year}`}
 
           </h3>
-          {/* Place your plots, images, and text here */}
-          {/* <p>Content goes here...</p> */}
+          
 
           <h2>Средний возраст</h2>
           <div>
@@ -70,7 +71,7 @@ function Expander({ year, data }) {
 
 
           {/* Example image */}
-          <img src="path_to_your_image.jpg" alt="Description" />
+          <img src="path_to_image.jpg" alt="Description" />
           {/* More content */}
         </div>
       )}
