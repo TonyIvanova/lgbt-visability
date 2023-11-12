@@ -1,12 +1,14 @@
-import React, { useMemo, useEffect,useState } from "react";
+import React, { useRef, useMemo, useEffect,useState } from "react";
 import * as d3 from "d3";
 import * as d3geo from "d3-geo";
 import geoData from "./../../assets/geodata/mapData.json";
+import '../../App.css';
 
-function Map({ statistics, topicsMap }) {
+function Map({ statistics,style={} }) {
 // Check if mapData is being passed correctly as statistics
 useEffect(() => {
   console.log('mapData passed to Map component:', statistics);
+  // console.log('topicsMap passed to Map component:', topicsMap);
 }, [statistics]);
 
   // Map
@@ -74,28 +76,47 @@ useEffect(() => {
   }, [geoData, statistics]);
 
   // Legend
+  const mapTooltip = useRef(null);
 
-  if (statistics && regionDescription !== "") {
+  useEffect(() => {
+    if (!mapTooltip.current) return;
+  }, [mapTooltip]);
+
+  const setTooltipPosition = (x, y) => {
+    if (!mapTooltip.current) return;
+    let newX = x - mapTooltip.current.offsetWidth / 2;
+    newX = Math.max(newX, 0);
+    mapTooltip.current.style.transform = `translate(${newX}px, ${y + 12}px)`;
+  };
+
+  if (statistics) {
     return (
-      <div style={{ position: "relative" }}>
+      <div
+        onPointerMove={(ev) => {
+          setTooltipPosition(ev.clientX, ev.clientY);
+        }}
+        style={{ position: 'relative', display: 'inline-block', ...style }}
+      >
         <svg className="map">
           <g className="map">{mapElements}</g>
         </svg>
-        <div className="map-tooltip">
-          <h3>{regionDescription}</h3>
-          <h2>{regionValue}%</h2>
+        {/* Additional div element styles and properties might need to be adjusted or removed based on your JavaScript environment */}
+        {/* <div style={{pointerEvents: 'none', width: 'calc(100% - 14px - 6.5px)',
+          height: 'calc(100% - 15.5px - 10px)', background: `url(${Mask})`, display: 'inline-block',
+          backgroundSize: '100% 100%', position: 'absolute', left: 'calc(14px + 1.5px)',
+          top: 'calc(15.5px + 2px)'}}></div> */}
+        <div className={`map-tooltip ${!regionDescription && 'hidden'}`} ref={mapTooltip}>
+          <div className="tip"></div>
+          {regionDescription && <>
+              <h3>{regionDescription}</h3>
+              <h1>{regionValue}%</h1>
+            </>
+          }
         </div>
       </div>
     );
-  } else if (statistics) {
-    return (
-      <>
-        <svg className="map">
-          <g className="map">{mapElements}</g>
-        </svg>
-      </>
-    );
   }
+  return <></>;
 }
 
 export default Map;

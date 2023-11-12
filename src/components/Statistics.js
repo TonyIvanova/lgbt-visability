@@ -331,7 +331,7 @@ console.log('baseName:',baseName)
           {
           // mapData.length > 0 
           // && 
-          <Map statistics={mapData} topicsMap={topicsMap} />
+          <Map statistics={mapData}  />
           }
 
           <p className="statistics-description">

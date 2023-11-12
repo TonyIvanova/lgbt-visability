@@ -358,14 +358,16 @@ header {
 }
 
 .map-tooltip {
-  position: absolute;
+  position: fixed;
   padding: 8px 16px;
   border-radius: 16px; 
-  top: 32px;
+  top: 0;
   left: 0;
   font-size: 12px; 
   text-align: left;
   background-color: #F4F3EE90;
+  pointer-events: none;
+  backdrop-filter: blur(16px);
 }
 .map-tooltip > p {
   padding: 0; 
