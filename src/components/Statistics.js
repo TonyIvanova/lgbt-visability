@@ -60,10 +60,10 @@ export default function Statistics({ topic, topicsMap }) {
     if (!topicsMap) {
       return; // Do not fetch data until topicsMap is loaded
     }
-  
+
     let isMounted = true;
     setLoading(true);
-  
+
     const fetchData = async () => {
       try {
         const descriptionsData = await getDescriptions(language, topicsMap[topic]);
@@ -85,8 +85,8 @@ export default function Statistics({ topic, topicsMap }) {
       isMounted = false;
     };
   }, [language, topicsMap, topic]);
-  
-  
+
+
   // Parse map/bar/pie descriptions
   useEffect(() => {
     const currentTopicDescription = descriptions.find(desc => desc.key === topicsMap[topic]);
@@ -98,10 +98,10 @@ export default function Statistics({ topic, topicsMap }) {
     const pieChartDescription = currentTopicDescription?.pie || "Pie Description not available";
     setPieDescription(pieChartDescription);
   }, [descriptions, topicsMap, topic]);
-  
 
-  
-// Get conclusions by language & year
+
+
+  // Get conclusions by language & year
   useEffect(() => {
     if (!topicsMap) {
       return; // Do not fetch data until topicsMap is loaded
@@ -110,24 +110,24 @@ export default function Statistics({ topic, topicsMap }) {
     setLoading(true);
     const fetchData = async () => {
       if (topicsMap) {
-      try {
-        // const storiesData = await getStories(language);
-        const conclusionsData = await getConclusions(year, language); 
+        try {
+          // const storiesData = await getStories(language);
+          const conclusionsData = await getConclusions(year, language);
 
-        if (isMounted) {
-          // setStories(storiesData);
-          setConclusions(conclusionsData);
-        }
-      } catch (err) {
-        if (isMounted) {
-          setError(err);
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
+          if (isMounted) {
+            // setStories(storiesData);
+            setConclusions(conclusionsData);
+          }
+        } catch (err) {
+          if (isMounted) {
+            setError(err);
+          }
+        } finally {
+          if (isMounted) {
+            setLoading(false);
+          }
         }
       }
-    }
     };
     fetchData();
     return () => {
@@ -136,67 +136,67 @@ export default function Statistics({ topic, topicsMap }) {
   }, [language]);
 
 
-// Generate a sheetName given selections
-function getSheetName(topicKey, genderSubset, opennessSubset) {
+  // Generate a sheetName given selections
+  function getSheetName(topicKey, genderSubset, opennessSubset) {
     const baseName = topicKey || "violence";
     let sheetName = baseName;
 
     if (baseName === "openness") { // If the topic is 'openness'
-        if (genderSubset === 'All' ) {
-            sheetName += '_' + opennessSubset ; //e.g. openness_family
-        }
-        else{
-          sheetName += '_' + opennessSubset + '_' + genderSubset; //e.g. openness_family_cis
-        }
-    } 
+      if (genderSubset === 'All') {
+        sheetName += '_' + opennessSubset; //e.g. openness_family
+      }
+      else {
+        sheetName += '_' + opennessSubset + '_' + genderSubset; //e.g. openness_family_cis
+      }
+    }
     else { // For topics other than 'openness'
-        if (genderSubset !== 'All' ) {
-            sheetName += '_' + genderSubset; //e.g. violence_cis
-        }
-        else {
-          // do nothing
-        }
-        
+      if (genderSubset !== 'All') {
+        sheetName += '_' + genderSubset; //e.g. violence_cis
+      }
+      else {
+        // do nothing
+      }
+
     }
     // console.log('sheetName', sheetName);
     return sheetName;
-}
+  }
 
-// Get data given topic, subsets, year & selectedQuestion 
-useEffect(() => {
+  // Get data given topic, subsets, year & selectedQuestion 
+  useEffect(() => {
     if (!topicsMap) {
       return; // Exit the effect if topicsMap is not yet available
     }
-  
+
     const fetchData = async () => {
       try {
         const sheetName = getSheetName(topic, genderSubset, opennessSubset);
         if (sheetName) {
-          const mapDataResponse = await getMapData(year, sheetName,selectedQuestion);
+          const mapDataResponse = await getMapData(year, sheetName, selectedQuestion);
           // console.log('Fetched mapData:', mapDataResponse);
           setMapData(mapDataResponse);
-  
-          const barDataResponse = await getBarData(year, sheetName,selectedQuestion);
+
+          const barDataResponse = await getBarData(year, sheetName, selectedQuestion);
           setBarData(Array.isArray(barDataResponse) ? barDataResponse : []);
-  
-          const pieDataResponse = await getPieData(year, sheetName,selectedQuestion);
+
+          const pieDataResponse = await getPieData(year, sheetName, selectedQuestion);
           setPieData(pieDataResponse);
         }
       } catch (error) {
         console.error("Failed to get sheet data:", error);
       }
     };
-  
+    console.log('STATISTICS/ fetchData/ Current selectedQuestion:', selectedQuestion);
     fetchData();
   }, [
-    topicsMap, 
-    topic, 
+    topicsMap,
+    topic,
     year,
-     genderSubset, 
-     opennessSubset, 
-     selectedQuestion
-    ]);
-  
+    genderSubset,
+    opennessSubset,
+    selectedQuestion
+  ]);
+
 
   const selectGenderSubset = (event) => {
     setGenderSubset(event.target.name);
@@ -209,7 +209,7 @@ useEffect(() => {
     setSelectedQuestion("All");
   }, [language]);
 
-  
+
   const handleArcClick = (arcName) => {
     console.info("STATISTICS/Handling bar arc click ", arcName);
     setSelectedQuestion(arcName);
@@ -291,32 +291,31 @@ useEffect(() => {
   const charts = () => {
     return (
       <>
-       {
-        (topic === "Открытость" || topic === "Openness") ? (
-          <div>
-            <ButtonGroupSubset
-              buttonsConfig={opennessButtonsConfig}
-              onButtonClick={selectOpennessSubset}
-            />
+        {
+          (topic === "Открытость" || topic === "Openness") ? (
+            <div>
+              <ButtonGroupSubset
+                buttonsConfig={opennessButtonsConfig}
+                onButtonClick={selectOpennessSubset}
+              />
 
-         
-           <PieChart data={pieData} onArcClick={handleArcClick} />
-           
-          </div>
-        ) : (
-          <BarPlot data={barData} onBarClick={handleArcClick} />
-        )
-  }
+              <PieChart data={pieData} onArcClick={handleArcClick} />
+
+            </div>
+          ) : (
+            <BarPlot data={barData} onBarClick={handleArcClick} />
+          )
+        }
         <p className="statistics-description">{pieDescription}</p>
       </>
     );
   };
 
   if (
-    mapData 
-    && mapDescription 
+    mapData
+    && mapDescription
     //&& selectedQuestion
-    ) {
+  ) {
     return (
       <div className="section">
         <div>
@@ -324,7 +323,11 @@ useEffect(() => {
             buttonsConfig={subsetButtonsConfig}
             onButtonClick={selectGenderSubset}
           />
-          {mapData.length > 0 && <Map statistics={mapData} topicsMap={topicsMap}/>}
+          {
+          // mapData.length > 0 
+          // && 
+          <Map statistics={mapData} topicsMap={topicsMap} />
+          }
 
           <p className="statistics-description">
             {selectedQuestion !== "All"

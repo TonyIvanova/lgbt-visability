@@ -2,19 +2,19 @@
 
 import "./App.css";
 import { createContext, useEffect, useState, useContext } from "react";
-import { 
-  getSections, 
+import {
+  getSections,
   getDescriptions,
   getStories,
   getConclusions,
-  getSheetData, 
+  getSheetData,
   dataMap,
   makeTopicsMap,
   loadYearData,
   loadConfig,
   getYears,
   getSampleData
- } from "./services/googleSheetsService";
+} from "./services/googleSheetsService";
 import Header from "./components/Header";
 
 import Expander from "./components/Expander";
@@ -41,7 +41,6 @@ export const DataContext = createContext([]);
 function AppContent() {
   console.log('AppContent start')
   const CONFIG_SHEET_ID = '1QKmA5UX-FM31jEE7UOVTmlCKxQ_Wa1K2oXxulhtkJHE'
-  
 
   const years = getYears()//Object.keys(dataMap);// to get list of years reports exist for
   const { language, setLanguage } = useLanguage();
@@ -53,7 +52,6 @@ function AppContent() {
   const [genderSubset, setGenderSubset] = useState('All'); //Trans/Cis
   const [opennessSubset, setOpennessSubset] = useState('')
   const [topic, setTopic] = useState('')
-
 
   const [yearData, setYearData] = useState({});
 
@@ -114,16 +112,16 @@ function AppContent() {
   }, [year]);
 
   useEffect(() => {
-    let isMounted = true; 
+    let isMounted = true;
     setLoading(true);
     const fetchData = async () => {
       try {
         const sectionsData = await getSections(language);
-        
+
         if (isMounted) {
           setSections(sectionsData);
           setTopic(sectionsData[0])
-         
+
         }
       } catch (err) {
         if (isMounted) {
@@ -139,23 +137,23 @@ function AppContent() {
     return () => {
       isMounted = false;
     };
-  }, [language]); 
+  }, [language]);
 
-  
+
   const changeLanguage = (lang) => {
     setLanguage(lang);
   };
   const selectTopic = (event) => {
-    console.log('APP/selectTopic',event.target.name);
+    console.log('APP/selectTopic', event.target.name);
     setTopic(event.target.name);
   };
 
   useEffect(() => {
-  console.log('APP/updated sample:',sampleData)  
-  // console.log('APP/updated sections:',sections)
-  // console.log('APP/updated sections.length:',sections.length)
-  // console.log('APP/updated topic:',topic)
-  //   console.log("APP/updated topicsMap: ", topicsMap);
+    console.log('APP/updated sample:', sampleData)
+    // console.log('APP/updated sections:',sections)
+    // console.log('APP/updated sections.length:',sections.length)
+    // console.log('APP/updated topic:',topic)
+    //   console.log("APP/updated topicsMap: ", topicsMap);
   }, [
     topicsMap,
     topic,
@@ -176,19 +174,19 @@ function AppContent() {
     return <div>Error: {error}</div>;
   }
 
-//Check in topicsMap has undefined values
-  const isTopicsMapPopulated = Object.keys(topicsMap).length > 0 && 
-  Object.values(topicsMap).every(value => value !== undefined);
+  //Check in topicsMap has undefined values
+  const isTopicsMapPopulated = Object.keys(topicsMap).length > 0 &&
+    Object.values(topicsMap).every(value => value !== undefined);
   //Check if all necessary data is loaded
   // const isDataReady = sections.length > 0 && years.length > 0  && isTopicsMapPopulated; 
- 
+
 
 
   const topicComponent = () => {
     return (
       <>
-       {isTopicsMapPopulated ? (
-        <Section topic={topic} topicsMap={topicsMap}/>
+        {isTopicsMapPopulated ? (
+          <Section topic={topic} topicsMap={topicsMap} />
         ) : (
           <div>APP/Loading  topicsMap...</div>
         )}
@@ -199,7 +197,7 @@ function AppContent() {
   if (sections && years) {
     return (
       <div className="App">
- 
+
         <Header />
         <ButtonGroup2
           // buttons={years || ["2022"]}//{["2022", "2023"]}
@@ -224,10 +222,9 @@ function AppContent() {
           onButtonClick={selectTopic}
         />
 
-<div style={{ display: 'flex', justifyContent: 'center' }}>
-   
-<Expander year={year} data = {sampleData}/>
-</div>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Expander year={year} data={sampleData} />
+        </div>
 
         <div className="topic-component">{topicComponent()}</div>
         {/* <DataContext.Provider value={{ data, conclusions }}> */}

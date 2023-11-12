@@ -71,6 +71,7 @@ export function BarPlot({ data, onBarClick = () => {} }) {
     );
   });
 
+  
   //show
   return (
     <div className={styles.barChart}>

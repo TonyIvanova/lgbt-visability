@@ -20,10 +20,10 @@ function sleep(ms) {
 async function loadConfig() {
   // console.log("loadConfig")
   var configData = await getSheetData(dataMap['config'], 'sheet_ids_by_year')
-  configData.forEach(function(itm) {
-      dataMap[itm.year] = itm.id
-      // console.log('GSHEETS/dataMap:',dataMap)
-    }
+  configData.forEach(function (itm) {
+    dataMap[itm.year] = itm.id
+    // console.log('GSHEETS/dataMap:',dataMap)
+  }
   )
 }
 
@@ -31,20 +31,20 @@ async function loadConfig() {
 export async function getSheetData(tableId, sheetName) {
   var loader = false
   // console.log("getSheetData " + tableId + "  " + sheetName)
-   // Check if is in cache first 
-  if(dataCache[tableId] == undefined){
+  // Check if is in cache first 
+  if (dataCache[tableId] == undefined) {
     loader = true
-    dataCache[tableId] ='loading'
+    dataCache[tableId] = 'loading'
   } else {
-    while(dataCache[tableId] == 'loading'){
-    await sleep()
+    while (dataCache[tableId] == 'loading') {
+      await sleep()
     }
   }
-  if((dataCache[tableId+"_"+sheetName] && typeof dataCache[tableId+"_"+sheetName] == 'object') ) {
+  if ((dataCache[tableId + "_" + sheetName] && typeof dataCache[tableId + "_" + sheetName] == 'object')) {
     dataCache[tableId] = "loaded"
-      return new Promise((resolve, reject) => { // returns a Promise that resolves to the requested data
-          resolve(dataCache[tableId+"_"+sheetName]);
-      })
+    return new Promise((resolve, reject) => { // returns a Promise that resolves to the requested data
+      resolve(dataCache[tableId + "_" + sheetName]);
+    })
   }
 
 
@@ -52,30 +52,30 @@ export async function getSheetData(tableId, sheetName) {
   function transformSheetRowsData(rowData) {
     var colsMap = {}
     var jsonData = []
-    if(!rowData) {
+    if (!rowData) {
       return jsonData
     }
     // console.log(rowData)
 
     // extracts first row
-    rowData[0].values.forEach( (item, idx) => {
+    rowData[0].values.forEach((item, idx) => {
       colsMap[idx] = item.formattedValue
     })
 
     // transforms {userEnteredValue: {…}, effectiveValue: {…}, formattedValue: 'Дальневосточный федеральный округ', effectiveFormat: {…}}
     // to { columnName1: formattedValue, ... }
-    rowData.forEach( (row, rowIdx) => {
-      if(rowIdx === 0) return;
+    rowData.forEach((row, rowIdx) => {
+      if (rowIdx === 0) return;
       var rowObject = {}
       row.values.forEach((cellValue, colIdx) => {
-          rowObject[colsMap[colIdx]] = cellValue.formattedValue;
+        rowObject[colsMap[colIdx]] = cellValue.formattedValue;
       })
       var allUndef = Object.values(rowObject).reduce(
-        function(acc, itm) {
-          return  acc &&= itm === undefined
+        function (acc, itm) {
+          return acc &&= itm === undefined
         }, true
       )
-      if(!allUndef) { 
+      if (!allUndef) {
         jsonData.push(rowObject)
       }
     })
@@ -85,22 +85,22 @@ export async function getSheetData(tableId, sheetName) {
 
   // iterate sheets
   function fillCachesWithTransformedWorksheetsData(data) {
-      // console.log(data)
-      if (!data || !Array.isArray(data.sheets)) {
-        console.error('Data is not in the expected format:', data);
-        return; // or throw an error
-      }
-      data.sheets.forEach( (sheet) => {//for each sheet in a spreadsheet
-        // console.log('sheet',sheet)
-        dataCache[tableId+"_"+sheet.properties.title] = transformSheetRowsData(sheet.data[0].rowData)
-      })
+    // console.log(data)
+    if (!data || !Array.isArray(data.sheets)) {
+      console.error('Data is not in the expected format:', data);
+      return; // or throw an error
+    }
+    data.sheets.forEach((sheet) => {//for each sheet in a spreadsheet
+      // console.log('sheet',sheet)
+      dataCache[tableId + "_" + sheet.properties.title] = transformSheetRowsData(sheet.data[0].rowData)
+    })
   }
 
   function waitForCacheAndExec(tableId, sheetName, func) {
     // console.log("Waiting for cache on ", tableId, sheetName)
     var myInterval = null
     const waitFunc = function () {
-      if(dataCache[tableId+"_"+sheetName] && dataCache[tableId] == 'loaded' || loader){
+      if (dataCache[tableId + "_" + sheetName] && dataCache[tableId] == 'loaded' || loader) {
         clearInterval(myInterval)
         return func()
       }
@@ -110,32 +110,32 @@ export async function getSheetData(tableId, sheetName) {
 
   function fetchData(tableId, resolve, reject) {
     return fetch(`https://sheets.googleapis.com/v4/spreadsheets/${tableId}/?key=${API_KEY}&includeGridData=true`)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
-    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
       .then(data => {
-          // console.log('API response:', tableId);
-          fillCachesWithTransformedWorksheetsData(data)
-          dataCache[tableId] = 'loaded'
-          resolve(dataCache[tableId+"_"+sheetName])
-          return dataCache[tableId+"_"+sheetName]
+        // console.log('API response:', tableId);
+        fillCachesWithTransformedWorksheetsData(data)
+        dataCache[tableId] = 'loaded'
+        resolve(dataCache[tableId + "_" + sheetName])
+        return dataCache[tableId + "_" + sheetName]
       })
   }
 
   // get data from each sheet
   const worksheetData = new Promise((resolve, reject) => {
     // console.log("promise")
-    return waitForCacheAndExec(tableId, sheetName, function() {
-      if(typeof dataCache[tableId+"_"+sheetName] == 'object') {
-        resolve(dataCache[tableId+"_"+sheetName])
+    return waitForCacheAndExec(tableId, sheetName, function () {
+      if (typeof dataCache[tableId + "_" + sheetName] == 'object') {
+        resolve(dataCache[tableId + "_" + sheetName])
       } else {
         fetchData(tableId, resolve, reject)
       }
     })
-    
+
 
   });
   // console.log('dataCache:',dataCache)
@@ -154,7 +154,7 @@ async function getSheetsMetadata(spreadsheetId) {
 export async function loadYearData(year) {
   await loadConfig()
   const spreadsheetId = dataMap[year];
-  
+
   if (!spreadsheetId) {
     throw new Error(`Spreadsheet ID not found for year: ${year}`);
   }
@@ -173,13 +173,13 @@ export async function loadYearData(year) {
 export async function getSections(language) {
   await loadConfig()
   return getSheetData(dataMap['config'], 'configuration').then(data => {
-    return data.map((itm)=>itm[language])
+    return data.map((itm) => itm[language])
   })
 }
 
 
 //TODO: doesnt see topicKey passed]
-export async function getDescriptions(language, topicKey='violence') {
+export async function getDescriptions(language, topicKey = 'violence') {
   // console.log('Loading configuration...');
   await loadConfig();
   // console.log(`Fetching descriptions for language: ${language} and topic: ${topicKey}...`);
@@ -234,7 +234,7 @@ export async function getConclusions(year, language, topicKey = 'economical_stat
   });
 }
 
-export async function getStories(year, language, topicKey ) {
+export async function getStories(year, language, topicKey) {
   // console.log(`Loading stories for year: ${year}, language: ${language}...`);
   await loadConfig();
 
@@ -245,8 +245,8 @@ export async function getStories(year, language, topicKey ) {
     // console.log('GetStories/year:', year);
     // // Filter out rows that match the topicKey\
     // console.log('GetStories/topicKey:', topicKey);
-    
-    
+
+
     const filteredData = data.filter(itm => itm.key === topicKey);
     // console.log('Filtered stories data:', filteredData);
 
@@ -266,13 +266,12 @@ export async function getStories(year, language, topicKey ) {
 }
 
 
-
-export async function getSampleData(year ) {
+export async function getSampleData(year) {
   console.log(`Loading sample for year: ${year}`);
   await loadConfig();
 
   return getSheetData(dataMap[year], 'sample').then(data => {
-   
+
     // console.log('Filtered sample data:', filteredData);
 
     // Map the filtered data into an array of sample objects
@@ -297,7 +296,7 @@ export async function getSampleData(year ) {
 //     const res = data.map(itm => ({
 //       key: itm[key],
 //       name: itm[language]
-     
+
 //     }));
 
 //     // console.log('Processed stories:', stories);
@@ -315,20 +314,20 @@ export async function getSampleData(year ) {
 export async function makeTopicsMap() {
   await loadConfig()
   return getSheetData(dataMap['config'], 'configuration').then(data => {
- 
+
     const topicsMap = {};
 
-    return data.reduce(function(itm) {
-      
-  // Build the map by iterating over the configuration data
-  data.forEach((item) => {
-    // For each configuration item, map both the English and Russian terms to the key
-    topicsMap[item['ru']] = item.key;
-    topicsMap[item['en']] = item.key;
-  });
+    return data.reduce(function (itm) {
 
-  // console.log('makeTopicsMap:',topicsMap)
-  return topicsMap;
+      // Build the map by iterating over the configuration data
+      data.forEach((item) => {
+        // For each configuration item, map both the English and Russian terms to the key
+        topicsMap[item['ru']] = item.key;
+        topicsMap[item['en']] = item.key;
+      });
+
+      // console.log('makeTopicsMap:',topicsMap)
+      return topicsMap;
 
     }, {})
   })
@@ -357,28 +356,30 @@ export async function getYears() {
 //TODO: maybe refactor so that map data is fetche for all columns
 //and from it them preselected based on selected Question
 export async function getMapData(year, sheetName, selectedQuestion) {
-  await loadConfig();
-  console.log(`Fetching mapData for year: ${year}, sheetName: ${sheetName}`);
-  console.log('getMapData/selectedQuestion',selectedQuestion)
-  return getSheetData(dataMap[year], sheetName).then(data => {
+  try {
+    await loadConfig();
+    console.log(`Fetching mapData for year: ${year}, sheetName: ${sheetName}`);
+    console.log('getMapData/selectedQuestion', selectedQuestion);
+
+    const data = await getSheetData(dataMap[year], sheetName);
     console.log('getMapData/Raw data fetched:', data);
-    
+
     const mapData = data
       .map(row => {
-        const value = parseFloat(row[selectedQuestion]) //|| 0; // Parse the 'All' column value
-        return {
-          name: row.District,
-          value: value
-        };
+        console.log('rgetMapData/ data:', data)
+        // console.log('rgetMapData/ selectedQuestion:',selectedQuestion)
+        // console.log('rgetMapData/ row[selectedQuestion]:',row[selectedQuestion])
+        const value = parseFloat(row[selectedQuestion]) //|| 0; // Parse the value
+        return { name: row.District, value: value };
       })
       .filter(item => item.name !== 'Все'); // Exclude 'Все' from the results
-    
+
     console.log('getMapData:', mapData);
     return mapData;
-  }).catch(error => {
+  } catch (error) {
     console.error('Error fetching map data:', error);
     throw error; // Re-throw the error to handle it further up the call chain
-  });
+  }
 }
 
 
@@ -402,7 +403,7 @@ export async function getBarData(year, sheetName) {
         }
         return acc;
       }, []);
-      console.log('barData:',barData)
+      console.log('barData:', barData)
       return barData;
     } else {
       // Handle the case where no 'Все' row is found
@@ -448,7 +449,7 @@ export async function getPieData(year, sheetName) {
         }
         return acc;
       }, []);
-console.log('pieData:',pieData)
+      console.log('pieData:', pieData)
       return pieData;
     } else {
       // Handle the case where no 'Все' row is found

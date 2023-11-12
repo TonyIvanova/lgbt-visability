@@ -56,14 +56,14 @@ function DistributionPlot({ data }) {
                 .attr("width", d => Math.max(0, x(d.x1) - x(d.x0) - 1))
                 .attr("height", d => height - y(d.length))
                 .attr("fill", "#69b3a2");
-// Draw circles for each age
-svg.selectAll("circle")
-.data(ages)
-.enter().append("circle")
-.attr("cx", d => x(d))
-.attr("cy", () => y(0)) // constant y value
-.attr("r", 3) // radius of the circles
-.attr("fill", "#69b3a2");
+            // Draw circles for each age
+            svg.selectAll("circle")
+                .data(ages)
+                .enter().append("circle")
+                .attr("cx", d => x(d))
+                .attr("cy", () => y(0)) // constant y value
+                .attr("r", 3) // radius of the circles
+                .attr("fill", "#69b3a2");
 
             // Draw axis
             svg.append("g")
@@ -71,11 +71,11 @@ svg.selectAll("circle")
             svg.append("g")
                 .attr("transform", `translate(0,${height})`)
                 .call(d3.axisBottom(x));
-        //     svg.append("g")
-        //     .call(d3.axisLeft(y).ticks(0)); // No tick for y-axis
-        // svg.append("g")
-        //     .attr("transform", `translate(0,${height / 2})`)
-        //     .call(d3.axisBottom(x));
+            //     svg.append("g")
+            //     .call(d3.axisLeft(y).ticks(0)); // No tick for y-axis
+            // svg.append("g")
+            //     .attr("transform", `translate(0,${height / 2})`)
+            //     .call(d3.axisBottom(x));
 
             // Draw mean line
             svg.append("line")

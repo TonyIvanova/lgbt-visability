@@ -91,70 +91,70 @@ export const ButtonGroupLang = ({ buttons, onButtonClick }) => {
 };
 
 export function ButtonGroupSubset({ buttonsConfig, onButtonClick }) {
-  
-    // We'll use state to keep track of which button was clicked.
-    const [clickedId, setClickedId] = useState(null);
-    const buttonStyle = {
-      fontSize: '1.2em', // Bigger 
-      // fontWeight: '200' , // Fatter 
-      textTransform:'uppercase'
-    };
-    return (
-      <div className="button-group2">
-        {buttonsConfig.map((button, i) => (
-          <button 
-            name={button.label}
-             key={'button-' + i}
-            onClick={() => {
-              onButtonClick(button.value);
-              setClickedId(i);
-            }}
-            className={
-              i === clickedId ? "lang active" : "lang"
-            }
 
-            style={buttonStyle}
-            
-          >
-            {button.label}
-          </button>
-        ))}
-      </div>
-    );
-  }
-  
-  export function ButtonGroupOpennes({ buttonsConfig, onButtonClick }) {
-  
-    // We'll use state to keep track of which button was clicked.
-    const [clickedId, setClickedId] = useState(null);
-    const buttonStyle = {
-      fontSize: '1.2em', // Bigger 
-      // fontWeight: '200' , // Fatter 
-      textTransform:'uppercase'
-    };
-    return (
-      <div className="button-group2">
-        {buttonsConfig.map((button, i) => (
-          <button 
-            name={button.label}
-            key={'button-' + i}
-            onClick={() => {
-              onButtonClick(button.value);
-              setClickedId(i);
-            }}
-            className={
-              i === clickedId ? "lang active" : "lang"
-            }
+  // We'll use state to keep track of which button was clicked.
+  const [clickedId, setClickedId] = useState(null);
+  const buttonStyle = {
+    fontSize: '1.2em', // Bigger 
+    // fontWeight: '200' , // Fatter 
+    textTransform: 'uppercase'
+  };
+  return (
+    <div className="button-group2">
+      {buttonsConfig.map((button, i) => (
+        <button
+          name={button.label}
+          key={'button-' + i}
+          onClick={() => {
+            onButtonClick(button.value);
+            setClickedId(i);
+          }}
+          className={
+            i === clickedId ? "lang active" : "lang"
+          }
 
-            style={buttonStyle}
-          >
-            {button.label}
-          </button>
-        ))}
-      </div>
-    );
-  }
-  
+          style={buttonStyle}
+
+        >
+          {button.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+export function ButtonGroupOpennes({ buttonsConfig, onButtonClick }) {
+
+  // We'll use state to keep track of which button was clicked.
+  const [clickedId, setClickedId] = useState(null);
+  const buttonStyle = {
+    fontSize: '1.2em', // Bigger 
+    // fontWeight: '200' , // Fatter 
+    textTransform: 'uppercase'
+  };
+  return (
+    <div className="button-group2">
+      {buttonsConfig.map((button, i) => (
+        <button
+          name={button.label}
+          key={'button-' + i}
+          onClick={() => {
+            onButtonClick(button.value);
+            setClickedId(i);
+          }}
+          className={
+            i === clickedId ? "lang active" : "lang"
+          }
+
+          style={buttonStyle}
+        >
+          {button.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 
 
 

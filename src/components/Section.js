@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
 import PersonalStories from "./shared/PersonalStories";
-import { 
-  getSheetData, 
+import {
+  getSheetData,
   dataMap,
   //  topicsMap,
   getDescriptions, getConclusions,
- } from "../services/googleSheetsService";
+} from "../services/googleSheetsService";
 import Statistics from "./Statistics";
-import { 
-  useDataMap, 
-  useDatata, 
-  useWhichSubset 
+import {
+  useDataMap,
+  useDatata,
+  useWhichSubset
 } from "../contexts/dataContext";
 import { useLanguage } from "../contexts/langContext";
 import { useYear, YearProvider } from "../contexts/yearContext";
@@ -25,7 +25,7 @@ export default function Section({ topic, topicsMap }) {
   useEffect(() => {
     async function fetchConclusions() {
       try {
-        const conclusionsData = await getConclusions(year, language,topicsMap[topic]);
+        const conclusionsData = await getConclusions(year, language, topicsMap[topic]);
         setConclusions(conclusionsData);
       } catch (error) {
         console.error('Failed to fetch conclusions:', error);
@@ -48,7 +48,7 @@ export default function Section({ topic, topicsMap }) {
 
       {topicsMap[topic] !== "openness" && (
         <div>
-          <PersonalStories topic={topic} topicsMap={topicsMap}/>
+          <PersonalStories topic={topic} topicsMap={topicsMap} />
         </div>
       )}
     </div>

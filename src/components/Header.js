@@ -23,7 +23,7 @@ export default function Header() {
       <div className="App-header-logo">
         <img src={logo} alt="Logo" />
         <ButtonGroupLang buttons={['ru','en']}
-       doSomethingAfterClick = {changeLanguage}
+       onButtonClick = {changeLanguage}
         />
 
       </div>
