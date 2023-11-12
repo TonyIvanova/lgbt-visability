@@ -104,14 +104,17 @@ export function ButtonGroupSubset({ buttonsConfig, onButtonClick }) {
     // fontWeight: '200' , // Fatter 
     textTransform: 'uppercase'
   };
+  console.log('buttonsConfig',buttonsConfig)
   return (
     <div className="button-group2">
-      {buttonsConfig.map((button, i) => (
+      {buttonsConfig.map((button, i) => 
+      // console.log('button',button)
+      (
         <button
-          name={button.label}
+          name={button.value}
           key={'button-' + i}
-          onClick={() => {
-            onButtonClick(button.value);
+          onClick={(event) => {
+            onButtonClick(event);
             setClickedId(i);
           }}
           className={

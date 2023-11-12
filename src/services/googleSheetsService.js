@@ -280,7 +280,7 @@ export async function getSampleData(year) {
       value: itm.value
     }));
 
-    console.log('Processed sample:', sample);
+    // console.log('Processed sample:', sample);
     return sample;
   }).catch(error => {
     console.error('Error fetching sample data:', error);
@@ -358,15 +358,15 @@ export async function getYears() {
 export async function getMapData(year, sheetName, selectedQuestion) {
   try {
     await loadConfig();
-    console.log(`Fetching mapData for year: ${year}, sheetName: ${sheetName}`);
-    console.log('getMapData/selectedQuestion', selectedQuestion);
+    // console.log(`Fetching mapData for year: ${year}, sheetName: ${sheetName}`);
+    // console.log('getMapData/selectedQuestion', selectedQuestion);
 
     const data = await getSheetData(dataMap[year], sheetName);
-    console.log('getMapData/Raw data fetched:', data);
+    // console.log('getMapData/Raw data fetched:', data);
 
     const mapData = data
       .map(row => {
-        console.log('rgetMapData/ data:', data)
+        
         // console.log('rgetMapData/ selectedQuestion:',selectedQuestion)
         // console.log('rgetMapData/ row[selectedQuestion]:',row[selectedQuestion])
         const value = parseFloat(row[selectedQuestion]) //|| 0; // Parse the value

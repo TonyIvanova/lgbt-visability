@@ -42,8 +42,8 @@ export default function Statistics({ topic, topicsMap }) {
   const [pieData, setPieData] = useState([]);
   const [barData, setBarData] = useState([]);
   const [mapData, setMapData] = useState([]);
-  const [opennessSubset, setOpennessSubset] = useState("All");
-  const [genderSubset, setGenderSubset] = useState("All");
+  const [opennessSubset, setOpennessSubset] = useState("all");
+  const [genderSubset, setGenderSubset] = useState("all");
 
   const [sections, setSections] = useState([]);
   const [descriptions, setDescriptions] = useState([]);
@@ -142,7 +142,7 @@ export default function Statistics({ topic, topicsMap }) {
     let sheetName = baseName;
 
     if (baseName === "openness") { // If the topic is 'openness'
-      if (genderSubset === 'All') {
+      if (genderSubset === 'all') {
         sheetName += '_' + opennessSubset; //e.g. openness_family
       }
       else {
@@ -150,7 +150,7 @@ export default function Statistics({ topic, topicsMap }) {
       }
     }
     else { // For topics other than 'openness'
-      if (genderSubset !== 'All') {
+      if (genderSubset !== 'all') {
         sheetName += '_' + genderSubset; //e.g. violence_cis
       }
       else {
@@ -221,13 +221,17 @@ export default function Statistics({ topic, topicsMap }) {
     // console.log("Statistics/ mapDescription:", pieDescription);
     // console.log("Statistics/ mapDescription:", barDescription);
     // console.log("Statistics/ updated descriptions:", descriptions);
-    // console.log("Statistics/updated mapDescription:", mapDescription);
-    console.log("Statistics/updated mapData: ", mapData);
-    console.log("Statistics/updated selectedQuestion: ", selectedQuestion);
+    // // console.log("Statistics/updated mapDescription:", mapDescription);
+    // console.log("Statistics/updated mapData: ", mapData);
+    // console.log("Statistics/updated selectedQuestion: ", selectedQuestion);
+
+    console.log("Statistics/updated opennessSubset: ", opennessSubset);
+    console.log("Statistics/updated genderSubset: ", genderSubset);
   }, [
     mapData,
     mapDescription,
-    selectedQuestion
+    selectedQuestion,
+    genderSubset, opennessSubset
   ]);
 
   // function useLogOnUpdate(value, label) {
