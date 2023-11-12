@@ -66,7 +66,11 @@ export const ButtonGroup2 = ({ buttons, onButtonClick }) => {
 
 export const ButtonGroupLang = ({ buttons, onButtonClick }) => {
   const [clickedId, setClickedId] = useState(0);
-
+  const buttonStyle = {
+    fontSize: '1.2em', // Bigger 
+    // fontWeight: '200' , // Fatter 
+    textTransform: 'uppercase'
+  };
   const handleClick = (event, id) => {
     setClickedId(id);
     onButtonClick(event);
@@ -82,6 +86,7 @@ export const ButtonGroupLang = ({ buttons, onButtonClick }) => {
           className={
             i === clickedId ? "lang active" : "lang"
           }
+          style={buttonStyle}
         >
           {buttonLabel}
         </button>
