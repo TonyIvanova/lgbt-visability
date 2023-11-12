@@ -7,7 +7,7 @@ export const ButtonGroup1 = ({ buttons, onButtonClick }) => {
     setClickedId(id);
     onButtonClick(event);
   };
-  console.log('Year Buttons prop:', buttons);
+  // console.log('Year Buttons prop:', buttons);
 
   if (!Array.isArray(buttons)) {
     console.error('The buttons prop must be an array.', buttons.key);
@@ -104,7 +104,7 @@ export function ButtonGroupSubset({ buttonsConfig, onButtonClick }) {
     // fontWeight: '200' , // Fatter 
     textTransform: 'uppercase'
   };
-  console.log('buttonsConfig',buttonsConfig)
+  // console.log('buttonsConfig',buttonsConfig)
   return (
     <div className="button-group2">
       {buttonsConfig.map((button, i) => 

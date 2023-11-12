@@ -96,22 +96,21 @@ export  function PieChart({ data, onArcClick = () => {} }) {
 
   const legend = pie.map((arc, i) => {
     return (
-      <>
-        <div className={styles.legendText} style={{ width: 500}}>
-          <div
-            style={{
-              background: colorScale(arc.data.value),
-              width: 10,
-              height: 10,
-              "border-radius": 10,
-            }}
-          ></div>
-          {arc.data.name}
-        </div>
-      </>
+      <div className={styles.legendItem} key={i} style={{ display: "flex", alignItems: "center" }}>
+        <div
+          style={{
+            background: colorScale(arc.data.value),
+            width: 10,
+            height: 10,
+            borderRadius: '50%',
+            marginRight: '10px', // add some space between the color box and the text
+          }}
+        />
+        <span>{arc.data.name}</span>
+      </div>
     );
   });
-
+  
   return (
     <div className={styles.pieChart}>
       <svg width={width} height={height} style={{ display: "inline-block" }}>
@@ -126,4 +125,5 @@ export  function PieChart({ data, onArcClick = () => {} }) {
       <div className={styles.legendContainer}>{legend}</div>
     </div>
   );
+  
 }

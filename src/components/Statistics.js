@@ -141,6 +141,7 @@ export default function Statistics({ topic, topicsMap }) {
     const baseName = topicKey || "violence";
     let sheetName = baseName;
 
+console.log('baseName:',baseName)
     if (baseName === "openness") { // If the topic is 'openness'
       if (genderSubset === 'all') {
         sheetName += '_' + opennessSubset; //e.g. openness_family
@@ -158,7 +159,7 @@ export default function Statistics({ topic, topicsMap }) {
       }
 
     }
-    // console.log('sheetName', sheetName);
+    console.log('sheetName', sheetName);
     return sheetName;
   }
 
@@ -170,7 +171,7 @@ export default function Statistics({ topic, topicsMap }) {
 
     const fetchData = async () => {
       try {
-        const sheetName = getSheetName(topic, genderSubset, opennessSubset);
+        const sheetName = getSheetName(topicsMap[topic], genderSubset, opennessSubset);
         if (sheetName) {
           const mapDataResponse = await getMapData(year, sheetName, selectedQuestion);
           // console.log('Fetched mapData:', mapDataResponse);
