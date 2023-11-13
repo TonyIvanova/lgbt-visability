@@ -1,9 +1,16 @@
-import React, { useMemo, useState } from "react";
+import React, { useRef, useMemo, useEffect,useState } from "react";
 import * as d3 from "d3";
 import * as d3geo from "d3-geo";
-import mapData from "./../../assets/geodata/mapData.json";
+import geoData from "./../../assets/geodata/mapData.json";
+import '../../App.css';
 
-function Map({ statistics }) {
+function Map({ statistics,style={} }) {
+// Check if mapData is being passed correctly as statistics
+useEffect(() => {
+  console.log('mapData passed to Map component:', statistics);
+  // console.log('topicsMap passed to Map component:', topicsMap);
+}, [statistics]);
+
   // Map
   const [regionDescription, setRegionDescription] = useState("");
   const [regionValue, setRegionValue] = useState("");
@@ -32,7 +39,7 @@ function Map({ statistics }) {
 
   const mapElements = useMemo(() => {
     if (statistics.length > 0) {
-      return mapData.features.map((d) => {
+      return geoData.features.map((d, index) => {
         const relevantStatistics = statistics.filter(
           (item) => item.name === d.properties.name
         )[0];
@@ -40,9 +47,8 @@ function Map({ statistics }) {
           ? colorScale(relevantStatistics?.value)
           : "lightgrey";
         return (
-          <>
-            <path
-              key={d.properties.name}
+          <path
+             key={"map-element-" + index}
               name={d.properties.name}
               d={path(d)}
               fill={color}
@@ -60,36 +66,53 @@ function Map({ statistics }) {
                 setRegionDescription("");
                 setRegionValue("");
               }}
-            />
-          </>
-        );
+            />);
       });
+    } else {
+      return <>
+      <p>No map data.</p>
+      </>
     }
-  }, [mapData, statistics]);
+  }, [geoData, statistics]);
 
   // Legend
+  const mapTooltip = useRef(null);
 
-  if (statistics && regionDescription !== "") {
+  useEffect(() => {
+    if (!mapTooltip.current) return;
+  }, [mapTooltip]);
+
+  const setTooltipPosition = (x, y) => {
+    if (!mapTooltip.current) return;
+    let newX = x - mapTooltip.current.offsetWidth / 2;
+    newX = Math.max(newX, 0);
+    mapTooltip.current.style.transform = `translate(${newX}px, ${y + 12}px)`;
+  };
+
+  if (statistics) {
     return (
-      <div style={{ position: "relative" }}>
+      <div
+        onPointerMove={(ev) => {
+          setTooltipPosition(ev.clientX, ev.clientY);
+        }}
+        style={{ position: 'relative', display: 'inline-block', ...style }}
+      >
         <svg className="map">
           <g className="map">{mapElements}</g>
         </svg>
-        <div className="map-tooltip">
-          <h3>{regionDescription}</h3>
-          <h2>{regionValue}%</h2>
+        
+        <div className={`map-tooltip ${!regionDescription && 'hidden'}`} ref={mapTooltip}>
+          <div className="tip"></div>
+          {regionDescription && <>
+              <h3>{regionDescription}</h3>
+              <h1>{regionValue}%</h1>
+            </>
+          }
         </div>
       </div>
     );
-  } else if (statistics) {
-    return (
-      <>
-        <svg className="map">
-          <g className="map">{mapElements}</g>
-        </svg>
-      </>
-    );
   }
+  return <></>;
 }
 
 export default Map;

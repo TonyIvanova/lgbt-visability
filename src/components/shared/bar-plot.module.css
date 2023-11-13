@@ -1,0 +1,45 @@
+.barChart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .bar {
+    cursor: pointer;
+  }
+  
+  .legendContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .legendText {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+
+  .container .slice {
+    transition-duration: 0.3s;
+    transition-property: filter, opacity;
+    filter: saturate(100%);
+    opacity: 1;
+    cursor: pointer;
+  }
+  
+  .container.hasHighlight .bar {
+    filter: saturate(50%);
+    opacity: 0.3;
+  }
+  
+  .container.hasHighlight .bar:hover {
+    filter: saturate(80%);
+    opacity: 0.7;
+  }
+  
+  .container.hasHighlight .bar .active {
+    filter: saturate(100%);
+    opacity: 1;
+  }
