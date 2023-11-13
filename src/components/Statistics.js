@@ -264,7 +264,7 @@ console.log('baseName:',baseName)
     return [
       { label: "Трансгендеры", value: "trans" },
       { label: "Цисгендеры", value: "cis" },
-      { label: "Все", value: "all" },
+      { label: "Все", value: "associates" },
     ];
   }, [language]);
 
@@ -273,14 +273,14 @@ console.log('baseName:',baseName)
       return [
         { label: "Family", value: "family" },
         { label: "Friends", value: "friends" },
-        { label: "Associates", value: "ass" },
+        { label: "Associates", value: "associates" },
       ];
     }
     if (language === "ru") {
       return [
         { label: "Семья", value: "family" },
         { label: "Друзья", value: "friends" },
-        { label: "Учеба/работа", value: "ass" },
+        { label: "Учеба/работа", value: "associates" },
       ];
     }
     //TODO: move to service & populate from Config gsheet
@@ -289,7 +289,7 @@ console.log('baseName:',baseName)
     return [
       { label: "Семья", value: "family" },
       { label: "Друзья", value: "friends" },
-      { label: "Учеба/работа", value: "ass" },
+      { label: "Учеба/работа", value: "associates" },
     ];
   }, [language]);
 
