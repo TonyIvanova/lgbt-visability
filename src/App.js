@@ -39,10 +39,11 @@ import { useYear, YearProvider } from "./contexts/yearContext";
 export const DataContext = createContext([]);
 
 function AppContent() {
-  console.log('AppContent start')
-  const CONFIG_SHEET_ID = '1QKmA5UX-FM31jEE7UOVTmlCKxQ_Wa1K2oXxulhtkJHE'
+  console.log('App/ AppContent start')
+  const CONFIG_SHEET_ID = process.env.REACT_APP_CONFIG_SPREADSHEET_ID
 
-  const years = getYears()//Object.keys(dataMap);// to get list of years reports exist for
+  // const years = getYears()//Object.keys(dataMap);// to get list of years reports exist for
+  const [years,setYears] = useState([]);
   const { language, setLanguage } = useLanguage();
   const { year, setYear } = useYear(); // report year
 
@@ -50,7 +51,7 @@ function AppContent() {
   const [error, setError] = useState(null);
 
   const [genderSubset, setGenderSubset] = useState('All'); //Trans/Cis
-  const [opennessSubset, setOpennessSubset] = useState('')
+  const [opennessSubset, setOpennessSubset] = useState('') //family/friends
   const [topic, setTopic] = useState('')
 
   const [yearData, setYearData] = useState({});
@@ -62,6 +63,24 @@ function AppContent() {
   const [sampleData, setSampleData] = useState([])
 
   const [topicsMap, setTopicsMap] = useState({});
+
+  console.log('App/ finished inits')
+  
+  
+    useEffect(() => {
+      const fetchYears = async () => {
+
+        getYears().then(res => {
+          console.log('Fetched years:', years);
+          setYears(res)
+        }).catch(error => {
+          console.error('Error fetching years:', error);
+        });
+        
+      };
+      fetchYears();
+    }, []);  
+  
   useEffect(() => {
     makeTopicsMap().then(map => {
       setTopicsMap(map);
@@ -70,6 +89,7 @@ function AppContent() {
       setError(err);
       setLoading(false);
     });
+    console.log('App/ finished make topicsMap')
   }, []);
 
   //Get sample data
@@ -87,6 +107,7 @@ function AppContent() {
       }
     };
     fetchData();
+    console.log('App/ finished fetch sample data')
   }, [year]);
 
   // Get selected year
@@ -108,7 +129,9 @@ function AppContent() {
         setLoading(false);
       }
     };
+    console.log('App/ starting fetch sample data')
     fetchData();
+    console.log('App/ finished fetch year data')
   }, [year]);
 
   useEffect(() => {
@@ -133,7 +156,9 @@ function AppContent() {
         }
       }
     };
+    console.log('App/ start fetch sections & topic data')
     fetchData();
+    console.log('App/ finished fetch sections & topic data')
     return () => {
       isMounted = false;
     };
@@ -149,15 +174,18 @@ function AppContent() {
   };
 
   useEffect(() => {
-    console.log('APP/updated sample:', sampleData)
-    // console.log('APP/updated sections:',sections)
+    console.log('APP/updated sampleData:', sampleData)
+    console.log('APP/updated sections:',sections)
     // console.log('APP/updated sections.length:',sections.length)
-    // console.log('APP/updated topic:',topic)
-    //   console.log("APP/updated topicsMap: ", topicsMap);
+    console.log('APP/updated topic:',topic)
+    console.log("APP/updated topicsMap: ", topicsMap);
+    console.log("APP/updated years: ", years);
   }, [
     topicsMap,
     topic,
-    sections
+    sections,
+    sampleData,
+    years
   ]);
 
 
@@ -200,8 +228,8 @@ function AppContent() {
 
         <Header />
         <ButtonGroup2
-          // buttons={years || ["2022"]}//{["2022", "2023"]}
-          buttons={["2022", "2023"]} //TODO: fix later fetching years 
+          buttons={years || ["2022"]}//{["2022", "2023"]}
+          // buttons={["2022", "2023"]} //TODO: fix later fetching years 
           onButtonClick={selectYear}
         />
 

@@ -1,9 +1,10 @@
 // googleSpredsheetService.js
+
 const API_KEY = process.env.REACT_APP_API_KEY;
 
 // Object for mapping spreadsheets to their ids in Google Drive
 export const dataMap = {
-  'config': process.env.REACT_APP_CONFIG_SPREADSHEET_ID//'1QKmA5UX-FM31jEE7UOVTmlCKxQ_Wa1K2oXxulhtkJHE',
+  'config': process.env.REACT_APP_CONFIG_SPREADSHEET_ID
 }
 
 
@@ -22,15 +23,17 @@ async function loadConfig() {
   var configData = await getSheetData(dataMap['config'], 'sheet_ids_by_year')
   configData.forEach(function (itm) {
     dataMap[itm.year] = itm.id
-    // console.log('GSHEETS/dataMap:',dataMap)
+    // console.log('GSHEETS/dataMap:',dataMap)\
+    console.log('loadConfig/ itm',itm)
   }
+  
   )
 }
 
 //  retrieve data from a gsheet and cache it
 export async function getSheetData(tableId, sheetName) {
   var loader = false
-  // console.log("getSheetData " + tableId + "  " + sheetName)
+  console.log("getSheetData " + tableId + "  " + sheetName)
   // Check if is in cache first 
   if (dataCache[tableId] == undefined) {
     loader = true
@@ -55,7 +58,7 @@ export async function getSheetData(tableId, sheetName) {
     if (!rowData) {
       return jsonData
     }
-    // console.log(rowData)
+    console.log('getSheetData/rowData',rowData)
 
     // extracts first row
     rowData[0].values.forEach((item, idx) => {
@@ -79,7 +82,7 @@ export async function getSheetData(tableId, sheetName) {
         jsonData.push(rowObject)
       }
     })
-    // console.log('jsonData:',jsonData)
+    console.log('getSheetData/ jsonData:',jsonData)
     return jsonData
   }
 
@@ -91,7 +94,7 @@ export async function getSheetData(tableId, sheetName) {
       return; // or throw an error
     }
     data.sheets.forEach((sheet) => {//for each sheet in a spreadsheet
-      // console.log('sheet',sheet)
+      console.log('getSheetData/ sheet',sheet)
       dataCache[tableId + "_" + sheet.properties.title] = transformSheetRowsData(sheet.data[0].rowData)
     })
   }
@@ -117,7 +120,7 @@ export async function getSheetData(tableId, sheetName) {
         return response.json();
       })
       .then(data => {
-        // console.log('API response:', tableId);
+        console.log('getSheetData/ API response:', tableId);
         fillCachesWithTransformedWorksheetsData(data)
         dataCache[tableId] = 'loaded'
         resolve(dataCache[tableId + "_" + sheetName])
@@ -138,7 +141,7 @@ export async function getSheetData(tableId, sheetName) {
 
 
   });
-  // console.log('dataCache:',dataCache)
+  console.log('worksheetData/ dataCache:',dataCache)
   return worksheetData;
 }
 
@@ -162,7 +165,7 @@ export async function loadYearData(year) {
   try {
     // get data for all sheets in the spreadsheet
     getSheetData(spreadsheetId, "economical_status")
-    // console.log('dataCache:',dataCache)
+    console.log('loadYearData/ dataCache:',dataCache)
     return 'All sheets data fetched and stored in cache.';
   } catch (error) {
     console.error(`Error fetching data for year ${year}:`, error);
@@ -238,7 +241,7 @@ export async function getStories(year, language, topicKey) {
   // console.log(`Loading stories for year: ${year}, language: ${language}...`);
   await loadConfig();
 
-  return getSheetData(dataMap[year], 'df_stories_filtered').then(data => {
+  return getSheetData(dataMap[year], 'stories_filtered').then(data => {
     //TODO: remove df_ prefix everywhere
     // console.log('Raw stories data fetched:', data);
     // console.log('GetStories/lang:', language);
@@ -272,7 +275,7 @@ export async function getSampleData(year) {
 
   return getSheetData(dataMap[year], 'sample').then(data => {
 
-    // console.log('Filtered sample data:', filteredData);
+    console.log('getSampleData/ sample data:', data);
 
     // Map the filtered data into an array of sample objects
     const sample = data.map(itm => ({
@@ -280,7 +283,7 @@ export async function getSampleData(year) {
       value: itm.value
     }));
 
-    // console.log('Processed sample:', sample);
+    console.log('getSampleData/ Processed sample:', sample);
     return sample;
   }).catch(error => {
     console.error('Error fetching sample data:', error);
@@ -341,10 +344,11 @@ export async function getYears() {
   await loadConfig();
 
   return getSheetData(dataMap['config'], 'sheet_ids_by_year').then(data => {
+    console.log('getYears/ data:', data);
     // Assuming each item in the data array has a 'year' property
     const years = data.map(itm => itm.year); // Collect all the 'year' values
 
-    // console.log('Processed years:', years);
+    console.log('getYears/ Processed years:', years);
     return years; // Return the array of years
   }).catch(error => {
     console.error('Error fetching years:', error);
@@ -372,7 +376,7 @@ export async function getMapData(year, sheetName, selectedQuestion) {
         const value = parseFloat(row[selectedQuestion]) //|| 0; // Parse the value
         return { name: row.District, value: value };
       })
-      .filter(item => item.name !== 'Все'); // Exclude 'Все' from the results
+      .filter(item => item.name !== 'All districts'); // Exclude 'All districts' from the results
 
     console.log('getMapData:', mapData);
     return mapData;
@@ -388,12 +392,12 @@ export async function getMapData(year, sheetName, selectedQuestion) {
 export async function getBarData(year, sheetName) {
   await loadConfig();
   return getSheetData(dataMap[year], sheetName).then(data => {
-    // Find the row where the district is 'Все'
-    const rowVse = data.find(row => row.District === 'Все');
+    // Find the row where the district is 'All districts'
+    const rowVse = data.find(row => row.District === 'All districts');
 
     // Check if row exists and create an array of objects with name and value properties
     if (rowVse) {
-      // Create a result array excluding the 'District' and 'All' properties
+      // Create a result array excluding the 'District' and 'All questions' properties
       const barData = Object.entries(rowVse).reduce((acc, [key, value]) => {
         if (key !== 'District' && key !== 'All') {
           acc.push({
@@ -406,8 +410,8 @@ export async function getBarData(year, sheetName) {
       console.log('barData:', barData)
       return barData;
     } else {
-      // Handle the case where no 'Все' row is found
-      throw new Error("Row 'Все' not found.");
+      // Handle the case where no 'All districts' row is found
+      throw new Error("Row 'All districts' not found.");
     }
   });
 }
@@ -434,12 +438,12 @@ export async function getBarData(year, sheetName) {
 export async function getPieData(year, sheetName) {
   await loadConfig();
   return getSheetData(dataMap[year], sheetName).then(data => {
-    // Find the row where the district is 'Все'
-    const rowVse = data.find(row => row.District === 'Все');
+    // Find the row where the district is 'All districts'
+    const rowVse = data.find(row => row.District === 'All districts');
 
     // Check if row exists and create an array of objects with name and value properties
     if (rowVse) {
-      // Create a result array excluding the 'District' and 'All' properties
+      // Create a result array excluding the 'District' and 'All questions' properties
       const pieData = Object.entries(rowVse).reduce((acc, [key, value]) => {
         if (key !== 'District' && key !== 'All') {
           acc.push({
@@ -452,8 +456,8 @@ export async function getPieData(year, sheetName) {
       console.log('pieData:', pieData)
       return pieData;
     } else {
-      // Handle the case where no 'Все' row is found
-      throw new Error("Row 'Все' not found.");
+      // Handle the case where no 'All districts' row is found
+      throw new Error("Row 'All districts' not found.");
     }
   });
 }
