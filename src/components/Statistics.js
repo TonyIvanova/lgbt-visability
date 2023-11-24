@@ -13,7 +13,7 @@ import {
   // topicsMap,
   loadYearData,
   loadConfig,
-  getBarData, getMapData, getPieData
+  getBarData, getMapData, getPieData, getIncomeData
 } from "../services/googleSheetsService";
 import { ButtonGroupLang, ButtonGroupSubset } from "./shared/ButtonGroup";
 import { useYear } from "../contexts/yearContext";
@@ -42,6 +42,7 @@ export default function Statistics({ topic, topicsMap }) {
   const [pieData, setPieData] = useState([]);
   const [barData, setBarData] = useState([]);
   const [mapData, setMapData] = useState([]);
+  const [incomeData, setIncomeData] = useState([]);
   const [opennessSubset, setOpennessSubset] = useState("family");
   const [genderSubset, setGenderSubset] = useState("all");
 
@@ -51,6 +52,7 @@ export default function Statistics({ topic, topicsMap }) {
   const [mapDescription, setMapDescription] = useState('');
   const [pieDescription, setPieDescription] = useState('');
   const [barDescription, setBarDescription] = useState('');
+  
 
   // const [stories, setStories] = useState([]);
   const [conclusions, setConclusions] = useState([]);
@@ -182,7 +184,12 @@ export default function Statistics({ topic, topicsMap }) {
 
           const pieDataResponse = await getPieData(year, sheetName, selectedQuestion);
           setPieData(pieDataResponse);
+        
+          const incomeDataResponse = await getIncomeData(year, language, genderSubset);
+          setIncomeData(incomeDataResponse);
+
         }
+        
       } catch (error) {
         console.error("Failed to get sheet data:", error);
       }
@@ -195,7 +202,8 @@ export default function Statistics({ topic, topicsMap }) {
     year,
     genderSubset,
     opennessSubset,
-    selectedQuestion
+    selectedQuestion,
+    language
   ]);
 
 
@@ -228,11 +236,13 @@ export default function Statistics({ topic, topicsMap }) {
 
     // console.log("Statistics/updated opennessSubset: ", opennessSubset);
     // console.log("Statistics/updated genderSubset: ", genderSubset);
+    console.log("Statistics/updated incomeData: ", incomeData);
   }, [
     mapData,
     mapDescription,
     selectedQuestion,
-    genderSubset, opennessSubset
+    genderSubset, opennessSubset,
+    incomeData
   ]);
 
   // function useLogOnUpdate(value, label) {
@@ -297,21 +307,30 @@ export default function Statistics({ topic, topicsMap }) {
     return (
       <>
         {
-          (topic === "Открытость" || topic === "Openness") ? (
-            <div>
-              {/* <ButtonGroupSubset
-                buttonsConfig={opennessButtonsConfig}
-                onButtonClick={selectOpennessSubset}
-              /> */}
+  (topicsMap[topic] === 'openness' ? (
+    <div>
+      <PieChart data={pieData} onArcClick={handleArcClick} />
+    </div>
+  ) : topicsMap[topic] === "economical_status" ? (
+    <div>
+       <h3>{language === "ru" ? `Результаты по вопросам в категории` : `Results by questions in category`}</h3>
+      <BarPlot data={barData} onBarClick={handleArcClick} />
+      <p className="statistics-description">{barDescription}</p>
+      <h3>{language === "ru" ? `Средний доход по всем округам` : `Average income accross all districts`}</h3>
+      <PieChart data={incomeData}  />
+      <p className="statistics-description">{pieDescription}</p>
+    </div>
+  ) : (
+    // Default case for other topics
+    <div>
+      <h3>{language === "ru" ? `Результаты по вопросам в категории` : `Results by questions in category`}</h3>
+    <BarPlot data={barData} onBarClick={handleArcClick} />
+    <p className="statistics-description">{barDescription}</p>
+    </div>
+  ))
+}
 
-              <PieChart data={pieData} onArcClick={handleArcClick} />
-
-            </div>
-          ) : (
-            <BarPlot data={barData} onBarClick={handleArcClick} />
-          )
-        }
-        <p className="statistics-description">{barDescription}</p>
+       
       </>
     );
   };
@@ -338,7 +357,11 @@ export default function Statistics({ topic, topicsMap }) {
           {
           // mapData.length > 0 
           // && 
+<div>
+<h3>{language === "ru" ? `Результаты по федеральным округам` : `Resuls by federal districts`}</h3>
+      
           <Map statistics={mapData}  />
+          </div>
           }
 
          <p className="statistics-description">

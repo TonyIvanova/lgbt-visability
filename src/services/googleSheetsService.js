@@ -358,11 +358,11 @@ export async function getYears() {
 
 
 export async function getFullReportLink(year, language) {
-  console.log(`Loading full report link for year: ${year}, language: ${language}...`);
+  // console.log(`Loading full report link for year: ${year}, language: ${language}...`);
   await loadConfig();
-  console.log('loaded config')
+  // console.log('loaded config')
   return getSheetData(dataMap['config'], 'sheet_ids_by_year').then(data => {
-    console.log('Raw sheet data fetched:', data);
+    // console.log('Raw sheet data fetched:', data);
 
     // Find the row that matches the given year
     const matchedRow = data.find(itm => itm.year === year);
@@ -422,7 +422,6 @@ export async function getMapData(year, sheetName, selectedQuestion) {
 }
 
 
-//TODOP: get opennes map data
 
 export async function getBarData(year, sheetName) {
   await loadConfig();
@@ -477,4 +476,32 @@ export async function getPieData(year, sheetName) {
       throw new Error("Row 'All districts' not found.");
     }
   });
+}
+
+export async function getIncomeData(year, language, genderSubset) {
+  try {
+    await loadConfig();
+    let sheetName = genderSubset !== 'all' ? 'income_' + genderSubset : 'income';
+
+    console.log('getIncomeData/ sheetName', sheetName);
+    const data = await getSheetData(dataMap[year], sheetName);
+    console.log('incomeData/Raw data fetched:', data);
+
+    const incomeData = data
+      .map(row => {
+        // console.log('Expected key:', `name_${language}`)
+        // console.log('row[`name_${language}`]',row[`name_${language}`])
+        // console.log('Actual keys in row:', Object.keys(row));
+        const name = row[`name_${language}`];
+        const value = row.value; // Convert value to a number
+        return { name, value };
+      })
+      // .filter(item => item.name && !isNaN(item.value)); // Check for a valid number in value
+
+    console.log('incomeData/incomeData:', incomeData);
+    return incomeData;
+  } catch (error) {
+    console.error('Error fetching map data:', error);
+    throw error;
+  }
 }
