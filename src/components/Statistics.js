@@ -236,7 +236,7 @@ export default function Statistics({ topic, topicsMap }) {
 
     // console.log("Statistics/updated opennessSubset: ", opennessSubset);
     // console.log("Statistics/updated genderSubset: ", genderSubset);
-    console.log("Statistics/updated incomeData: ", incomeData);
+    // console.log("Statistics/updated incomeData: ", incomeData);
   }, [
     mapData,
     mapDescription,
@@ -349,11 +349,13 @@ export default function Statistics({ topic, topicsMap }) {
             onButtonClick={selectGenderSubset}
             styleType="gender-style"
           />
-            <ButtonGroupSubset
-                buttonsConfig={opennessButtonsConfig}
-                onButtonClick={selectOpennessSubset}
-                styleType="openness-sstyle"
-              />
+                {topicsMap[topic] === "openness" && (
+        <ButtonGroupSubset
+          buttonsConfig={opennessButtonsConfig}
+          onButtonClick={selectOpennessSubset}
+          styleType="openness-style"
+        />
+      )}
           {
           // mapData.length > 0 
           // && 

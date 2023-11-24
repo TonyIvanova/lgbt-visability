@@ -188,11 +188,11 @@ export async function getDescriptions(language, topicKey = 'violence') {
   // console.log(`Fetching descriptions for language: ${language} and topic: ${topicKey}...`);
 
   return getSheetData(dataMap['config'], 'descriptions').then(data => {
-    // console.log('Raw descriptions data fetched:', data);
+    console.log('Raw descriptions data fetched:', data);
 
     // Filter out the row where `key` equals `topicsMap[topic]`
     const filteredData = data.filter(itm => itm.key === topicKey)
-    // console.log(`Filtered descriptions data, removed topic ${topicKey}:`, filteredData);
+    console.log(`Filtered descriptions data, removed topic ${topicKey}:`, filteredData);
 
     const descriptions = filteredData.map(itm => ({ // Map over each item and transform it into an object
       key: itm.key,
@@ -203,7 +203,7 @@ export async function getDescriptions(language, topicKey = 'violence') {
     }));
 
     // Log the final descriptions object after reduce
-    // console.log(`Processed ${topicKey} descriptions:`, descriptions);
+    console.log(`Processed ${topicKey} descriptions:`, descriptions);
 
     return descriptions;
   }).catch(error => {
@@ -290,26 +290,6 @@ export async function getSampleData(year) {
     throw error;
   });
 }
-
-
-// export async function getConfiguration(language) {
-//   await loadConfig()
-//   return getSheetData(dataMap['config'], 'configuration').then(data => {
-
-//     const res = data.map(itm => ({
-//       key: itm[key],
-//       name: itm[language]
-
-//     }));
-
-//     // console.log('Processed stories:', stories);
-//     return res;
-
-//   }).catch(error => {
-//     console.error('Error fetching stories:', error);
-//     throw error;
-//   });
-// }
 
 
 
