@@ -42,7 +42,7 @@ export default function Statistics({ topic, topicsMap }) {
   const [pieData, setPieData] = useState([]);
   const [barData, setBarData] = useState([]);
   const [mapData, setMapData] = useState([]);
-  const [opennessSubset, setOpennessSubset] = useState("all");
+  const [opennessSubset, setOpennessSubset] = useState("family");
   const [genderSubset, setGenderSubset] = useState("all");
 
   const [sections, setSections] = useState([]);
