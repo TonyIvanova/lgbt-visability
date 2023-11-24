@@ -122,9 +122,20 @@ header {
   padding: 0px 0px 0px 10px;
 }
 .lang:hover,
+.lang.active,
 .lang:active {
-  color: #969aff;
-  background-color: #ffffff;
+  color: #969aff; 
+  background-color: #ffffff; 
+}
+.gender-style .lang:hover,
+.gender-style .lang.active {
+  color: #ffffff; 
+  background-color: pink
+}
+.openness-style .lang:hover,
+.openness-style .lang.active {
+  color: #ffffff; 
+  background-color: cyan
 }
 
 
@@ -175,7 +186,11 @@ header {
   border-radius: 200px 200px 200px 200px;
   padding: 11px 24px 10px 24px;
 }
-
+.button-secondary:hover,
+.button-secondary.active {
+  color: #ffffff;
+  background-color: #969aff;
+}
 
 
 .button-tetriary {
@@ -196,13 +211,6 @@ header {
   border-radius: 200px 200px 200px 200px;
   padding: 11px 24px 10px 24px;
 }
-.button-secondary:hover,
-.button-secondary.active {
-  color: #ffffff;
-  background-color: #969aff;
-}
-
-
 .button-tetriary:hover,
 .button-tetriary.active {
   color: #fff;

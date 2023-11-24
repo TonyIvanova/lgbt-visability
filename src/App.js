@@ -283,7 +283,7 @@ function AppContent() {
           label={language === 'ru' ? `Полная версия отчета за ${year} год` : `Full report for ${year}`}
           color="grey"
         />
-<h1>{reportLink}</h1>
+{/* <h1>{reportLink}</h1> */}
         <h1>
           {language === 'ru'
             ? `Положение ЛГБТК+ людей в россии на ${year} год`
