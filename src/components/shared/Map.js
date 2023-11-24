@@ -7,7 +7,7 @@ import '../../App.css';
 function Map({ statistics,style={} }) {
 // Check if mapData is being passed correctly as statistics
 useEffect(() => {
-  console.log('mapData passed to Map component:', statistics);
+  // console.log('mapData passed to Map component:', statistics);
   // console.log('topicsMap passed to Map component:', topicsMap);
 }, [statistics]);
 

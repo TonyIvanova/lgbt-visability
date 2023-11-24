@@ -141,7 +141,7 @@ export default function Statistics({ topic, topicsMap }) {
     const baseName = topicKey || "violence";
     let sheetName = baseName;
 
-console.log('baseName:',baseName)
+// console.log('baseName:',baseName)
     if (baseName === "openness") { // If the topic is 'openness'
       if (genderSubset === 'all') {
         sheetName += '_' + opennessSubset; //e.g. openness_family
@@ -159,7 +159,7 @@ console.log('baseName:',baseName)
       }
 
     }
-    console.log('sheetName', sheetName);
+    // console.log('sheetName', sheetName);
     return sheetName;
   }
 
@@ -187,7 +187,7 @@ console.log('baseName:',baseName)
         console.error("Failed to get sheet data:", error);
       }
     };
-    console.log('STATISTICS/ fetchData/ Current selectedQuestion:', selectedQuestion);
+    // console.log('STATISTICS/ fetchData/ Current selectedQuestion:', selectedQuestion);
     fetchData();
   }, [
     topicsMap,
@@ -212,7 +212,7 @@ console.log('baseName:',baseName)
 
 
   const handleArcClick = (arcName) => {
-    console.info("STATISTICS/Handling bar arc click ", arcName);
+    // console.info("STATISTICS/Handling bar arc click ", arcName);
     setSelectedQuestion(arcName);
   };
 
@@ -226,8 +226,8 @@ console.log('baseName:',baseName)
     // console.log("Statistics/updated mapData: ", mapData);
     // console.log("Statistics/updated selectedQuestion: ", selectedQuestion);
 
-    console.log("Statistics/updated opennessSubset: ", opennessSubset);
-    console.log("Statistics/updated genderSubset: ", genderSubset);
+    // console.log("Statistics/updated opennessSubset: ", opennessSubset);
+    // console.log("Statistics/updated genderSubset: ", genderSubset);
   }, [
     mapData,
     mapDescription,
@@ -255,15 +255,15 @@ console.log('baseName:',baseName)
     }
     if (language === "ru") {
       return [
-        { label: "Трансгендеры", value: "trans" },
-        { label: "Цисгендеры", value: "cis" },
+        { label: "Трансгендерные люди", value: "trans" },
+        { label: "Цисгендерные люди", value: "cis" },
         { label: "Все", value: "all" },
       ];
     }
     // default to Russian if the language doesn't match any known value
     return [
-      { label: "Трансгендеры", value: "trans" },
-      { label: "Цисгендеры", value: "cis" },
+      { label: "Трансгендерные люди", value: "trans" },
+      { label: "Цисгендерные люди", value: "cis" },
       { label: "Все", value: "associates" },
     ];
   }, [language]);
@@ -299,10 +299,10 @@ console.log('baseName:',baseName)
         {
           (topic === "Открытость" || topic === "Openness") ? (
             <div>
-              <ButtonGroupSubset
+              {/* <ButtonGroupSubset
                 buttonsConfig={opennessButtonsConfig}
                 onButtonClick={selectOpennessSubset}
-              />
+              /> */}
 
               <PieChart data={pieData} onArcClick={handleArcClick} />
 
@@ -311,7 +311,7 @@ console.log('baseName:',baseName)
             <BarPlot data={barData} onBarClick={handleArcClick} />
           )
         }
-        <p className="statistics-description">{pieDescription}</p>
+        <p className="statistics-description">{barDescription}</p>
       </>
     );
   };
@@ -324,21 +324,30 @@ console.log('baseName:',baseName)
     return (
       <div className="section">
         <div>
+          
           <ButtonGroupSubset
             buttonsConfig={subsetButtonsConfig}
             onButtonClick={selectGenderSubset}
           />
+            <ButtonGroupSubset
+                buttonsConfig={opennessButtonsConfig}
+                onButtonClick={selectOpennessSubset}
+              />
           {
           // mapData.length > 0 
           // && 
           <Map statistics={mapData}  />
           }
 
-          <p className="statistics-description">
-            {selectedQuestion !== "All"
-              ? "Процент респондентов которые сталкивались с: " + ""
-              : mapDescription}
-          </p>
+         <p className="statistics-description">
+    {selectedQuestion !== "All"
+        ? language === 'ru'
+            ? `На карте отображены результаты подкатегории `+``
+            : `The map displays results for the subcategory ` + ``
+        : mapDescription}
+</p>
+
+              
           <h3 style={{ margin: 0 }}>
             {selectedQuestion !== "All" ? selectedQuestion : ""}
           </h3>

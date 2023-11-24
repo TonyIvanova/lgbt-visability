@@ -55,19 +55,31 @@ function Expander({ year, data }) {
           </div>
 
           <div style={{ padding: '20px' }} >
-            <h2>Sex Distribution</h2>
+            <h2>
+            {language === 'ru' ? 'Количество респондентов по сексуально ориентации': 'Amount of respiondents by Sexual orientation'}
+            </h2>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               <PieChart data={sexData} onArcClick={handleArcClick} />
             </div>
           </div>
           <div style={{ padding: '20px', align: 'center' }}>
-            <h2>Gender Distribution</h2>
+            <h2> 
+              {language === 'ru' ? 'Количество респондентов по гендеру': 'Amount of respiondents by Gender'}
+
+            </h2>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               <PieChart data={genderData} onArcClick={handleArcClick} />
             </div>
           </div>
-          <h4>  Rоличество по гендеру мужчины, женщины, небинарные люди, "другое"</h4>
-          <h4> количество по цисгендерным и трансгендерным людям</h4>
+         
+          <div style={{ padding: '20px' }} >
+            <h2>
+            {language === 'ru' ? 'Количество респондентов по трансгендерности': 'Amount of respiondents by Transgenderness'}
+            </h2>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <PieChart data={sexData} onArcClick={handleArcClick} />
+            </div>
+          </div>
 
 
           {/* Example image */}
