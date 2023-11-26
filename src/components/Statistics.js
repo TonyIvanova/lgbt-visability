@@ -179,7 +179,7 @@ export default function Statistics({ topic, topicsMap }) {
           // console.log('Fetched mapData:', mapDataResponse);
           setMapData(mapDataResponse);
 
-          const barDataResponse = await getBarData(year, sheetName, selectedQuestion);
+          const barDataResponse = await getBarData(year, language, sheetName, selectedQuestion);
           setBarData(Array.isArray(barDataResponse) ? barDataResponse : []);
 
           const pieDataResponse = await getPieData(year, sheetName, selectedQuestion);
@@ -309,7 +309,9 @@ export default function Statistics({ topic, topicsMap }) {
         {
   (topicsMap[topic] === 'openness' ? (
     <div>
+       <h3>{language === "ru" ? `Результаты по вариантам ответов` : `Results by response`}</h3>
       <PieChart data={pieData} onArcClick={handleArcClick} />
+      <p className="statistics-description">{pieDescription}</p>
     </div>
   ) : topicsMap[topic] === "economical_status" ? (
     <div>

@@ -130,12 +130,14 @@ header {
 .gender-style .lang:hover,
 .gender-style .lang.active {
   color: rgb(96, 181, 96); 
-  background-color: #ffffff
+  background-color: #ffffff;
+  /* text-decoration: underline; */
 }
 .openness-style .lang:hover,
 .openness-style .lang.active {
   color: orange;
-  background-color: #ffffff
+  background-color: #ffffff;
+  /* text-decoration: underline; */
 }
 
 

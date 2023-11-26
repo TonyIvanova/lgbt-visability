@@ -1,5 +1,5 @@
 // googleSpredsheetService.js
-
+// import { useLanguage } from '../contexts/langContext';
 const API_KEY = process.env.REACT_APP_API_KEY;
 
 // Object for mapping spreadsheets to their ids in Google Drive
@@ -19,12 +19,12 @@ function sleep(ms) {
 
 // get from config/sheet_ids_by_year:  year -> id
 async function loadConfig() {
-  console.log("loadConfig")
+  // console.log("loadConfig")
   var configData = await getSheetData(dataMap['config'], 'sheet_ids_by_year')
   configData.forEach(function (itm) {
     dataMap[itm.year] = itm.id
     // console.log('GSHEETS/dataMap:',dataMap)\
-    console.log('loadConfig/ itm',itm)
+    // console.log('loadConfig/ itm',itm)
   }
   
   )
@@ -141,7 +141,7 @@ export async function getSheetData(tableId, sheetName) {
 
 
   });
-  // console.log('worksheetData/ dataCache:',dataCache)
+  console.log('worksheetData/ dataCache:',dataCache)
   return worksheetData;
 }
 
@@ -188,11 +188,11 @@ export async function getDescriptions(language, topicKey = 'violence') {
   // console.log(`Fetching descriptions for language: ${language} and topic: ${topicKey}...`);
 
   return getSheetData(dataMap['config'], 'descriptions').then(data => {
-    console.log('Raw descriptions data fetched:', data);
+    // console.log('Raw descriptions data fetched:', data);
 
     // Filter out the row where `key` equals `topicsMap[topic]`
     const filteredData = data.filter(itm => itm.key === topicKey)
-    console.log(`Filtered descriptions data, removed topic ${topicKey}:`, filteredData);
+    // console.log(`Filtered descriptions data, removed topic ${topicKey}:`, filteredData);
 
     const descriptions = filteredData.map(itm => ({ // Map over each item and transform it into an object
       key: itm.key,
@@ -403,28 +403,70 @@ export async function getMapData(year, sheetName, selectedQuestion) {
 
 
 
-export async function getBarData(year, sheetName) {
+// export async function getBarData(year, language,sheetName) {
+  
+//   await loadConfig();
+//   const questions = await getQuestions(year, language) 
+
+  
+//   return getSheetData(dataMap[year], sheetName).then(data => {
+//     // Find the row where the district is 'All districts'
+//     const rowVse = data.find(row => row.District === 'All districts');
+
+//     // Check if row exists and create an array of objects with name and value properties
+//     if (rowVse) {
+//       // Create a result array excluding the 'District' and 'All questions' properties
+//       const barData = Object.entries(rowVse).reduce((acc, [key, value]) => {
+//         if (key !== 'District' && key !== 'All') {
+//           acc.push({
+//             name: key,
+//             value: parseFloat(value) || 0 // Ensuring the value is a number
+//           });
+//         }
+//         return acc;
+//       }, []);
+//       console.log('barData:', barData)
+//       return barData;
+//     } else {
+//       // Handle the case where no 'All districts' row is found
+//       throw new Error("Row 'All districts' not found.");
+//     }
+//   });
+// }
+
+export async function getBarData(year, language, sheetName) {
+  
   await loadConfig();
+  const questions = await getQuestions(year, language);
+
   return getSheetData(dataMap[year], sheetName).then(data => {
-    // Find the row where the district is 'All districts'
     const rowVse = data.find(row => row.District === 'All districts');
 
-    // Check if row exists and create an array of objects with name and value properties
     if (rowVse) {
-      // Create a result array excluding the 'District' and 'All questions' properties
       const barData = Object.entries(rowVse).reduce((acc, [key, value]) => {
         if (key !== 'District' && key !== 'All') {
+          let name = key;
+          if (language === 'en') {
+            console.log('key',key)
+            console.log('questions',questions)
+           
+            // Find the English equivalent of the Russian question
+            const questionObj = questions.find(q => q.name_ru === key);
+            console.log('questionObj',questionObj)
+            name = questionObj ? questionObj.name_en : key; // Use Russian key as fallback
+          }
+
           acc.push({
-            name: key,
-            value: parseFloat(value) || 0 // Ensuring the value is a number
+            name: name,
+            value: parseFloat(value) || 0
           });
         }
         return acc;
       }, []);
-      // console.log('barData:', barData)
+
+      console.log('barData:', barData);
       return barData;
     } else {
-      // Handle the case where no 'All districts' row is found
       throw new Error("Row 'All districts' not found.");
     }
   });
@@ -463,9 +505,9 @@ export async function getIncomeData(year, language, genderSubset) {
     await loadConfig();
     let sheetName = genderSubset !== 'all' ? 'income_' + genderSubset : 'income';
 
-    console.log('getIncomeData/ sheetName', sheetName);
+    // console.log('getIncomeData/ sheetName', sheetName);
     const data = await getSheetData(dataMap[year], sheetName);
-    console.log('incomeData/Raw data fetched:', data);
+    // console.log('incomeData/Raw data fetched:', data);
 
     const incomeData = data
       .map(row => {
@@ -478,10 +520,31 @@ export async function getIncomeData(year, language, genderSubset) {
       })
       // .filter(item => item.name && !isNaN(item.value)); // Check for a valid number in value
 
-    console.log('incomeData/incomeData:', incomeData);
+    // console.log('incomeData/incomeData:', incomeData);
     return incomeData;
   } catch (error) {
     console.error('Error fetching map data:', error);
     throw error;
   }
+}
+
+
+
+export async function getQuestions(year) {
+  // console.log(`Loading questions_ for year: ${year}, language: ${language}...`);
+  await loadConfig();
+  return getSheetData(dataMap[year], 'questions').then(data => {
+    console.log('Raw questions_ data fetched:', data);
+
+    const questions = data.map(itm => ({
+      name_ru: itm["questions_ru"],
+      name_en: itm["questions_en"]
+    }));
+
+    console.log('Processed questions_:', questions);
+    return questions;
+  }).catch(error => {
+    console.error('Error fetching questions_:', error);
+    throw error;
+  });
 }

@@ -109,7 +109,7 @@ function AppContent() {
       }
     };
     fetchData();
-    console.log('App/ finished fetch sample data')
+    // console.log('App/ finished fetch sample data')
   }, [year]);
 
   
@@ -125,10 +125,10 @@ function AppContent() {
   
         if (isMounted) {  // Check if the component is still mounted
           if (link) {
-            console.log('link',link)
+            // console.log('link',link)
             setReportLink(link); 
           } else {
-            console.log('no link')
+            // console.log('no link')
             setReportLink('123'); 
           }
         }
@@ -165,16 +165,16 @@ function AppContent() {
         setLoading(true);
         const data = await loadYearData(year);
         setYearData(data);
-        console.log(data)
+        // console.log(data)
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-    console.log('App/ starting fetch sample data')
+    // console.log('App/ starting fetch sample data')
     fetchData();
-    console.log('App/ finished fetch year data')
+    // console.log('App/ finished fetch year data')
   }, [year]);
 
   useEffect(() => {
@@ -199,9 +199,9 @@ function AppContent() {
         }
       }
     };
-    console.log('App/ start fetch sections & topic data')
+    // console.log('App/ start fetch sections & topic data')
     fetchData();
-    console.log('App/ finished fetch sections & topic data')
+    // console.log('App/ finished fetch sections & topic data')
     return () => {
       isMounted = false;
     };
@@ -212,7 +212,7 @@ function AppContent() {
     setLanguage(lang);
   };
   const selectTopic = (event) => {
-    console.log('APP/selectTopic', event.target.name);
+    // console.log('APP/selectTopic', event.target.name);
     setTopic(event.target.name);
   };
 
@@ -223,7 +223,7 @@ function AppContent() {
     // console.log('APP/updated topic:',topic)
     // console.log("APP/updated topicsMap: ", topicsMap);
     // console.log("APP/updated years: ", years);
-    console.log('APP/updated reportLink:',reportLink)
+    // console.log('APP/updated reportLink:',reportLink)
   }, [
     topicsMap,
     topic,
