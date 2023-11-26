@@ -2,10 +2,10 @@ import React, { createContext, useContext, useState } from "react";
 
 // Create a Context
 export const YearContext = createContext();
-console.log('YearContext start')
+// console.log('YearContext start')
 // Create a Provider component
 export const YearProvider = ({ children }) => {
-  console.log('YearProvider start')
+  // console.log('YearProvider start')
   const [year, setYear] = useState("2022");
   return (
     <YearContext.Provider value={{ year, setYear }}>

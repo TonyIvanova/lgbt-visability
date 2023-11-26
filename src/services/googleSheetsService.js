@@ -82,7 +82,7 @@ export async function getSheetData(tableId, sheetName) {
         jsonData.push(rowObject)
       }
     })
-    console.log('getSheetData/ jsonData:',jsonData)
+    // console.log('getSheetData/ jsonData:',jsonData)
     return jsonData
   }
 
@@ -355,14 +355,14 @@ export async function getFullReportLink(year, language) {
     // Select the appropriate report link based on the language
     const reportLinkKey = `full_report_${language}`;
     const reportLink = matchedRow[reportLinkKey];
-    console.log('reportLinkKey', reportLinkKey);
-    console.log('reportLink', reportLink);
+    // console.log('reportLinkKey', reportLinkKey);
+    // console.log('reportLink', reportLink);
     if (!reportLink) {
       console.error(`No report link found for the language: ${language}`);
       throw new Error(`No report link found for the language: ${language}`);
     }
 
-    console.log(`Full report link for year ${year}, language ${language}:`, reportLink);
+    // console.log(`Full report link for year ${year}, language ${language}:`, reportLink);
     return reportLink;
   }).catch(error => {
     console.error('Error fetching full report link:', error);
@@ -437,7 +437,7 @@ export async function getMapData(year, sheetName, selectedQuestion) {
 export async function getBarData(year, language, sheetName) {
   
   await loadConfig();
-  const questions = await getQuestions(year, language);
+  const questions = await getQuestions(year);
 
   return getSheetData(dataMap[year], sheetName).then(data => {
     const rowVse = data.find(row => row.District === 'All districts');
@@ -447,12 +447,12 @@ export async function getBarData(year, language, sheetName) {
         if (key !== 'District' && key !== 'All') {
           let name = key;
           if (language === 'en') {
-            console.log('key',key)
-            console.log('questions',questions)
+            // console.log('key',key)
+            // console.log('questions',questions)
            
             // Find the English equivalent of the Russian question
             const questionObj = questions.find(q => q.name_ru === key);
-            console.log('questionObj',questionObj)
+            // console.log('questionObj',questionObj)
             name = questionObj ? questionObj.name_en : key; // Use Russian key as fallback
           }
 
@@ -464,7 +464,7 @@ export async function getBarData(year, language, sheetName) {
         return acc;
       }, []);
 
-      console.log('barData:', barData);
+      // console.log('barData:', barData);
       return barData;
     } else {
       throw new Error("Row 'All districts' not found.");
@@ -473,8 +473,11 @@ export async function getBarData(year, language, sheetName) {
 }
 
 
-export async function getPieData(year, sheetName) {
+export async function getPieData(year,language, sheetName) {
+  console.log('pie language input:', language)
   await loadConfig();
+  const translations = await getTranslations(year);
+
   return getSheetData(dataMap[year], sheetName).then(data => {
     // Find the row where the district is 'All districts'
     const rowVse = data.find(row => row.District === 'All districts');
@@ -482,16 +485,38 @@ export async function getPieData(year, sheetName) {
     // Check if row exists and create an array of objects with name and value properties
     if (rowVse) {
       // Create a result array excluding the 'District' and 'All questions' properties
+      
+
+
+      
       const pieData = Object.entries(rowVse).reduce((acc, [key, value]) => {
         if (key !== 'District' && key !== 'All') {
+          let name;
+          console.log('pie language in reduce:', language)
+          if (language === 'en') {
+            // Find the English equivalent of the Russian question
+            const translationsObj = translations.find(t=> t.name_ru=== key);
+            console.log('translations',translations)
+            console.log('translations.find(t=> t.name_ru=== key)',translations.find(t=> t.name_ru=== key))
+            
+            console.log('key',key)
+            name = translationsObj ? translationsObj.name_en : key; // Use Russian key as fallback
+            console.log('if name:', name)
+          } else {
+            name = key;
+            console.log('else name:', name)
+          }
+
           acc.push({
-            name: key,
+            name: name,
             value: parseFloat(value) || 0 // Ensuring the value is a number
           });
+          console.log('acc:', acc)
         }
+        console.log('acc:', acc)
         return acc;
       }, []);
-      // console.log('pieData:', pieData)
+      console.log('pieData:', pieData)
       return pieData;
     } else {
       // Handle the case where no 'All districts' row is found
@@ -534,17 +559,37 @@ export async function getQuestions(year) {
   // console.log(`Loading questions_ for year: ${year}, language: ${language}...`);
   await loadConfig();
   return getSheetData(dataMap[year], 'questions').then(data => {
-    console.log('Raw questions_ data fetched:', data);
+    // console.log('Raw questions_ data fetched:', data);
 
     const questions = data.map(itm => ({
       name_ru: itm["questions_ru"],
       name_en: itm["questions_en"]
     }));
 
-    console.log('Processed questions_:', questions);
+    // console.log('Processed questions_:', questions);
     return questions;
   }).catch(error => {
     console.error('Error fetching questions_:', error);
+    throw error;
+  });
+}
+
+
+export async function getTranslations(year) {
+  // console.log(`Loading questions_ for year: ${year}, language: ${language}...`);
+  await loadConfig();
+  return getSheetData(dataMap['config'], 'translations').then(data => {
+    // console.log('Raw translations data fetched:', data);
+
+    const questions = data.map(itm => ({
+      name_ru: itm["ru"],
+      name_en: itm["en"]
+    }));
+
+    console.log('Processed translations:', questions);
+    return questions;
+  }).catch(error => {
+    console.error('Error fetching translations:', error);
     throw error;
   });
 }

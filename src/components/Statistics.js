@@ -181,8 +181,8 @@ export default function Statistics({ topic, topicsMap }) {
 
           const barDataResponse = await getBarData(year, language, sheetName, selectedQuestion);
           setBarData(Array.isArray(barDataResponse) ? barDataResponse : []);
-
-          const pieDataResponse = await getPieData(year, sheetName, selectedQuestion);
+          console.log('statistics /pre pie language:', language)
+          const pieDataResponse = await getPieData(year, language,sheetName, selectedQuestion);
           setPieData(pieDataResponse);
         
           const incomeDataResponse = await getIncomeData(year, language, genderSubset);
