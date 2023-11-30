@@ -2,8 +2,9 @@ import React, { useRef, useMemo, useState } from "react";
 import * as d3 from "d3";
 import styles from "./pie-chart.module.css";
 
-export  function PieChart({ data, onArcClick = () => {} }) {
-  // const [selectedArc, setSelectedArc] = useState(null);
+export function PieChart({ data, onArcClick, topicKey }) {
+  // Conditional click handler based on topicKey
+  const handleClick = topicKey === 'openness' ? () => {} : onArcClick;
 
   const handleArcClick = (name) => {
     // setSelectedArc(name);
@@ -75,6 +76,9 @@ export  function PieChart({ data, onArcClick = () => {} }) {
       <g
         key={i}
         className={styles.slice}
+        onClick={() => {
+          handleArcClick(arc.data.name);
+        }}
         onMouseEnter={() => {
           if (ref.current) {
             ref.current.classList.add(styles.hasHighlight);
@@ -85,9 +89,7 @@ export  function PieChart({ data, onArcClick = () => {} }) {
             ref.current.classList.remove(styles.hasHighlight);
           }
         }}
-        onClick={() => {
-          handleArcClick(arc.data.name);
-        }}
+       
       >
         <path d={slicePath} fill={color} className={styles.active} />
       </g>

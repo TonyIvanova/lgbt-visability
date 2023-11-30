@@ -52,7 +52,7 @@ export default function Statistics({ topic, topicsMap }) {
   const [mapDescription, setMapDescription] = useState('');
   const [pieDescription, setPieDescription] = useState('');
   const [barDescription, setBarDescription] = useState('');
-  
+
 
   // const [stories, setStories] = useState([]);
   const [conclusions, setConclusions] = useState([]);
@@ -143,7 +143,7 @@ export default function Statistics({ topic, topicsMap }) {
     const baseName = topicKey || "violence";
     let sheetName = baseName;
 
-// console.log('baseName:',baseName)
+    // console.log('baseName:',baseName)
     if (baseName === "openness") { // If the topic is 'openness'
       if (genderSubset === 'all') {
         sheetName += '_' + opennessSubset; //e.g. openness_family
@@ -175,21 +175,21 @@ export default function Statistics({ topic, topicsMap }) {
       try {
         const sheetName = getSheetName(topicsMap[topic], genderSubset, opennessSubset);
         if (sheetName) {
-          const mapDataResponse = await getMapData(year,language, sheetName, selectedQuestion);
+          const mapDataResponse = await getMapData(year, language, sheetName, selectedQuestion, topicsMap[topic]);
           // console.log('Fetched mapData:', mapDataResponse);
           setMapData(mapDataResponse);
 
           const barDataResponse = await getBarData(year, language, sheetName, selectedQuestion);
           setBarData(Array.isArray(barDataResponse) ? barDataResponse : []);
-          console.log('statistics /pre pie language:', language)
-          const pieDataResponse = await getPieData(year, language,sheetName, selectedQuestion);
+          // console.log('statistics /pre pie language:', language)
+          const pieDataResponse = await getPieData(year, language, sheetName, selectedQuestion);
           setPieData(pieDataResponse);
-        
+
           const incomeDataResponse = await getIncomeData(year, language, genderSubset);
           setIncomeData(incomeDataResponse);
 
         }
-        
+
       } catch (error) {
         console.error("Failed to get sheet data:", error);
       }
@@ -231,11 +231,11 @@ export default function Statistics({ topic, topicsMap }) {
     // console.log("Statistics/ mapDescription:", barDescription);
     // console.log("Statistics/ updated descriptions:", descriptions);
     // // console.log("Statistics/updated mapDescription:", mapDescription);
-    // console.log("Statistics/updated mapData: ", mapData);
+    console.log("Statistics/updated mapData: ", mapData);
     // console.log("Statistics/updated selectedQuestion: ", selectedQuestion);
 
-    // console.log("Statistics/updated opennessSubset: ", opennessSubset);
-    // console.log("Statistics/updated genderSubset: ", genderSubset);
+    console.log("Statistics/updated opennessSubset: ", opennessSubset);
+    console.log("Statistics/updated genderSubset: ", genderSubset);
     // console.log("Statistics/updated incomeData: ", incomeData);
   }, [
     mapData,
@@ -307,32 +307,32 @@ export default function Statistics({ topic, topicsMap }) {
     return (
       <>
         {
-  (topicsMap[topic] === 'openness' ? (
-    <div>
-       <h3>{language === "ru" ? `Результаты по вариантам ответов` : `Results by response`}</h3>
-      <PieChart data={pieData} onArcClick={handleArcClick} />
-      <p className="statistics-description">{pieDescription}</p>
-    </div>
-  ) : topicsMap[topic] === "economical_status" ? (
-    <div>
-       <h3>{language === "ru" ? `Результаты по вопросам в категории` : `Results by questions in category`}</h3>
-      <BarPlot data={barData} onBarClick={handleArcClick} />
-      <p className="statistics-description">{barDescription}</p>
-      <h3>{language === "ru" ? `Средний доход по всем округам` : `Average income accross all districts`}</h3>
-      <PieChart data={incomeData}  />
-      <p className="statistics-description">{pieDescription}</p>
-    </div>
-  ) : (
-    // Default case for other topics
-    <div>
-      <h3>{language === "ru" ? `Результаты по вопросам в категории` : `Results by questions in category`}</h3>
-    <BarPlot data={barData} onBarClick={handleArcClick} />
-    <p className="statistics-description">{barDescription}</p>
-    </div>
-  ))
-}
+          (topicsMap[topic] === 'openness' ? (
+            <div>
+              <h3>{language === "ru" ? `Результаты по вариантам ответов` : `Results by response`}</h3>
+              <PieChart data={pieData} onArcClick={handleArcClick} topicKey={topicsMap[topic]}/>
+              <p className="statistics-description">{pieDescription}</p>
+            </div>
+          ) : topicsMap[topic] === "economical_status" ? (
+            <div>
+              <h3>{language === "ru" ? `Результаты по вопросам в категории` : `Results by questions in category`}</h3>
+              <BarPlot data={barData} onBarClick={handleArcClick} />
+              <p className="statistics-description">{barDescription}</p>
+              <h3>{language === "ru" ? `Средний доход по всем округам` : `Average income accross all districts`}</h3>
+              <PieChart data={incomeData}  topicKey={topicsMap[topic]}/>
+              <p className="statistics-description">{pieDescription}</p>
+            </div>
+          ) : (
+            // Default case for other topics
+            <div>
+              <h3>{language === "ru" ? `Результаты по вопросам в категории` : `Results by questions in category`}</h3>
+              <BarPlot data={barData} onBarClick={handleArcClick} />
+              <p className="statistics-description">{barDescription}</p>
+            </div>
+          ))
+        }
 
-       
+
       </>
     );
   };
@@ -345,38 +345,38 @@ export default function Statistics({ topic, topicsMap }) {
     return (
       <div className="section">
         <div>
-          
+
           <ButtonGroupSubset
             buttonsConfig={subsetButtonsConfig}
             onButtonClick={selectGenderSubset}
             styleType="gender-style"
           />
-                {topicsMap[topic] === "openness" && (
-        <ButtonGroupSubset
-          buttonsConfig={opennessButtonsConfig}
-          onButtonClick={selectOpennessSubset}
-          styleType="openness-style"
-        />
-      )}
+          {topicsMap[topic] === "openness" && (
+            <ButtonGroupSubset
+              buttonsConfig={opennessButtonsConfig}
+              onButtonClick={selectOpennessSubset}
+              styleType="openness-style"
+            />
+          )}
           {
-          // mapData.length > 0 
-          // && 
-<div>
-<h3>{language === "ru" ? `Результаты по федеральным округам` : `Resuls by federal districts`}</h3>
-      
-          <Map statistics={mapData}  />
-          </div>
+            // mapData.length > 0 
+            // && 
+            <div>
+              <h3>{language === "ru" ? `Результаты по федеральным округам` : `Resuls by federal districts`}</h3>
+
+              <Map statistics={mapData} />
+            </div>
           }
 
-         <p className="statistics-description">
-    {selectedQuestion !== "All"
-        ? language === 'ru'
-            ? `На карте отображены результаты подкатегории `+``
-            : `The map displays results for the subcategory ` + ``
-        : mapDescription}
-</p>
+          <p className="statistics-description">
+            {selectedQuestion !== "All"
+              ? language === 'ru'
+                ? `На карте отображены результаты подкатегории ` + ``
+                : `The map displays results for the subcategory ` + ``
+              : mapDescription}
+          </p>
 
-              
+
           <h3 style={{ margin: 0 }}>
             {selectedQuestion !== "All" ? selectedQuestion : ""}
           </h3>
