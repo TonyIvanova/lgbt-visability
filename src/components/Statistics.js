@@ -175,7 +175,7 @@ export default function Statistics({ topic, topicsMap }) {
       try {
         const sheetName = getSheetName(topicsMap[topic], genderSubset, opennessSubset);
         if (sheetName) {
-          const mapDataResponse = await getMapData(year, sheetName, selectedQuestion);
+          const mapDataResponse = await getMapData(year,language, sheetName, selectedQuestion);
           // console.log('Fetched mapData:', mapDataResponse);
           setMapData(mapDataResponse);
 

@@ -374,32 +374,44 @@ export async function getFullReportLink(year, language) {
 
 //TODO: maybe refactor so that map data is fetche for all columns
 //and from it them preselected based on selected Question
-export async function getMapData(year, sheetName, selectedQuestion) {
+export async function getMapData(year, language, sheetName, selectedQuestion) {
   try {
     await loadConfig();
-    // console.log(`Fetching mapData for year: ${year}, sheetName: ${sheetName}`);
-    // console.log('getMapData/selectedQuestion', selectedQuestion);
+    const questions = await getQuestions(year);
+    console.log(`Fetching mapData for year: ${year}, sheetName: ${sheetName}`);
+    console.log('getMapData/selectedQuestion', selectedQuestion);
+
+    // Retrieve the Russian equivalent if language is English
+    let questionKey = selectedQuestion;
+    if (language === 'en') {
+      const questionObj = questions.find(q => q.name_en === selectedQuestion);
+      if (questionObj) {
+        questionKey = questionObj.name_ru;
+      }
+    }
 
     const data = await getSheetData(dataMap[year], sheetName);
     // console.log('getMapData/Raw data fetched:', data);
 
     const mapData = data
       .map(row => {
-        
-        // console.log('rgetMapData/ selectedQuestion:',selectedQuestion)
-        // console.log('rgetMapData/ row[selectedQuestion]:',row[selectedQuestion])
-        const value = parseFloat(row[selectedQuestion]) //|| 0; // Parse the value
+        console.log('getMapData/ selectedQuestion:', selectedQuestion);
+        // console.log('getMapData/ row[questionKey]:', row[questionKey]);
+
+        const value = parseFloat(row[questionKey]) || 0; // Use the Russian equivalent key
+       
         return { name: row.District, value: value };
       })
       .filter(item => item.name !== 'All districts'); // Exclude 'All districts' from the results
 
-    // console.log('getMapData:', mapData);
+    console.log('getMapData:', mapData);
     return mapData;
   } catch (error) {
     console.error('Error fetching map data:', error);
     throw error; // Re-throw the error to handle it further up the call chain
   }
 }
+
 
 
 
@@ -458,7 +470,8 @@ export async function getBarData(year, language, sheetName) {
 
           acc.push({
             name: name,
-            value: parseFloat(value) || 0
+            value: parseFloat(value) || 0,
+            // question: key //visible question text in corresponding language
           });
         }
         return acc;
@@ -486,10 +499,8 @@ export async function getPieData(year,language, sheetName) {
     if (rowVse) {
       // Create a result array excluding the 'District' and 'All questions' properties
       
-
-
       
-      const pieData = Object.entries(rowVse).reduce((acc, [key, value]) => {
+      const pieData = Object.entries(rowVse).reduce((acc, [ key, value]) => {
         if (key !== 'District' && key !== 'All') {
           let name;
           console.log('pie language in reduce:', language)
@@ -500,7 +511,7 @@ export async function getPieData(year,language, sheetName) {
             console.log('translations.find(t=> t.name_ru=== key)',translations.find(t=> t.name_ru=== key))
             
             console.log('key',key)
-            name = translationsObj ? translationsObj.name_en : key; // Use Russian key as fallback
+            name =translationsObj.name_en //: key; // Use Russian key as fallback
             console.log('if name:', name)
           } else {
             name = key;
@@ -509,7 +520,8 @@ export async function getPieData(year,language, sheetName) {
 
           acc.push({
             name: name,
-            value: parseFloat(value) || 0 // Ensuring the value is a number
+            value: parseFloat(value) || 0, // Ensuring the value is a number
+           
           });
           console.log('acc:', acc)
         }

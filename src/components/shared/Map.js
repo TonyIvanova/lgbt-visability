@@ -42,6 +42,7 @@ useEffect(() => {
       return geoData.features.map((d, index) => {
         const relevantStatistics = statistics.filter(
           (item) => item.name === d.properties.name
+          
         )[0];
         const color = relevantStatistics
           ? colorScale(relevantStatistics?.value)
@@ -49,7 +50,8 @@ useEffect(() => {
         return (
           <path
              key={"map-element-" + index}
-              name={d.properties.name}
+             name={d.properties.name}
+             
               d={path(d)}
               fill={color}
               stroke="#0e1724"
