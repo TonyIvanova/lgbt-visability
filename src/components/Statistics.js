@@ -364,13 +364,10 @@ export default function Statistics({ topic, topicsMap }) {
           {
             // mapData.length > 0 
             // && 
-            <div>
+            <div className="map-section">
               <h2>{language === "ru" ? `Результаты по федеральным округам` : `Resuls by federal district`}</h2>
               <Map statistics={mapData} />
-            </div>
-          }
-
-          
+              <div>
           <p className="statistics-description">
             {mapDescription}
             {topicsMap[topic] !== 'openness' && (
@@ -387,7 +384,12 @@ export default function Statistics({ topic, topicsMap }) {
               </strong>
             )}
           </p>
+          </div>
 
+            </div>
+          }
+
+         
 
 
           {/* <h3 style={{ margin: 0 }}>

@@ -127,15 +127,26 @@ export default function PersonalStories({ topic, topicsMap }) {
 
   if (storyIndex != null) {
     return (
+      <div>
+      <div style={{
+        margin: 'auto',
+        maxWidth: '800px',
+        textAlign: 'left',
+        marginBottom: '0px'
+
+  }} > 
+  <h2>
+              {language === 'ru'
+                ? `Личные истории`
+                : `Personal stories`}
+            </h2>
+            </div>
+
       <div className="personal-stories-container">
-         <h2>
-    {language === 'ru' 
-        ? `Истории` 
-        : `Stories`}
-</h2>
+        
 
         {getStory()}
-      </div>
+      </div></div>
     );
   } else {
     return <></>;

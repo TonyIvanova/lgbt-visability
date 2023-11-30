@@ -401,3 +401,24 @@ header {
 .map-tooltip.hidden {
   opacity: 0;
 }
+
+.charts-section {
+  margin-top: 20px; /* Add space between the map and the charts */
+  
+  display: flex;
+  flex-direction: column; /* Stack children vertically */
+  align-items: center; /* Center children horizontally within the container */
+
+  /* If .charts-section contains block elements like divs */
+  text-align: center; /* Center inline or inline-block elements like text or buttons */
+}
+.map-section {
+  margin-top: 20px; /* Add space between the map and the charts */
+  
+  display: flex;
+  flex-direction: column; /* Stack children vertically */
+  align-items: center; /* Center children horizontally within the container */
+
+  /* If .charts-section contains block elements like divs */
+  text-align: center; /* Center inline or inline-block elements like text or buttons */
+}
