@@ -1,10 +1,30 @@
-import React, { useRef, useMemo, useState } from "react";
+import React, { useRef, useMemo, useEffect, useState } from "react";
 import * as d3 from "d3";
 import styles from "./pie-chart.module.css";
 
 export function PieChart({ data, onArcClick, topicKey }) {
   // Conditional click handler based on topicKey
   const handleClick = topicKey === 'openness' ? () => { } : onArcClick;
+  const [tooltipContent, setTooltipContent] = useState('');
+  const [showTooltip, setShowTooltip] = useState(false);
+  const tooltipRef = useRef(null);
+  // const ref = useRef(null);
+
+  const handleMouseEnter = (arc, event) => {
+    setTooltipContent(`${arc.data.value}`);
+    setShowTooltip(true);
+    if (tooltipRef.current) {
+      tooltipRef.current.style.opacity = 1;
+      tooltipRef.current.style.transform = `translate(${event.clientX}px, ${event.clientY}px)`;
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setShowTooltip(false);
+    if (tooltipRef.current) {
+      tooltipRef.current.style.opacity = 0;
+    }
+  };
 
   const handleArcClick = (name) => {
     // setSelectedArc(name);
@@ -21,7 +41,7 @@ export function PieChart({ data, onArcClick, topicKey }) {
   // Reference to the SVG group containing the arcs for adding/removing highlight class
   const ref = useRef(null);
 
-
+  
   // Compute the pie layout for the given data
   const pie = useMemo(() => {
     const pieGenerator = d3.pie().value((d) => d.value);
@@ -29,7 +49,9 @@ export function PieChart({ data, onArcClick, topicKey }) {
   }, [data]);
 
   // Arc generator to create arc shapes for pie chart
-  const arcGenerator = d3.arc();
+  // const arcGenerator = d3.arc();
+  const arcGenerator = d3.arc().innerRadius(radius * 0.6).outerRadius(radius);
+
 
   // Function to slightly alter the color
   const adjustColor = (color) => {
@@ -60,52 +82,17 @@ export function PieChart({ data, onArcClick, topicKey }) {
     }
     assignedColors[color] = true; // Mark this color as used
 
-    // Add highlight for selected arc
-    // if (selectedArc === arc?.data?.name) {
-    //   return (
-    //     <g
-    //       key={i}
-    //       className={styles.slice}
-    //       onMouseEnter={() => {
-    //         if (ref.current) {
-    //           ref.current.classList.add(styles.hasHighlight);
-    //         }
-    //       }}
-    //       onMouseLeave={() => {
-    //         if (ref.current) {
-    //           ref.current.classList.remove(styles.hasHighlight);
-    //         }
-    //       }}
-    //       onClick={() => {
-    //         handleArcClick(arc.data.name);
-    //       }}
-    //     >
-    //       <path d={slicePath} fill={color} />
-    //     </g>
-    //   );
-    // } else {}
-
     // Return SVG group for each pie slice with interaction handlers
     return (
+
       <g
         key={i}
         className={styles.slice}
-        onClick={() => {
-          handleArcClick(arc.data.name);
-        }}
-        onMouseEnter={() => {
-          if (ref.current) {
-            ref.current.classList.add(styles.hasHighlight);
-          }
-        }}
-        onMouseLeave={() => {
-          if (ref.current) {
-            ref.current.classList.remove(styles.hasHighlight);
-          }
-        }}
-
+        onClick={() => onArcClick(arc.data.name)}
+        onMouseEnter={(e) => handleMouseEnter(arc, e)}
+        onMouseLeave={handleMouseLeave}
       >
-        <path d={slicePath} fill={color} className={styles.active} />
+        <path d={arcGenerator(arc)} fill={color} className={styles.active} />
       </g>
     );
   });
@@ -129,16 +116,19 @@ export function PieChart({ data, onArcClick, topicKey }) {
 
   return (
     <div className={styles.pieChart}>
-      <svg width={width} height={height} style={{ display: "inline-block" }}>
-        <g
-          transform={`translate(${width / 2}, ${height / 2})`}
-          className={styles.container}
-          ref={ref}
-        >
+      <svg width={width} height={height}>
+        <g transform={`translate(${width / 2}, ${height / 2})`} ref={ref}>
           {shapes}
         </g>
       </svg>
       <div className={styles.legendContainer}>{legend}</div>
+      {showTooltip && (
+        <div className={`pie-tooltip ${!showTooltip ? 'hidden' : ''}`} ref={tooltipRef}>
+          {/* <div className="tip"> </div> */}
+            <h1>{tooltipContent}</h1>
+          </div>
+       
+      )}
     </div>
   );
 

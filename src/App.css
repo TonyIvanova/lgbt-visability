@@ -402,6 +402,39 @@ header {
   opacity: 0;
 }
 
+
+.pie-tooltip {
+  position: fixed;
+  padding: 8px 16px;
+  border-radius: 16px; 
+  top: 0;
+  left: 0;
+  font-size: 12px; 
+  text-align: left;
+  background-color: #F4F3EE90;
+  pointer-events: none;
+  backdrop-filter: blur(16px);
+}
+.pie-tooltip > p {
+  padding: 0; 
+}
+.pie-tooltip .tip {
+  position: absolute;
+  border-top-right-radius: 2rem;
+  border-top-left-radius: 1rem;
+  top: 0%;
+  left: 50%;
+  width: 1rem;
+  height: 0.5rem;
+  transform: translate(-50%, -100%);
+  background-color: #F4F3EE90;
+  pointer-events: none;
+}
+
+.pie-tooltip.hidden {
+  opacity: 0;
+}
+
 .charts-section {
   margin-top: 20px; /* Add space between the map and the charts */
   
