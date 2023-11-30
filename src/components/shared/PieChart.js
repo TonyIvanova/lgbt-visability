@@ -4,12 +4,13 @@ import styles from "./pie-chart.module.css";
 
 export function PieChart({ data, onArcClick, topicKey }) {
   // Conditional click handler based on topicKey
-  const handleClick = topicKey === 'openness' ? () => {} : onArcClick;
+  const handleClick = topicKey === 'openness' ? () => { } : onArcClick;
 
   const handleArcClick = (name) => {
     // setSelectedArc(name);
     onArcClick(name);
   };
+
 
   // Chart setup
   const width = 150;
@@ -20,17 +21,23 @@ export function PieChart({ data, onArcClick, topicKey }) {
   // Reference to the SVG group containing the arcs for adding/removing highlight class
   const ref = useRef(null);
 
-  
-// Compute the pie layout for the given data
+
+  // Compute the pie layout for the given data
   const pie = useMemo(() => {
     const pieGenerator = d3.pie().value((d) => d.value);
     return pieGenerator(data);
   }, [data]);
 
-// Arc generator to create arc shapes for pie chart
+  // Arc generator to create arc shapes for pie chart
   const arcGenerator = d3.arc();
 
-    // Create SVG shapes for each pie slice
+  // Function to slightly alter the color
+  const adjustColor = (color) => {
+    return d3.color(color).darker(0.15).toString();
+  }
+  const assignedColors = {};
+
+  // Create SVG shapes for each pie slice
   const shapes = pie.map((arc, i) => {
     // Define the properties for each slice
     const sliceInfo = {
@@ -43,8 +50,15 @@ export function PieChart({ data, onArcClick, topicKey }) {
     // Generate the SVG path data for the slice
     const slicePath = arcGenerator(sliceInfo);
 
+
     // Determine the fill color for the slice
-    const color = arc?.data?.value ? colorScale(arc.data.value) : "lightgrey";
+    let color = arc?.data?.value ? colorScale(arc.data.value) : "lightgrey";
+
+    // Check if this color has already been used, and adjust if necessary
+    if (assignedColors[color]) {
+      color = adjustColor(color);
+    }
+    assignedColors[color] = true; // Mark this color as used
 
     // Add highlight for selected arc
     // if (selectedArc === arc?.data?.name) {
@@ -71,7 +85,7 @@ export function PieChart({ data, onArcClick, topicKey }) {
     //   );
     // } else {}
 
-   // Return SVG group for each pie slice with interaction handlers
+    // Return SVG group for each pie slice with interaction handlers
     return (
       <g
         key={i}
@@ -89,7 +103,7 @@ export function PieChart({ data, onArcClick, topicKey }) {
             ref.current.classList.remove(styles.hasHighlight);
           }
         }}
-       
+
       >
         <path d={slicePath} fill={color} className={styles.active} />
       </g>
@@ -112,7 +126,7 @@ export function PieChart({ data, onArcClick, topicKey }) {
       </div>
     );
   });
-  
+
   return (
     <div className={styles.pieChart}>
       <svg width={width} height={height} style={{ display: "inline-block" }}>
@@ -127,5 +141,5 @@ export function PieChart({ data, onArcClick, topicKey }) {
       <div className={styles.legendContainer}>{legend}</div>
     </div>
   );
-  
+
 }

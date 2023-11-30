@@ -308,24 +308,27 @@ export default function Statistics({ topic, topicsMap }) {
       <>
         {
           (topicsMap[topic] === 'openness' ? (
-            <div>
-              <h3>{language === "ru" ? `Результаты по вариантам ответов` : `Results by response`}</h3>
-              <PieChart data={pieData} onArcClick={handleArcClick} topicKey={topicsMap[topic]}/>
+            // <div>
+            <div className="charts-section">
+              <h2>{language === "ru" ? `Результаты по вариантам ответов` : `Results by response option`}</h2>
+              <PieChart data={pieData} onArcClick={handleArcClick} topicKey={topicsMap[topic]} />
               <p className="statistics-description">{pieDescription}</p>
             </div>
           ) : topicsMap[topic] === "economical_status" ? (
-            <div>
-              <h3>{language === "ru" ? `Результаты по вопросам в категории` : `Results by questions in category`}</h3>
+            // <div>
+            <div className="charts-section">
+              <h2>{language === "ru" ? `Результаты по вопросам в категории` : `Results by questions in category`}</h2>
               <BarPlot data={barData} onBarClick={handleArcClick} />
               <p className="statistics-description">{barDescription}</p>
-              <h3>{language === "ru" ? `Средний доход по всем округам` : `Average income accross all districts`}</h3>
-              <PieChart data={incomeData}  topicKey={topicsMap[topic]}/>
+              <h2>{language === "ru" ? `Средний доход по всем округам` : `Average income accross all districts`}</h2>
+              <PieChart data={incomeData} topicKey={topicsMap[topic]} />
               <p className="statistics-description">{pieDescription}</p>
             </div>
           ) : (
             // Default case for other topics
-            <div>
-              <h3>{language === "ru" ? `Результаты по вопросам в категории` : `Results by questions in category`}</h3>
+            // <div>
+            <div className="charts-section">
+              <h2>{language === "ru" ? `Результаты по вопросам в категории` : `Results by questions in category`}</h2>
               <BarPlot data={barData} onBarClick={handleArcClick} />
               <p className="statistics-description">{barDescription}</p>
             </div>
@@ -362,24 +365,34 @@ export default function Statistics({ topic, topicsMap }) {
             // mapData.length > 0 
             // && 
             <div>
-              <h3>{language === "ru" ? `Результаты по федеральным округам` : `Resuls by federal districts`}</h3>
-
+              <h2>{language === "ru" ? `Результаты по федеральным округам` : `Resuls by federal district`}</h2>
               <Map statistics={mapData} />
             </div>
           }
 
+          
           <p className="statistics-description">
-            {selectedQuestion !== "All"
-              ? language === 'ru'
-                ? `На карте отображены результаты подкатегории ` + ``
-                : `The map displays results for the subcategory ` + ``
-              : mapDescription}
+            {mapDescription}
+            {topicsMap[topic] !== 'openness' && (
+              <strong>
+                {selectedQuestion !== "All" ? (
+                  language === 'ru'
+                    ? `На карте отображены результаты подкатегории ${selectedQuestion}. `
+                    : `The map displays results for the subcategory ${selectedQuestion}. `
+                ) : (
+                  language === 'ru'
+                    ? `На карте отображены результаты сумарно по всем подкатегориям.`
+                    : `The map displays results across all subcategories.`
+                )}
+              </strong>
+            )}
           </p>
 
 
-          <h3 style={{ margin: 0 }}>
+
+          {/* <h3 style={{ margin: 0 }}>
             {selectedQuestion !== "All" ? selectedQuestion : ""}
-          </h3>
+          </h3> */}
           <br />
         </div>
         <div>{charts()}</div>

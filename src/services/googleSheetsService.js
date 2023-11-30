@@ -188,11 +188,11 @@ export async function getDescriptions(language, topicKey) {
   // console.log(`Fetching descriptions for language: ${language} and topic: ${topicKey}...`);
 
   return getSheetData(dataMap['config'], 'descriptions').then(data => {
-    // console.log('Raw descriptions data fetched:', data);
+    console.log('Raw descriptions data fetched:', data);
 
     // Filter out the row where `key` equals `topicsMap[topic]`
     const filteredData = data.filter(itm => itm.key === topicKey)
-    // console.log(`Filtered descriptions data, removed topic ${topicKey}:`, filteredData);
+    console.log(`Filtered descriptions data, removed topic ${topicKey}:`, filteredData);
 
     const descriptions = filteredData.map(itm => ({ // Map over each item and transform it into an object
       key: itm.key,
@@ -397,8 +397,8 @@ export async function getMapData(year, language, sheetName, selectedQuestion, to
       }
     }
     const data = await getSheetData(dataMap[year], sheetName);
-    console.log('getMapData/Raw data fetched:', data);
-    console.log('getMapData/sheetName:', sheetName);
+    // console.log('getMapData/Raw data fetched:', data);
+    // console.log('getMapData/sheetName:', sheetName);
 
     const mapData = data
       .map(row => {
@@ -510,7 +510,7 @@ export async function getPieData(year, language, sheetName) {
       const pieData = Object.entries(rowVse).reduce((acc, [key, value]) => {
         if (key !== 'District' && key !== 'All') {
           let name;
-          console.log('pie language in reduce:', language)
+          // console.log('pie language in reduce:', language)
           if (language === 'en') {
             // Find the English equivalent of the Russian question
             const translationsObj = translations.find(t => t.name_ru === key);

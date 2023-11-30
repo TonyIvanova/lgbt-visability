@@ -282,7 +282,10 @@ header {
   max-width: 1100px;
   margin: 0 auto;
   border-radius: 34px;
+  flex-direction: column;
+  align-items: stretch; /* Stretch children to fill the width */
 }
+
 
 .tooltip {
   position: absolute;
