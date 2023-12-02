@@ -1,17 +1,37 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import logo from "./../assets/logo.svg";
 import {ButtonGroupLang} from "./shared/ButtonGroup";
 import { useLanguage } from '../contexts/langContext';
+import { getBannerData } from "../services/googleSheetsService";
 
 
 export default function Header() {
   const {language, setLanguage} = useLanguage(); 
-  // console.log('Header start');
-  // console.log(language);
-  // const changeLanguage = (lang) => {
-  //   setLanguage(lang);
-  // };
-
+  const Banner = ({ year, link }) => {
+    return (
+      <a href={link} target="_blank" rel="noopener noreferrer" className="banner">
+        <div>
+      
+          {language === 'ru'
+            ? `Участвовать  в исследовании ${year} года`
+            : `  Participate in the ${year} survey`}
+      
+          </div>
+      </a>
+    );
+  };
+  
+    const [banner, setBanner] = useState(null);
+  
+    useEffect(() => {
+      getBannerData().then(setBanner);
+    }, []);
+  
+    if (!banner || banner.status !== 'on') {
+      return null; // Don't display if no active config
+    }
+  
+  
   
   const changeLanguage = (event) => {
     console.log(event.target.name);
@@ -23,6 +43,8 @@ export default function Header() {
   <div className="App-header-logo">
     <img src={logo} alt="Logo" />
   </div>
+
+  <Banner year={banner.year} link={banner.link}/>
 
   <div style={{ display: 'flex', alignItems: 'center' }}>
     <ButtonGroupLang buttons={['ru','en']} onButtonClick={changeLanguage} />

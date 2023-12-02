@@ -165,6 +165,7 @@ export async function loadYearData(year) {
   try {
     // get data for all sheets in the spreadsheet
     getSheetData(spreadsheetId, "economical_status")
+
     // console.log('loadYearData/ dataCache:',dataCache)
     return 'All sheets data fetched and stored in cache.';
   } catch (error) {
@@ -617,4 +618,10 @@ export async function getTranslations(year) {
     console.error('Error fetching translations:', error);
     throw error;
   });
+}
+
+export async function getBannerData() {
+  const bannerData = await getSheetData(dataMap['config'], 'data_collection');
+  const activeBanner = bannerData.find(row => row.status === 'on');
+  return activeBanner;
 }

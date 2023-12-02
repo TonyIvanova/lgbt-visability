@@ -473,3 +473,14 @@ header {
   fill-opacity: 0.7; /* Makes the bar slightly transparent */
   
 }
+
+
+.banner {
+  display: block;
+  background: linear-gradient(to right, #ff7e5f, #feb47b); /* Example gradient */
+  padding: 10px;
+  text-align: center;
+  border-radius: 4px;
+  color: white;
+  text-decoration: none;
+}
