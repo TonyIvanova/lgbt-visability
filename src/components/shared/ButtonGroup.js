@@ -95,10 +95,12 @@ export const ButtonGroupLang = ({ buttons, onButtonClick }) => {
   );
 };
 
-export function ButtonGroupSubset({ buttonsConfig, onButtonClick,styleType }) {
+export function ButtonGroupSubset({ buttonsConfig, onButtonClick,styleType, init }) {
 
   // We'll use state to keep track of which button was clicked.
-  const [clickedId, setClickedId] = useState(null);
+  const initialClickedId = buttonsConfig.findIndex(button => button.value === init);
+
+  const [clickedId, setClickedId] = useState(initialClickedId);
   const buttonStyle = {
     fontSize: '1.2em', // Bigger 
     // fontWeight: '200' , // Fatter 

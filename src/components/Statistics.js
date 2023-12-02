@@ -353,12 +353,14 @@ export default function Statistics({ topic, topicsMap }) {
             buttonsConfig={subsetButtonsConfig}
             onButtonClick={selectGenderSubset}
             styleType="gender-style"
+            init={genderSubset}
           />
           {topicsMap[topic] === "openness" && (
             <ButtonGroupSubset
               buttonsConfig={opennessButtonsConfig}
               onButtonClick={selectOpennessSubset}
               styleType="openness-style"
+              init='family'
             />
           )}
           {
