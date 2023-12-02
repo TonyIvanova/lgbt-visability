@@ -405,11 +405,12 @@ header {
 
 .pie-tooltip {
   position: fixed;
-  padding: 8px 16px;
+  padding: 8px;
   border-radius: 16px; 
   top: 0;
   left: 0;
   font-size: 12px; 
+  
   text-align: left;
   background-color: #F4F3EE90;
   pointer-events: none;

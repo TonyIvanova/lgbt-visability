@@ -99,7 +99,7 @@ function AppContent() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const data = await getSampleData(year);
+        const data = await getSampleData(year, language);
         setSampleData(data);
         console.log(data)
       } catch (err) {
@@ -247,6 +247,10 @@ function AppContent() {
     return <div>Error: {error}</div>;
   }
 
+  if (!sampleData) {
+    return <div>Loading sample data...</div>;
+  }
+
   //Check in topicsMap has undefined values
   const isTopicsMapPopulated = Object.keys(topicsMap).length > 0 &&
     Object.values(topicsMap).every(value => value !== undefined);
@@ -295,10 +299,11 @@ function AppContent() {
           onButtonClick={selectTopic}
         />
 
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
+     
+         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <Expander year={year} data={sampleData} />
         </div>
-
+      
         <div className="topic-component">{topicComponent()}</div>
         {/* <DataContext.Provider value={{ data, conclusions }}> */}
         <img src={bg1} alt="" className="background-image-1"></img>

@@ -269,21 +269,27 @@ export async function getStories(year, language, topicKey) {
 }
 
 
-export async function getSampleData(year) {
+export async function getSampleData(year, language) {
   // console.log(`Loading sample for year: ${year}`);
   await loadConfig();
 
   return getSheetData(dataMap[year], 'sample').then(data => {
 
-    // console.log('getSampleData/ sample data:', data);
+    console.log('getSampleData/ sample data:', data);
+    console.log('getSampleData/ sample data[0]:', data[0][`name_${language}`]);
 
     // Map the filtered data into an array of sample objects
-    const sample = data.map(itm => ({
-      key: itm.key,
+    const sample = data.map(itm => (
+      
+      {
+      
+        key: itm.key,
+        name: itm[`name_${language}`],//itm.key,
       value: itm.value
-    }));
+    }
+    ));
 
-    // console.log('getSampleData/ Processed sample:', sample);
+    console.log('getSampleData/ Processed sample:', sample);
     return sample;
   }).catch(error => {
     console.error('Error fetching sample data:', error);

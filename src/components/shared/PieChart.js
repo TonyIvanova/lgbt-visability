@@ -99,7 +99,7 @@ export function PieChart({ data, onArcClick, topicKey }) {
 
   const legend = pie.map((arc, i) => {
     return (
-      <div className={styles.legendItem} key={i} style={{ display: "flex", alignItems: "center" }}>
+      <div className={styles.legendItem} key={i} style={{ display: "flex", alignItems: "center" , marginLeft:"10px"}}>
         <div
           style={{
             background: colorScale(arc.data.value),
