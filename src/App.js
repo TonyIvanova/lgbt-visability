@@ -222,7 +222,7 @@ function AppContent() {
     // console.log('APP/updated sections.length:',sections.length)
     // console.log('APP/updated topic:',topic)
     // console.log("APP/updated topicsMap: ", topicsMap);
-    // console.log("APP/updated years: ", years);
+    console.log("APP/updated years: ", years);
     // console.log('APP/updated reportLink:',reportLink)
   }, [
     topicsMap,

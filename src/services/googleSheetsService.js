@@ -188,11 +188,11 @@ export async function getDescriptions(language, topicKey) {
   // console.log(`Fetching descriptions for language: ${language} and topic: ${topicKey}...`);
 
   return getSheetData(dataMap['config'], 'descriptions').then(data => {
-    console.log('Raw descriptions data fetched:', data);
+    // console.log('Raw descriptions data fetched:', data);
 
     // Filter out the row where `key` equals `topicsMap[topic]`
     const filteredData = data.filter(itm => itm.key === topicKey)
-    console.log(`Filtered descriptions data, removed topic ${topicKey}:`, filteredData);
+    // console.log(`Filtered descriptions data, removed topic ${topicKey}:`, filteredData);
 
     const descriptions = filteredData.map(itm => ({ // Map over each item and transform it into an object
       key: itm.key,
@@ -203,7 +203,7 @@ export async function getDescriptions(language, topicKey) {
     }));
 
     // Log the final descriptions object after reduce
-    console.log(`Processed ${topicKey} descriptions:`, descriptions);
+    // console.log(`Processed ${topicKey} descriptions:`, descriptions);
 
     return descriptions;
   }).catch(error => {
@@ -229,7 +229,7 @@ export async function getConclusions(year, language, topicKey) {
       text: itm["text_" + language]
     }));
 
-    // console.log('Processed conclusions:', conclusions);
+    console.log('Processed conclusions:', conclusions);
     return conclusions;
   }).catch(error => {
     console.error('Error fetching conclusions:', error);

@@ -231,11 +231,10 @@ export default function Statistics({ topic, topicsMap }) {
     // console.log("Statistics/ mapDescription:", barDescription);
     // console.log("Statistics/ updated descriptions:", descriptions);
     // // console.log("Statistics/updated mapDescription:", mapDescription);
-    console.log("Statistics/updated mapData: ", mapData);
+    // console.log("Statistics/updated mapData: ", mapData);
     // console.log("Statistics/updated selectedQuestion: ", selectedQuestion);
-
-    console.log("Statistics/updated opennessSubset: ", opennessSubset);
-    console.log("Statistics/updated genderSubset: ", genderSubset);
+    // console.log("Statistics/updated opennessSubset: ", opennessSubset);
+    // console.log("Statistics/updated genderSubset: ", genderSubset);
     // console.log("Statistics/updated incomeData: ", incomeData);
   }, [
     mapData,
@@ -318,7 +317,7 @@ export default function Statistics({ topic, topicsMap }) {
             // <div>
             <div className="charts-section">
               <h2>{language === "ru" ? `Результаты по вопросам в категории` : `Results by questions in category`}</h2>
-              <BarPlot data={barData} onBarClick={handleArcClick} />
+              <BarPlot data={barData} onBarClick={handleArcClick} language={language}/>
               <p className="statistics-description">{barDescription}</p>
               <h2>{language === "ru" ? `Средний доход по всем округам` : `Average income accross all districts`}</h2>
               <PieChart data={incomeData} topicKey={topicsMap[topic]} />

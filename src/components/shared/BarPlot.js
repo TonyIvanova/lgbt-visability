@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import * as d3 from "d3";
 import styles from "./bar-plot.module.css";
 
-export function BarPlot({ data, onBarClick = () => {} }) {
+export function BarPlot({ data, language, onBarClick = () => {} }) {
   const handleBarClick = (name) => {
     onBarClick(name);
     console.info("Clicked bar with name ", name); 
@@ -22,8 +22,11 @@ export function BarPlot({ data, onBarClick = () => {} }) {
 
   const ref = useRef(null);
 
+  const xAxisLabel = language === 'en' ? "Subcategories" : "Подкатегории";
+  const yAxisLabel = language === 'en' ? "Count" : "Количество случаев";
 
 
+ 
 
   // Create bars based on data
   const bars = data.map((d, i) => {
@@ -82,9 +85,25 @@ export function BarPlot({ data, onBarClick = () => {} }) {
           {bars}
           <g
             transform={`translate(0,${height})`}
-            ref={node => d3.select(node).call(d3.axisBottom(xScale))}
+            // ref={node => d3.select(node).call(d3.axisBottom(xScale))}
           />
           <g ref={node => d3.select(node).call(d3.axisLeft(yScale))} />
+         
+           <text
+            transform={`translate(${width / 2}, ${height + margin.bottom - 5})`}
+            textAnchor="middle"
+          >
+            {xAxisLabel}
+          </text>
+          <text
+            transform={`rotate(-90)`}
+            x={-height / 2}
+            y={-margin.left + 15}
+            textAnchor="middle"
+          >
+            {yAxisLabel}
+          </text>
+
         </g>
       </svg>
       <div className={styles.legendContainer}>{legend}</div>
