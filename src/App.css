@@ -456,3 +456,15 @@ header {
   /* If .charts-section contains block elements like divs */
   text-align: center; /* Center inline or inline-block elements like text or buttons */
 }
+.legendContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; 
+}
+
+.legendText {
+  display: flex;
+  align-items: center;
+  /* flex-shrink: 0; 
+  width: 450px; */
+}

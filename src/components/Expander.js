@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { getSampleData } from '../services/googleSheetsService'
 import { PieChart } from './shared/PieChart';
 import DistributionPlot from './shared/DistributionPlot';
-function Expander({ year, data }) {
+function Expander({ year, data, language }) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [language, setLanguage] = useState(''); // example state for language
+  // const [language, setLanguage] = useState(''); 
+  console.log('Expander/ language',language)
   const isDataLoaded = Array.isArray(data) && data.length > 0;
   // Filter data for sex-related categories
   const sexData = data.filter(item =>

@@ -27,7 +27,7 @@ export const DataProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [descriptions, setDescriptions] = useState({});
   const [configuration, setConfiguration] = useState({});
-  const [whichSubset, setWhichSubset] = useState('All'); //Trans/Cis
+  const [genderSubset, setGenderSubset] = useState('all'); //Trans/Cis
 
   const [topicsMap, setTopicsMap] = useState({});
   useEffect(() => {

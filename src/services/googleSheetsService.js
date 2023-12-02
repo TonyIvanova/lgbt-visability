@@ -275,8 +275,8 @@ export async function getSampleData(year, language) {
 
   return getSheetData(dataMap[year], 'sample').then(data => {
 
-    console.log('getSampleData/ sample data:', data);
-    console.log('getSampleData/ sample data[0]:', data[0][`name_${language}`]);
+    // console.log('getSampleData/ sample data:', data);
+    // console.log('getSampleData/ sample data[0]:', data[0][`name_${language}`]);
 
     // Map the filtered data into an array of sample objects
     const sample = data.map(itm => (
@@ -289,7 +289,7 @@ export async function getSampleData(year, language) {
     }
     ));
 
-    console.log('getSampleData/ Processed sample:', sample);
+    // console.log('getSampleData/ Processed sample:', sample);
     return sample;
   }).catch(error => {
     console.error('Error fetching sample data:', error);

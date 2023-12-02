@@ -52,7 +52,7 @@ function AppContent() {
   const [error, setError] = useState(null);
   const [reportLink, setReportLink] = useState('');
 
-  const [genderSubset, setGenderSubset] = useState('All'); //Trans/Cis
+  const [genderSubset, setGenderSubset] = useState(''); //Trans/Cis
   const [opennessSubset, setOpennessSubset] = useState('') //family/friends
   const [topic, setTopic] = useState('')
 
@@ -301,7 +301,7 @@ function AppContent() {
 
      
          <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <Expander year={year} data={sampleData} />
+          <Expander year={year} data={sampleData}  language={language}/>
         </div>
       
         <div className="topic-component">{topicComponent()}</div>

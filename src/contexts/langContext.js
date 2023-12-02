@@ -7,7 +7,7 @@ export const LanguageContext = createContext();
 // console.log('LanguageContext start');
 // Create a provider component
 export const LanguageProvider = ({ children }) => {
-  const [language, setLanguage] = useState('en');
+  const [language, setLanguage] = useState('ru');
   // console.log('LanguageProvider start');
   
   return (
