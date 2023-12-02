@@ -13,7 +13,7 @@ import {
   // topicsMap,
   loadYearData,
   loadConfig,
-  getBarData, getMapData, getPieData
+  getBarData, getMapData, getPieData, getIncomeData
 } from "../services/googleSheetsService";
 import { ButtonGroupLang, ButtonGroupSubset } from "./shared/ButtonGroup";
 import { useYear } from "../contexts/yearContext";
@@ -42,7 +42,8 @@ export default function Statistics({ topic, topicsMap }) {
   const [pieData, setPieData] = useState([]);
   const [barData, setBarData] = useState([]);
   const [mapData, setMapData] = useState([]);
-  const [opennessSubset, setOpennessSubset] = useState("all");
+  const [incomeData, setIncomeData] = useState([]);
+  const [opennessSubset, setOpennessSubset] = useState("family");
   const [genderSubset, setGenderSubset] = useState("all");
 
   const [sections, setSections] = useState([]);
@@ -51,6 +52,7 @@ export default function Statistics({ topic, topicsMap }) {
   const [mapDescription, setMapDescription] = useState('');
   const [pieDescription, setPieDescription] = useState('');
   const [barDescription, setBarDescription] = useState('');
+
 
   // const [stories, setStories] = useState([]);
   const [conclusions, setConclusions] = useState([]);
@@ -141,7 +143,7 @@ export default function Statistics({ topic, topicsMap }) {
     const baseName = topicKey || "violence";
     let sheetName = baseName;
 
-console.log('baseName:',baseName)
+    // console.log('baseName:',baseName)
     if (baseName === "openness") { // If the topic is 'openness'
       if (genderSubset === 'all') {
         sheetName += '_' + opennessSubset; //e.g. openness_family
@@ -159,7 +161,7 @@ console.log('baseName:',baseName)
       }
 
     }
-    console.log('sheetName', sheetName);
+    // console.log('sheetName', sheetName);
     return sheetName;
   }
 
@@ -173,21 +175,26 @@ console.log('baseName:',baseName)
       try {
         const sheetName = getSheetName(topicsMap[topic], genderSubset, opennessSubset);
         if (sheetName) {
-          const mapDataResponse = await getMapData(year, sheetName, selectedQuestion);
+          const mapDataResponse = await getMapData(year, language, sheetName, selectedQuestion, topicsMap[topic]);
           // console.log('Fetched mapData:', mapDataResponse);
           setMapData(mapDataResponse);
 
-          const barDataResponse = await getBarData(year, sheetName, selectedQuestion);
+          const barDataResponse = await getBarData(year, language, sheetName, selectedQuestion);
           setBarData(Array.isArray(barDataResponse) ? barDataResponse : []);
-
-          const pieDataResponse = await getPieData(year, sheetName, selectedQuestion);
+          // console.log('statistics /pre pie language:', language)
+          const pieDataResponse = await getPieData(year, language, sheetName, selectedQuestion);
           setPieData(pieDataResponse);
+
+          const incomeDataResponse = await getIncomeData(year, language, genderSubset);
+          setIncomeData(incomeDataResponse);
+
         }
+
       } catch (error) {
         console.error("Failed to get sheet data:", error);
       }
     };
-    console.log('STATISTICS/ fetchData/ Current selectedQuestion:', selectedQuestion);
+    // console.log('STATISTICS/ fetchData/ Current selectedQuestion:', selectedQuestion);
     fetchData();
   }, [
     topicsMap,
@@ -195,7 +202,8 @@ console.log('baseName:',baseName)
     year,
     genderSubset,
     opennessSubset,
-    selectedQuestion
+    selectedQuestion,
+    language
   ]);
 
 
@@ -212,7 +220,7 @@ console.log('baseName:',baseName)
 
 
   const handleArcClick = (arcName) => {
-    console.info("STATISTICS/Handling bar arc click ", arcName);
+    // console.info("STATISTICS/Handling bar arc click ", arcName);
     setSelectedQuestion(arcName);
   };
 
@@ -223,16 +231,18 @@ console.log('baseName:',baseName)
     // console.log("Statistics/ mapDescription:", barDescription);
     // console.log("Statistics/ updated descriptions:", descriptions);
     // // console.log("Statistics/updated mapDescription:", mapDescription);
-    // console.log("Statistics/updated mapData: ", mapData);
+    console.log("Statistics/updated mapData: ", mapData);
     // console.log("Statistics/updated selectedQuestion: ", selectedQuestion);
 
     console.log("Statistics/updated opennessSubset: ", opennessSubset);
     console.log("Statistics/updated genderSubset: ", genderSubset);
+    // console.log("Statistics/updated incomeData: ", incomeData);
   }, [
     mapData,
     mapDescription,
     selectedQuestion,
-    genderSubset, opennessSubset
+    genderSubset, opennessSubset,
+    incomeData
   ]);
 
   // function useLogOnUpdate(value, label) {
@@ -255,15 +265,15 @@ console.log('baseName:',baseName)
     }
     if (language === "ru") {
       return [
-        { label: "Трансгендеры", value: "trans" },
-        { label: "Цисгендеры", value: "cis" },
+        { label: "Трансгендерные люди", value: "trans" },
+        { label: "Цисгендерные люди", value: "cis" },
         { label: "Все", value: "all" },
       ];
     }
     // default to Russian if the language doesn't match any known value
     return [
-      { label: "Трансгендеры", value: "trans" },
-      { label: "Цисгендеры", value: "cis" },
+      { label: "Трансгендерные люди", value: "trans" },
+      { label: "Цисгендерные люди", value: "cis" },
       { label: "Все", value: "associates" },
     ];
   }, [language]);
@@ -297,21 +307,35 @@ console.log('baseName:',baseName)
     return (
       <>
         {
-          (topic === "Открытость" || topic === "Openness") ? (
-            <div>
-              <ButtonGroupSubset
-                buttonsConfig={opennessButtonsConfig}
-                onButtonClick={selectOpennessSubset}
-              />
-
-              <PieChart data={pieData} onArcClick={handleArcClick} />
-
+          (topicsMap[topic] === 'openness' ? (
+            // <div>
+            <div className="charts-section">
+              <h2>{language === "ru" ? `Результаты по вариантам ответов` : `Results by response option`}</h2>
+              <PieChart data={pieData} onArcClick={handleArcClick} topicKey={topicsMap[topic]} />
+              <p className="statistics-description">{pieDescription}</p>
+            </div>
+          ) : topicsMap[topic] === "economical_status" ? (
+            // <div>
+            <div className="charts-section">
+              <h2>{language === "ru" ? `Результаты по вопросам в категории` : `Results by questions in category`}</h2>
+              <BarPlot data={barData} onBarClick={handleArcClick} />
+              <p className="statistics-description">{barDescription}</p>
+              <h2>{language === "ru" ? `Средний доход по всем округам` : `Average income accross all districts`}</h2>
+              <PieChart data={incomeData} topicKey={topicsMap[topic]} />
+              <p className="statistics-description">{pieDescription}</p>
             </div>
           ) : (
-            <BarPlot data={barData} onBarClick={handleArcClick} />
-          )
+            // Default case for other topics
+            // <div>
+            <div className="charts-section">
+              <h2>{language === "ru" ? `Результаты по вопросам в категории` : `Results by questions in category`}</h2>
+              <BarPlot data={barData} onBarClick={handleArcClick} />
+              <p className="statistics-description">{barDescription}</p>
+            </div>
+          ))
         }
-        <p className="statistics-description">{pieDescription}</p>
+
+
       </>
     );
   };
@@ -324,24 +348,55 @@ console.log('baseName:',baseName)
     return (
       <div className="section">
         <div>
+
           <ButtonGroupSubset
             buttonsConfig={subsetButtonsConfig}
             onButtonClick={selectGenderSubset}
+            styleType="gender-style"
+            init={genderSubset}
           />
+          {topicsMap[topic] === "openness" && (
+            <ButtonGroupSubset
+              buttonsConfig={opennessButtonsConfig}
+              onButtonClick={selectOpennessSubset}
+              styleType="openness-style"
+              init='family'
+            />
+          )}
           {
-          // mapData.length > 0 
-          // && 
-          <Map statistics={mapData}  />
+            // mapData.length > 0 
+            // && 
+            <div className="map-section">
+              <h2>{language === "ru" ? `Результаты по федеральным округам` : `Resuls by federal district`}</h2>
+              <Map statistics={mapData} />
+              <div>
+          <p className="statistics-description">
+            {mapDescription}
+            {topicsMap[topic] !== 'openness' && (
+              <strong>
+                {selectedQuestion !== "All" ? (
+                  language === 'ru'
+                    ? `На карте отображены результаты подкатегории ${selectedQuestion}. `
+                    : `The map displays results for the subcategory ${selectedQuestion}. `
+                ) : (
+                  language === 'ru'
+                    ? `На карте отображены результаты сумарно по всем подкатегориям.`
+                    : `The map displays results across all subcategories.`
+                )}
+              </strong>
+            )}
+          </p>
+          </div>
+
+            </div>
           }
 
-          <p className="statistics-description">
-            {selectedQuestion !== "All"
-              ? "Процент респондентов которые сталкивались с: " + ""
-              : mapDescription}
-          </p>
-          <h3 style={{ margin: 0 }}>
+         
+
+
+          {/* <h3 style={{ margin: 0 }}>
             {selectedQuestion !== "All" ? selectedQuestion : ""}
-          </h3>
+          </h3> */}
           <br />
         </div>
         <div>{charts()}</div>

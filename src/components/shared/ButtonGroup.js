@@ -95,10 +95,12 @@ export const ButtonGroupLang = ({ buttons, onButtonClick }) => {
   );
 };
 
-export function ButtonGroupSubset({ buttonsConfig, onButtonClick }) {
+export function ButtonGroupSubset({ buttonsConfig, onButtonClick,styleType, init }) {
 
   // We'll use state to keep track of which button was clicked.
-  const [clickedId, setClickedId] = useState(null);
+  const initialClickedId = buttonsConfig.findIndex(button => button.value === init);
+
+  const [clickedId, setClickedId] = useState(initialClickedId);
   const buttonStyle = {
     fontSize: '1.2em', // Bigger 
     // fontWeight: '200' , // Fatter 
@@ -106,7 +108,7 @@ export function ButtonGroupSubset({ buttonsConfig, onButtonClick }) {
   };
   // console.log('buttonsConfig',buttonsConfig)
   return (
-    <div className="button-group2">
+    <div className={`button-group2 ${styleType}`}>
       {buttonsConfig.map((button, i) => 
       // console.log('button',button)
       (
@@ -118,7 +120,8 @@ export function ButtonGroupSubset({ buttonsConfig, onButtonClick }) {
             setClickedId(i);
           }}
           className={
-            i === clickedId ? "lang active" : "lang"
+            // i === clickedId ? "lang active" : "lang"
+            i === clickedId ? `lang active ${styleType}` : `lang ${styleType}`
           }
 
           style={buttonStyle}

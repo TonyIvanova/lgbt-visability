@@ -122,9 +122,22 @@ header {
   padding: 0px 0px 0px 10px;
 }
 .lang:hover,
+.lang.active,
 .lang:active {
-  color: #969aff;
+  color: #969aff; 
+  background-color: #ffffff; 
+}
+.gender-style .lang:hover,
+.gender-style .lang.active {
+  color: rgb(96, 181, 96); 
   background-color: #ffffff;
+  /* text-decoration: underline; */
+}
+.openness-style .lang:hover,
+.openness-style .lang.active {
+  color: orange;
+  background-color: #ffffff;
+  /* text-decoration: underline; */
 }
 
 
@@ -175,7 +188,11 @@ header {
   border-radius: 200px 200px 200px 200px;
   padding: 11px 24px 10px 24px;
 }
-
+.button-secondary:hover,
+.button-secondary.active {
+  color: #ffffff;
+  background-color: #969aff;
+}
 
 
 .button-tetriary {
@@ -196,13 +213,6 @@ header {
   border-radius: 200px 200px 200px 200px;
   padding: 11px 24px 10px 24px;
 }
-.button-secondary:hover,
-.button-secondary.active {
-  color: #ffffff;
-  background-color: #969aff;
-}
-
-
 .button-tetriary:hover,
 .button-tetriary.active {
   color: #fff;
@@ -272,7 +282,10 @@ header {
   max-width: 1100px;
   margin: 0 auto;
   border-radius: 34px;
+  flex-direction: column;
+  align-items: stretch; /* Stretch children to fill the width */
 }
+
 
 .tooltip {
   position: absolute;
@@ -387,4 +400,76 @@ header {
 
 .map-tooltip.hidden {
   opacity: 0;
+}
+
+
+.pie-tooltip {
+  position: fixed;
+  padding: 8px;
+  border-radius: 16px; 
+  top: 0;
+  left: 0;
+  font-size: 12px; 
+  
+  text-align: left;
+  background-color: #F4F3EE90;
+  pointer-events: none;
+  backdrop-filter: blur(16px);
+}
+.pie-tooltip > p {
+  padding: 0; 
+}
+.pie-tooltip .tip {
+  position: absolute;
+  border-top-right-radius: 2rem;
+  border-top-left-radius: 1rem;
+  top: 0%;
+  left: 50%;
+  width: 1rem;
+  height: 0.5rem;
+  transform: translate(-50%, -100%);
+  background-color: #F4F3EE90;
+  pointer-events: none;
+}
+
+.pie-tooltip.hidden {
+  opacity: 0;
+}
+
+.charts-section {
+  margin-top: 20px; /* Add space between the map and the charts */
+  
+  display: flex;
+  flex-direction: column; /* Stack children vertically */
+  align-items: center; /* Center children horizontally within the container */
+
+  /* If .charts-section contains block elements like divs */
+  text-align: center; /* Center inline or inline-block elements like text or buttons */
+}
+.map-section {
+  margin-top: 20px; /* Add space between the map and the charts */
+  
+  display: flex;
+  flex-direction: column; /* Stack children vertically */
+  align-items: center; /* Center children horizontally within the container */
+
+  /* If .charts-section contains block elements like divs */
+  text-align: center; /* Center inline or inline-block elements like text or buttons */
+}
+.legendContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; 
+}
+
+.legendText {
+  display: flex;
+  align-items: center;
+  /* flex-shrink: 0; 
+  width: 450px; */
+}
+
+.hasHighlight {
+  fill-opacity: 0.7; /* Makes the bar slightly transparent */
+  
 }

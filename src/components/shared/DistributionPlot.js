@@ -20,9 +20,10 @@ function DistributionPlot({ data }) {
             // Find the 'ages' and 'sample_mean_age' objects in the data
             const agesData = data.find(item => item.key === 'ages');
             const meanAgeData = data.find(item => item.key === 'sample_mean_age');
-            console.log('leanAgeData.value', meanAgeData.value)
+            console.log('meanAgeData.value', meanAgeData.value)
             // Parse ages and mean age from the data
-            const ages = agesData ? JSON.parse(agesData.value) : [];
+            // const ages = agesData ? JSON.parse(agesData.value) : [];
+            const ages = agesData ? agesData.value.split(',').map(Number) : [];
             const meanAge = meanAgeData ? parseFloat(meanAgeData.value) : 0;
 
 

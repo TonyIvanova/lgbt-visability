@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import arrow from "./../../assets/arrow.svg";
-import {
+import { 
   getSheetData,
-  getStories,
-  // topicsMap, 
-  dataMap
+getStories,
+// topicsMap, 
+dataMap 
 } from "../../services/googleSheetsService";
 // import { useData, useDataMap } from "../../contexts/dataContext"
 import { useYear } from "../../contexts/yearContext";
@@ -30,28 +30,28 @@ export default function PersonalStories({ topic, topicsMap }) {
     setLoading(true);
     const fetchData = async () => {
       if (topicsMap) {
-        try {
-          // console.log('PersStories/topicsMap[topic]', topicsMap[topic])
-          // console.log('PersStories/topicsMap[]', topicsMap)
-          // console.log('PersStories/[topic]', topic)
-          const stories = await getStories(year, language, topicsMap[topic]);
+      try {
+        // console.log('PersStories/topicsMap[topic]', topicsMap[topic])
+        // console.log('PersStories/topicsMap[]', topicsMap)
+        // console.log('PersStories/[topic]', topic)
+        const stories = await getStories(year, language,topicsMap[topic]);
+        
+       
 
-
-
-          if (isMounted) {
-            setStories(stories);
-            setStoryIndex(0);
-          }
-        } catch (err) {
-          if (isMounted) {
-            setError(err);
-          }
-        } finally {
-          if (isMounted) {
-            setLoading(false);
-          }
+        if (isMounted) {
+          setStories(stories);
+          setStoryIndex(0);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError(err);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
         }
       }
+    }
     };
     fetchData();
     return () => {
@@ -66,7 +66,7 @@ export default function PersonalStories({ topic, topicsMap }) {
   //       return; // Do not fetch data until topicsMap is loaded
   //     }
   //     // if (topicsMap[topic] === 'openness') return;
-
+      
   //     // if (topicsMap && topic) {
   //       if (topicsMap[topic] === 'openness') return;
 
@@ -74,7 +74,7 @@ export default function PersonalStories({ topic, topicsMap }) {
   //       console.log('PersStories/topicsMap[]', topicsMap)
   //       console.log('PersStories/[topic]', topic)
   //       const stories = await getStories(year, language,topicsMap[topic]);
-
+        
   //       setStories(stories);
   //       setStoryIndex(0);
   //     }
@@ -127,15 +127,26 @@ export default function PersonalStories({ topic, topicsMap }) {
 
   if (storyIndex != null) {
     return (
+      <div>
+      <div style={{
+        margin: 'auto',
+        maxWidth: '800px',
+        textAlign: 'left',
+        marginBottom: '0px'
+
+  }} > 
+  <h2>
+              {language === 'ru'
+                ? `Личные истории`
+                : `Personal stories`}
+            </h2>
+            </div>
+
       <div className="personal-stories-container">
-        <h2>
-          {language === 'ru'
-            ? `Истории`
-            : `Stories`}
-        </h2>
+        
 
         {getStory()}
-      </div>
+      </div></div>
     );
   } else {
     return <></>;

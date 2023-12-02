@@ -7,7 +7,7 @@ import '../../App.css';
 function Map({ statistics,style={} }) {
 // Check if mapData is being passed correctly as statistics
 useEffect(() => {
-  console.log('mapData passed to Map component:', statistics);
+  // console.log('mapData passed to Map component:', statistics);
   // console.log('topicsMap passed to Map component:', topicsMap);
 }, [statistics]);
 
@@ -42,6 +42,7 @@ useEffect(() => {
       return geoData.features.map((d, index) => {
         const relevantStatistics = statistics.filter(
           (item) => item.name === d.properties.name
+          
         )[0];
         const color = relevantStatistics
           ? colorScale(relevantStatistics?.value)
@@ -49,7 +50,8 @@ useEffect(() => {
         return (
           <path
              key={"map-element-" + index}
-              name={d.properties.name}
+             name={d.properties.name}
+             
               d={path(d)}
               fill={color}
               stroke="#0e1724"
@@ -102,7 +104,7 @@ useEffect(() => {
         </svg>
         
         <div className={`map-tooltip ${!regionDescription && 'hidden'}`} ref={mapTooltip}>
-          <div className="tip"></div>
+          {/* <div className="tip"></div> */}
           {regionDescription && <>
               <h3>{regionDescription}</h3>
               <h1>{regionValue}%</h1>

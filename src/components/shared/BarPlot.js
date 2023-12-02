@@ -57,7 +57,9 @@ export function BarPlot({ data, onBarClick = () => {} }) {
    // Create legend 
   const legend = data.map((d, i) => {
     return (
-      <div className={styles.legendText} style={{ width: 500 }} key={i}>
+      <div className={styles.legendText} 
+      key={i}
+      >
         <div
           style={{
             background: colorScale(d.value),
@@ -86,6 +88,7 @@ export function BarPlot({ data, onBarClick = () => {} }) {
         </g>
       </svg>
       <div className={styles.legendContainer}>{legend}</div>
+      
     </div>
   );
 }

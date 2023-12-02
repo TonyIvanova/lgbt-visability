@@ -4,11 +4,11 @@ import React, { createContext, useContext, useState } from 'react';
 
 // Create a context for the language
 export const LanguageContext = createContext();
-console.log('LanguageContext start');
+// console.log('LanguageContext start');
 // Create a provider component
 export const LanguageProvider = ({ children }) => {
-  const [language, setLanguage] = useState('en');
-  console.log('LanguageProvider start');
+  const [language, setLanguage] = useState('ru');
+  // console.log('LanguageProvider start');
   
   return (
     <LanguageContext.Provider value={{ language, setLanguage }}>

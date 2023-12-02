@@ -6,8 +6,8 @@ import { useLanguage } from '../contexts/langContext';
 
 export default function Header() {
   const {language, setLanguage} = useLanguage(); 
-  console.log('Header start');
-  console.log(language);
+  // console.log('Header start');
+  // console.log(language);
   // const changeLanguage = (lang) => {
   //   setLanguage(lang);
   // };

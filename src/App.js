@@ -13,7 +13,8 @@ import {
   loadYearData,
   loadConfig,
   getYears,
-  getSampleData
+  getSampleData,
+  getFullReportLink
 } from "./services/googleSheetsService";
 import Header from "./components/Header";
 
@@ -39,18 +40,20 @@ import { useYear, YearProvider } from "./contexts/yearContext";
 export const DataContext = createContext([]);
 
 function AppContent() {
-  console.log('AppContent start')
-  const CONFIG_SHEET_ID = '1QKmA5UX-FM31jEE7UOVTmlCKxQ_Wa1K2oXxulhtkJHE'
+  // console.log('App/ AppContent start')
+  const CONFIG_SHEET_ID = process.env.REACT_APP_CONFIG_SPREADSHEET_ID
 
-  const years = getYears()//Object.keys(dataMap);// to get list of years reports exist for
+  // const years = getYears()//Object.keys(dataMap);// to get list of years reports exist for
+  const [years,setYears] = useState([]);
   const { language, setLanguage } = useLanguage();
   const { year, setYear } = useYear(); // report year
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [reportLink, setReportLink] = useState('');
 
-  const [genderSubset, setGenderSubset] = useState('All'); //Trans/Cis
-  const [opennessSubset, setOpennessSubset] = useState('')
+  const [genderSubset, setGenderSubset] = useState(''); //Trans/Cis
+  const [opennessSubset, setOpennessSubset] = useState('') //family/friends
   const [topic, setTopic] = useState('')
 
   const [yearData, setYearData] = useState({});
@@ -62,6 +65,24 @@ function AppContent() {
   const [sampleData, setSampleData] = useState([])
 
   const [topicsMap, setTopicsMap] = useState({});
+
+  // console.log('App/ finished inits')
+  
+  
+    useEffect(() => {
+      const fetchYears = async () => {
+
+        getYears().then(res => {
+          // console.log('Fetched years:', years);
+          setYears(res)
+        }).catch(error => {
+          console.error('Error fetching years:', error);
+        });
+        
+      };
+      fetchYears();
+    }, []);  
+  
   useEffect(() => {
     makeTopicsMap().then(map => {
       setTopicsMap(map);
@@ -70,6 +91,7 @@ function AppContent() {
       setError(err);
       setLoading(false);
     });
+    // console.log('App/ finished make topicsMap')
   }, []);
 
   //Get sample data
@@ -77,7 +99,7 @@ function AppContent() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const data = await getSampleData(year);
+        const data = await getSampleData(year, language);
         setSampleData(data);
         console.log(data)
       } catch (err) {
@@ -87,7 +109,49 @@ function AppContent() {
       }
     };
     fetchData();
+    // console.log('App/ finished fetch sample data')
   }, [year]);
+
+  
+  useEffect(() => {
+    let isMounted = true;  // Flag to track the mounted status
+  
+    const updateLink = async () => {
+      setLoading(true);
+      try {
+        // console.log('in get link app year:',year)
+        // console.log('in get link app: language ',language)
+        const link = await getFullReportLink(year, language);
+  
+        if (isMounted) {  // Check if the component is still mounted
+          if (link) {
+            // console.log('link',link)
+            setReportLink(link); 
+          } else {
+            // console.log('no link')
+            setReportLink('123'); 
+          }
+        }
+      } catch (error) {
+        console.error('Error updating report link:', error);
+        if (isMounted) {  // Check if the component is still mounted
+          setReportLink('errored'); // Reset the link in case of an error
+        }
+      } finally {
+        if (isMounted) {  // Check if the component is still mounted
+          setLoading(false);
+        }
+      }
+    };
+  
+    updateLink();
+  
+    return () => {
+      isMounted = false;  // Set the flag to false when the component unmounts
+    };
+  }, [year, language]);
+  
+  
 
   // Get selected year
   const selectYear = (event) => {
@@ -101,14 +165,16 @@ function AppContent() {
         setLoading(true);
         const data = await loadYearData(year);
         setYearData(data);
-        console.log(data)
+        // console.log(data)
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
+    // console.log('App/ starting fetch sample data')
     fetchData();
+    // console.log('App/ finished fetch year data')
   }, [year]);
 
   useEffect(() => {
@@ -133,7 +199,9 @@ function AppContent() {
         }
       }
     };
+    // console.log('App/ start fetch sections & topic data')
     fetchData();
+    // console.log('App/ finished fetch sections & topic data')
     return () => {
       isMounted = false;
     };
@@ -144,20 +212,25 @@ function AppContent() {
     setLanguage(lang);
   };
   const selectTopic = (event) => {
-    console.log('APP/selectTopic', event.target.name);
+    // console.log('APP/selectTopic', event.target.name);
     setTopic(event.target.name);
   };
 
   useEffect(() => {
-    console.log('APP/updated sample:', sampleData)
+    // console.log('APP/updated sampleData:', sampleData)
     // console.log('APP/updated sections:',sections)
     // console.log('APP/updated sections.length:',sections.length)
     // console.log('APP/updated topic:',topic)
-    //   console.log("APP/updated topicsMap: ", topicsMap);
+    // console.log("APP/updated topicsMap: ", topicsMap);
+    // console.log("APP/updated years: ", years);
+    // console.log('APP/updated reportLink:',reportLink)
   }, [
     topicsMap,
     topic,
-    sections
+    sections,
+    sampleData,
+    years,
+    reportLink,
   ]);
 
 
@@ -172,6 +245,10 @@ function AppContent() {
 
   if (error) {
     return <div>Error: {error}</div>;
+  }
+
+  if (!sampleData) {
+    return <div>Loading sample data...</div>;
   }
 
   //Check in topicsMap has undefined values
@@ -194,27 +271,27 @@ function AppContent() {
     );
   };
 
-  if (sections && years) {
+  if (sections && years ) {
     return (
       <div className="App">
 
         <Header />
         <ButtonGroup2
-          // buttons={years || ["2022"]}//{["2022", "2023"]}
-          buttons={["2022", "2023"]} //TODO: fix later fetching years 
+          buttons={years || ["2022"]}//{["2022", "2023"]}
+          // buttons={["2022", "2023"]} //TODO: fix later fetching years 
           onButtonClick={selectYear}
         />
 
         <LinkComponent
-          href="https://file.notion.so/f/s/3f63cada-c12a-4eca-99a6-b84e522f7e23/%D0%94%D0%BE%D0%BA%D0%BB%D0%B0%D0%B4_%D0%BE_%D0%BF%D0%BE%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B8_%D0%9B%D0%93%D0%91%D0%A2_%D0%BB%D1%8E%D0%B4%D0%B5%D0%B9_%D0%B2_%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D0%B8_%D0%B2_2022_%D0%B3%D0%BE%D0%B4%D1%83_FIN_RUS.pdf?id=2bdf16e6-9614-4150-b857-e482f92fa0fb&table=block&spaceId=6398057c-62de-418f-af30-b4892f72994d&expirationTimestamp=1698199200000&signature=hiCTwxpZilClgplfjpd1bLQR3dViGuFGuFAzRgmdISE&downloadName=%D0%94%D0%BE%D0%BA%D0%BB%D0%B0%D0%B4_%D0%BE_%D0%BF%D0%BE%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B8_%D0%9B%D0%93%D0%91%D0%A2_%D0%BB%D1%8E%D0%B4%D0%B5%D0%B9_%D0%B2_%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D0%B8_%D0%B2_2022_%D0%B3%D0%BE%D0%B4%D1%83_FIN_RUS.pdf"
-          label={`Ссылка на полную версию отчета за ${year} год`}
+          href={reportLink}
+          label={language === 'ru' ? `Полная версия отчета за ${year} год` : `Full report for ${year}`}
           color="grey"
         />
-
+{/* <h1>{reportLink}</h1> */}
         <h1>
           {language === 'ru'
-            ? `Положение лгбт+ людей в россии на ${year} год`
-            : `LGBT+ people's situation in Russia in ${year}`}
+            ? `Положение ЛГБТК+ людей в россии на ${year} год`
+            : `LGBTQ+ people's situation in Russia in ${year}`}
         </h1>
 
         <ButtonGroup1
@@ -222,10 +299,11 @@ function AppContent() {
           onButtonClick={selectTopic}
         />
 
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <Expander year={year} data={sampleData} />
+     
+         <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Expander year={year} data={sampleData}  language={language}/>
         </div>
-
+      
         <div className="topic-component">{topicComponent()}</div>
         {/* <DataContext.Provider value={{ data, conclusions }}> */}
         <img src={bg1} alt="" className="background-image-1"></img>
@@ -243,8 +321,8 @@ function AppContent() {
 
         <h1>
           {language === 'ru'
-            ? `Положение лгбт+ людей в россии на ${year} год`
-            : `LGBT+ people's situation in Russia in ${year}`}
+            ? `Положение ЛГБТК+ людей в россии в ${year} году`
+            : `LGBTK+ people's situation in Russia in ${year}`}
         </h1>
 
         <img src={loader} alt=""></img>

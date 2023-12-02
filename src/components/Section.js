@@ -44,12 +44,23 @@ export default function Section({ topic, topicsMap }) {
         {conclusions.map((item, index) => {
           return <p key={index}>{item.text}</p>;
         })}
+       
       </div>
 
+{/* <div className="conclusions"> 
+  <h2>
+              {language === 'ru'
+                ? `Истории`
+                : `Stories`}
+            </h2>
+            </div> */}
       {topicsMap[topic] !== "openness" && (
-        <div>
-          <PersonalStories topic={topic} topicsMap={topicsMap} />
-        </div>
+      
+          <div >
+
+            <PersonalStories topic={topic} topicsMap={topicsMap} />
+          </div>
+     
       )}
     </div>
   );
